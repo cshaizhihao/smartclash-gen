@@ -1,4 +1,6 @@
-const STORAGE_KEY = 'smartclash-web-v062';
+const STORAGE_KEY = 'smartclash-web-v070';
+const AUTH_KEY = 'smartclash-web-auth';
+const AUTH_SESSION_KEY = 'smartclash-web-auth-session';
 
 const state = {
   nodes: [
@@ -15,16 +17,27 @@ const state = {
 };
 
 const el = {
+  authGate: document.getElementById('authGate'),
+  authUser: document.getElementById('authUser'),
+  authPass: document.getElementById('authPass'),
+  authRemember: document.getElementById('authRemember'),
+  authBtn: document.getElementById('authBtn'),
+  authTips: document.getElementById('authTips'),
+  appShell: document.getElementById('appShell'),
+  logoutBtn: document.getElementById('logoutBtn'),
+
   nodeName: document.getElementById('nodeName'),
   addNode: document.getElementById('addNode'),
   nodeUrls: document.getElementById('nodeUrls'),
   importUrlsBtn: document.getElementById('importUrlsBtn'),
   importStatus: document.getElementById('importStatus'),
+
   groupName: document.getElementById('groupName'),
   groupType: document.getElementById('groupType'),
   addGroup: document.getElementById('addGroup'),
   nodePool: document.getElementById('nodePool'),
   groups: document.getElementById('groups'),
+
   rules: document.getElementById('rules'),
   mixedPort: document.getElementById('mixedPort'),
   saveBtn: document.getElementById('saveBtn'),
@@ -36,6 +49,79 @@ const el = {
   markdown: document.getElementById('markdown'),
   warnings: document.getElementById('warnings'),
 };
+
+function simpleHash(input) {
+  return btoa(unescape(encodeURIComponent(input)));
+}
+
+function getAuthConfig() {
+  try {
+    return JSON.parse(localStorage.getItem(AUTH_KEY) || 'null');
+  } catch {
+    return null;
+  }
+}
+
+function setAuthConfig(username, password) {
+  localStorage.setItem(
+    AUTH_KEY,
+    JSON.stringify({ username, passHash: simpleHash(password) })
+  );
+}
+
+function setAuthed(remember) {
+  if (remember) localStorage.setItem(AUTH_SESSION_KEY, '1');
+  else sessionStorage.setItem(AUTH_SESSION_KEY, '1');
+}
+
+function clearSession() {
+  localStorage.removeItem(AUTH_SESSION_KEY);
+  sessionStorage.removeItem(AUTH_SESSION_KEY);
+}
+
+function isAuthed() {
+  return localStorage.getItem(AUTH_SESSION_KEY) === '1' || sessionStorage.getItem(AUTH_SESSION_KEY) === '1';
+}
+
+function showApp() {
+  el.authGate.classList.add('hidden');
+  el.appShell.classList.remove('blurred');
+}
+
+function showAuth(message) {
+  el.authTips.textContent = message || '请登录后使用';
+  el.authGate.classList.remove('hidden');
+  el.appShell.classList.add('blurred');
+}
+
+el.authBtn.addEventListener('click', () => {
+  const username = el.authUser.value.trim();
+  const password = el.authPass.value.trim();
+  if (!username || !password) {
+    showAuth('用户名和密码不能为空');
+    return;
+  }
+
+  const auth = getAuthConfig();
+  if (!auth) {
+    setAuthConfig(username, password);
+    setAuthed(el.authRemember.checked);
+    showApp();
+    return;
+  }
+
+  if (auth.username === username && auth.passHash === simpleHash(password)) {
+    setAuthed(el.authRemember.checked);
+    showApp();
+  } else {
+    showAuth('登录失败：用户名或密码错误');
+  }
+});
+
+el.logoutBtn.addEventListener('click', () => {
+  clearSession();
+  showAuth('已退出登录');
+});
 
 function mkNodeLi(node) {
   const li = document.createElement('li');
@@ -115,8 +201,8 @@ function hydrateState() {
     if (Array.isArray(parsed.rules)) state.rules = parsed.rules;
     if (parsed.mixedPort) state.mixedPort = Number(parsed.mixedPort);
     if (typeof parsed.nodeUrls === 'string') el.nodeUrls.value = parsed.nodeUrls;
-  } catch (_) {
-    // ignore broken cache
+  } catch {
+    // ignore
   }
 }
 
@@ -132,17 +218,12 @@ function render() {
     const box = document.createElement('article');
     box.className = 'group';
     box.dataset.id = g.id;
-    box.innerHTML = `
-      <h4>${g.name} <small>(${g.type})</small></h4>
-      <ul class="list" id="group-${g.id}"></ul>
-    `;
-
+    box.innerHTML = `<h4>${g.name} <small>(${g.type})</small></h4><ul class="list" id="group-${g.id}"></ul>`;
     const ul = box.querySelector('ul');
     g.members.forEach((id) => {
       const node = state.nodes.find((n) => n.id === id);
       if (node) ul.appendChild(mkNodeLi(node));
     });
-
     el.groups.appendChild(box);
     new Sortable(ul, { group: 'nodes', animation: 150, onSort: syncFromDom });
   });
@@ -152,7 +233,6 @@ function render() {
 
   el.rules.value = state.rules.join('\n');
   el.mixedPort.value = state.mixedPort;
-  if (!el.nodeUrls.value) el.nodeUrls.value = '';
   refreshMarkdownPreview();
 }
 
@@ -169,19 +249,11 @@ function buildYamlObject() {
   const proxyGroups = state.groups.map((g) => ({
     name: g.name,
     type: g.type,
-    proxies: g.members
-      .map((id) => state.nodes.find((n) => n.id === id)?.name)
-      .filter(Boolean),
+    proxies: g.members.map((id) => state.nodes.find((n) => n.id === id)?.name).filter(Boolean),
   }));
 
-  const rules = el.rules.value
-    .split('\n')
-    .map((x) => x.trim())
-    .filter(Boolean);
-
-  if (!rules.some((r) => r.startsWith('MATCH,'))) {
-    rules.push('MATCH,Smart-AUTO');
-  }
+  const rules = el.rules.value.split('\n').map((x) => x.trim()).filter(Boolean);
+  if (!rules.some((r) => r.startsWith('MATCH,'))) rules.push('MATCH,Smart-AUTO');
 
   return {
     'mixed-port': Number(el.mixedPort.value || state.mixedPort || 7892),
@@ -209,7 +281,6 @@ function validateState() {
       warnings.push(`Smart 组「${g.name}」当前为空成员`);
       blockers.push(`Smart 组「${g.name}」为空，禁止发布`);
     }
-
     g.members.forEach((id) => {
       if (!knownNodeIds.has(id)) {
         warnings.push(`策略组「${g.name}」存在无效节点引用：${id}`);
@@ -218,58 +289,34 @@ function validateState() {
     });
   });
 
-  const lines = el.rules.value
-    .split('\n')
-    .map((x) => x.trim())
-    .filter(Boolean);
-
+  const lines = el.rules.value.split('\n').map((x) => x.trim()).filter(Boolean);
   lines.forEach((line, i) => {
     const segs = line.split(',').map((s) => s.trim()).filter(Boolean);
     if (segs.length < 2) {
-      warnings.push(`规则第 ${i + 1} 行格式疑似无效：${line}`);
       blockers.push(`规则第 ${i + 1} 行格式错误，禁止发布`);
       return;
     }
     if (segs.length >= 3) {
       const target = segs[2];
-      if (target !== 'DIRECT' && !knownGroupNames.has(target)) {
-        warnings.push(`规则第 ${i + 1} 行策略组不存在：${target}`);
-        blockers.push(`规则第 ${i + 1} 行引用不存在策略组，禁止发布`);
-      }
+      if (target !== 'DIRECT' && !knownGroupNames.has(target)) blockers.push(`规则第 ${i + 1} 行引用不存在策略组，禁止发布`);
     }
   });
 
-  if (!lines.some((line) => line.startsWith('MATCH,'))) {
-    warnings.push('未显式填写 MATCH 规则，保存时会自动补全');
-  }
-
   const p = Number(el.mixedPort.value || 0);
-  if (!Number.isInteger(p) || p < 1 || p > 65535) {
-    blockers.push('mixed-port 必须是 1-65535 之间的整数，禁止发布');
-  }
+  if (!Number.isInteger(p) || p < 1 || p > 65535) blockers.push('mixed-port 必须是 1-65535 之间的整数，禁止发布');
 
   return { warnings, blockers };
 }
 
 function renderWarnings(result) {
   const items = [];
-  if (result.blockers.length) {
-    result.blockers.forEach((x) => items.push(`<li>⛔ ${x}</li>`));
-  }
-  if (result.warnings.length) {
-    result.warnings.forEach((x) => items.push(`<li>⚠️ ${x}</li>`));
-  }
-  if (!items.length) {
-    el.warnings.innerHTML = '<li class="ok">✅ 状态校验通过，可保存可发布</li>';
-    return;
-  }
-  el.warnings.innerHTML = items.join('');
+  result.blockers.forEach((x) => items.push(`<li>⛔ ${x}</li>`));
+  result.warnings.forEach((x) => items.push(`<li>⚠️ ${x}</li>`));
+  el.warnings.innerHTML = items.length ? items.join('') : '<li class="ok">✅ 状态校验通过，可保存可发布</li>';
 }
 
 function refreshMarkdownPreview() {
-  if (!el.markdown.dataset.manualEdit) {
-    el.markdown.value = buildMarkdown();
-  }
+  if (!el.markdown.dataset.manualEdit) el.markdown.value = buildMarkdown();
   renderWarnings(validateState());
 }
 
@@ -287,26 +334,9 @@ el.addNode.addEventListener('click', () => {
   persistState();
 });
 
-el.addGroup.addEventListener('click', () => {
-  const name = el.groupName.value.trim();
-  if (!name) return;
-  state.groups.push({
-    id: crypto.randomUUID(),
-    name,
-    type: el.groupType.value,
-    members: [],
-  });
-  el.groupName.value = '';
-  render();
-  persistState();
-});
-
 el.importUrlsBtn.addEventListener('click', () => {
   const lines = el.nodeUrls.value.split('\n').map((x) => x.trim()).filter(Boolean);
-  if (!lines.length) {
-    setImportStatus('请先粘贴节点 URL', 'error');
-    return;
-  }
+  if (!lines.length) return setImportStatus('请先粘贴节点 URL', 'error');
 
   const exists = new Set(state.nodes.map((n) => n.name));
   let okCount = 0;
@@ -316,27 +346,26 @@ el.importUrlsBtn.addEventListener('click', () => {
   lines.forEach((line, i) => {
     const parsed = parseNodeUrl(line, i);
     if (!parsed) return;
-    if (!parsed.ok) {
-      errors.push(parsed.error);
-      return;
-    }
-    if (exists.has(parsed.name)) {
-      dupCount += 1;
-      return;
-    }
+    if (!parsed.ok) return errors.push(parsed.error);
+    if (exists.has(parsed.name)) return dupCount++;
     exists.add(parsed.name);
     state.nodes.push({ id: crypto.randomUUID(), name: parsed.name });
-    okCount += 1;
+    okCount++;
   });
 
   render();
   persistState();
+  if (errors.length) setImportStatus(`导入 ${okCount}，重复 ${dupCount}，失败 ${errors.length}`, 'error');
+  else setImportStatus(`导入成功 ${okCount}，重复跳过 ${dupCount}`, 'success');
+});
 
-  if (errors.length) {
-    setImportStatus(`导入 ${okCount} 条，重复 ${dupCount} 条，失败 ${errors.length} 条`, 'error');
-    return;
-  }
-  setImportStatus(`导入成功 ${okCount} 条，重复跳过 ${dupCount} 条`, 'success');
+el.addGroup.addEventListener('click', () => {
+  const name = el.groupName.value.trim();
+  if (!name) return;
+  state.groups.push({ id: crypto.randomUUID(), name, type: el.groupType.value, members: [] });
+  el.groupName.value = '';
+  render();
+  persistState();
 });
 
 el.saveBtn.addEventListener('click', () => {
@@ -354,17 +383,14 @@ el.publishBtn.addEventListener('click', () => {
   renderWarnings(result);
   if (result.blockers.length) {
     const summary = result.blockers.slice(0, 2).join('；');
-    setPublishStatus(`发布失败：${summary}${result.blockers.length > 2 ? '…' : ''}`, 'error');
-    return;
+    return setPublishStatus(`发布失败：${summary}${result.blockers.length > 2 ? '…' : ''}`, 'error');
   }
-  state.mixedPort = Number(el.mixedPort.value || 7892);
   persistState();
   setPublishStatus('发布成功：配置已通过校验（模拟发布）', 'success');
 });
 
 el.copyBtn.addEventListener('click', async () => {
-  const text = el.markdown.value;
-  await navigator.clipboard.writeText(text);
+  await navigator.clipboard.writeText(el.markdown.value);
   el.copyBtn.textContent = '已复制 ✅';
   setTimeout(() => (el.copyBtn.textContent = '复制 Markdown'), 1200);
 });
@@ -402,15 +428,13 @@ el.mixedPort.addEventListener('input', () => {
   persistState();
 });
 
-el.nodeUrls.addEventListener('input', () => {
-  persistState();
-});
-
-el.markdown.addEventListener('input', () => {
-  el.markdown.dataset.manualEdit = '1';
-});
+el.nodeUrls.addEventListener('input', persistState);
+el.markdown.addEventListener('input', () => (el.markdown.dataset.manualEdit = '1'));
 
 hydrateState();
 render();
 setPublishStatus('尚未发布', 'idle');
 setImportStatus('未导入', 'idle');
+
+if (isAuthed()) showApp();
+else showAuth('请先登录，首次使用会自动初始化账户');

@@ -27,6 +27,7 @@ const el = {
   saveBtn: document.getElementById('saveBtn'),
   copyBtn: document.getElementById('copyBtn'),
   downloadBtn: document.getElementById('downloadBtn'),
+  downloadYamlBtn: document.getElementById('downloadYamlBtn'),
   publishBtn: document.getElementById('publishBtn'),
   publishStatus: document.getElementById('publishStatus'),
   markdown: document.getElementById('markdown'),
@@ -292,7 +293,8 @@ el.publishBtn.addEventListener('click', () => {
   const result = validateState();
   renderWarnings(result);
   if (result.blockers.length) {
-    setPublishStatus(`发布失败：存在 ${result.blockers.length} 个阻塞问题`, 'error');
+    const summary = result.blockers.slice(0, 2).join('；');
+    setPublishStatus(`发布失败：${summary}${result.blockers.length > 2 ? '…' : ''}`, 'error');
     return;
   }
   state.mixedPort = Number(el.mixedPort.value || 7892);
@@ -313,6 +315,17 @@ el.downloadBtn.addEventListener('click', () => {
   const a = document.createElement('a');
   a.href = url;
   a.download = 'smartclash-config.md';
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
+el.downloadYamlBtn.addEventListener('click', () => {
+  const yaml = jsyaml.dump(buildYamlObject(), { noRefs: true });
+  const blob = new Blob([yaml], { type: 'application/x-yaml;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'smartclash-config.yaml';
   a.click();
   URL.revokeObjectURL(url);
 });

@@ -1,6 +1,6 @@
 # smartclash-gen
 
-> 版本：**v0.6.2**
+> 版本：**v0.6.3**
 
 一个面向 **OpenClash + mihomo(type: smart)** 的配置生成器：
 
@@ -15,7 +15,7 @@
 
 ## 安装后应用示意图
 
-![应用示意图](docs/app-preview-v0.6.2-web.svg)
+![应用示意图](docs/app-preview-v0.6.3-web.svg)
 
 ---
 
@@ -130,6 +130,12 @@ python3 generate.py \
 ---
 
 ## 版本更新说明
+
+### v0.6.3
+- 新增 `下载 YAML` 按钮，可直接导出 `smartclash-config.yaml`
+- 发布失败状态优化：显示阻塞原因摘要（前两条）以便快速修复
+- 与现有流程保持一致：页面编辑 → 保存 → 复制/下载 → 发布
+- README 版本号、变更说明与截图同步到 v0.6.3
 
 ### v0.6.2
 - 规则模块新增 `mixed-port` 输入框，生成 YAML 时支持页面内端口自定义

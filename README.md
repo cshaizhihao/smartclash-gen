@@ -1,6 +1,6 @@
 # smartclash-gen
 
-> 版本：**v0.4.0**
+> 版本：**v0.5.0**
 
 一个面向 **OpenClash + mihomo(type: smart)** 的配置生成器：
 
@@ -15,7 +15,7 @@
 
 ## 安装后应用示意图
 
-![应用示意图](docs/app-preview.svg)
+![应用示意图](docs/app-preview-v0.5.svg)
 
 ---
 
@@ -90,6 +90,20 @@ python3 generate.py --sub-file subscriptions.txt --rules rules.txt --port 10801 
 python3 generate.py --urls urls.txt --rules rules.txt --report build/report.json
 ```
 
+### OpenClash 直接落地（新增）
+
+支持将生成结果直接部署到目标路径，并自动备份旧文件：
+
+```bash
+python3 generate.py \
+  --sub-file subscriptions.txt \
+  --rules rules.txt \
+  --port 7892 \
+  --output openclash.yaml \
+  --deploy /etc/openclash/config/custom.yaml \
+  --backup-dir /etc/openclash/config/backups
+```
+
 ---
 
 ## 默认生成能力
@@ -116,6 +130,13 @@ python3 generate.py --urls urls.txt --rules rules.txt --report build/report.json
 ---
 
 ## 版本更新说明
+
+### v0.5.0
+- 新增 `--deploy`：生成后可直接部署到目标 YAML 路径
+- 新增 `--backup-dir`：部署前自动备份旧配置
+- 报告中新增 deploy 执行结果字段
+- README 新增 OpenClash 直接落地用法
+- README 附本次更新后的应用截图（v0.5.0）
 
 ### v0.4.0
 - 增加输入校验报告：`report.json`

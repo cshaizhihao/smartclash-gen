@@ -5,13 +5,15 @@ import json
 import re
 import sys
 import uuid
+import shutil
+from datetime import datetime
 from pathlib import Path
 from urllib.parse import parse_qs, unquote, urlparse
 from urllib.request import Request, urlopen
 
 import yaml
 
-VERSION = "0.4.0"
+VERSION = "0.5.0"
 
 EXIT_OK = 0
 EXIT_WARN = 10
@@ -274,6 +276,16 @@ def write_report(path: Path, report: dict):
     path.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding='utf-8')
 
 
+def deploy_yaml(generated_yaml: Path, deploy_path: Path, backup_dir: Path):
+    backup_dir.mkdir(parents=True, exist_ok=True)
+    if deploy_path.exists():
+        ts = datetime.now().strftime('%Y%m%d-%H%M%S')
+        backup_file = backup_dir / f"{deploy_path.name}.{ts}.bak"
+        shutil.copy2(deploy_path, backup_file)
+    deploy_path.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(generated_yaml, deploy_path)
+
+
 def main():
     ap = argparse.ArgumentParser(description=f'smartclash-gen v{VERSION}')
     ap.add_argument('--urls', help='urls.txt path (one url per line)')
@@ -283,6 +295,8 @@ def main():
     ap.add_argument('--port', type=int, default=7892, help='mixed-port')
     ap.add_argument('--output', default='openclash.yaml', help='output yaml file')
     ap.add_argument('--report', default='report.json', help='validation report output')
+    ap.add_argument('--deploy', help='deploy generated yaml to target path, e.g. /etc/openclash/config/custom.yaml')
+    ap.add_argument('--backup-dir', default='./backups', help='backup directory when --deploy is used')
     args = ap.parse_args()
 
     warnings = []
@@ -351,6 +365,18 @@ def main():
 
     out.write_text(yml, encoding='utf-8')
     out.with_suffix('.md').write_text(f"# smartclash-gen v{VERSION}\n\n```yaml\n{yml}\n```\n", encoding='utf-8')
+
+    if args.deploy:
+        try:
+            deploy_yaml(out, Path(args.deploy), Path(args.backup_dir))
+            report['deploy'] = {'enabled': True, 'target': args.deploy, 'backup_dir': args.backup_dir, 'ok': True}
+            print(f'Deployed to: {args.deploy}')
+        except Exception as e:
+            report['deploy'] = {'enabled': True, 'target': args.deploy, 'backup_dir': args.backup_dir, 'ok': False, 'error': str(e)}
+            warnings.append(f'deploy failed: {e}')
+    else:
+        report['deploy'] = {'enabled': False}
+
     write_report(Path(args.report), report)
 
     print(f'Generated {out} and {out.with_suffix(".md")}')

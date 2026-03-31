@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>smartclash-gen 可视化编排器</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <header>
+    <h1>smartclash-gen v0.6.0</h1>
+    <p>页面内模块化编辑 → 拖拽排序 → 保存生成可编辑 Markdown</p>
+  </header>
+
+  <main class="layout">
+    <section class="left">
+      <article class="panel">
+        <h2>节点模块区</h2>
+        <div class="row">
+          <input id="nodeName" placeholder="节点名称，如 HK-01" />
+          <button id="addNode">添加节点</button>
+        </div>
+        <ul id="nodePool" class="list"></ul>
+      </article>
+
+      <article class="panel">
+        <h2>策略组模块区（支持拖拽排序）</h2>
+        <div class="row">
+          <input id="groupName" placeholder="策略组名，如 Smart-HK" />
+          <select id="groupType">
+            <option value="smart">smart</option>
+            <option value="select">select</option>
+            <option value="url-test">url-test</option>
+            <option value="fallback">fallback</option>
+          </select>
+          <button id="addGroup">添加组</button>
+        </div>
+        <div id="groups"></div>
+      </article>
+
+      <article class="panel">
+        <h2>规则模块区（每行一条）</h2>
+        <textarea id="rules" rows="10" placeholder="DOMAIN-SUFFIX,google.com,Smart-AUTO&#10;MATCH,Smart-AUTO"></textarea>
+
+        <h3>一致性告警（不阻塞编辑）</h3>
+        <ul id="warnings" class="warnings"></ul>
+
+        <div class="row">
+          <button id="saveBtn">保存并生成 Markdown</button>
+          <button id="copyBtn">复制 Markdown</button>
+        </div>
+      </article>
+    </section>
+
+    <aside class="panel sticky">
+      <h2>Markdown 输出预览区（可直接编辑）</h2>
+      <textarea id="markdown" rows="28"></textarea>
+    </aside>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>

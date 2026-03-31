@@ -1,0 +1,73 @@
+* { box-sizing: border-box; }
+:root {
+  --bg: #0a0f1f;
+  --panel: #111a2e;
+  --panel-2: #0f172a;
+  --line: #334155;
+  --text: #e2e8f0;
+  --sub: #94a3b8;
+  --accent: #38bdf8;
+}
+body {
+  margin: 0;
+  color: var(--text);
+  background: radial-gradient(circle at 20% 10%, #172554 0%, var(--bg) 40%);
+  font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+header { padding: 18px 22px; border-bottom: 1px solid var(--line); }
+h1 { margin: 0; font-size: 22px; letter-spacing: .2px; }
+header p { margin: 6px 0 0; color: var(--sub); }
+
+.layout { display: grid; grid-template-columns: 1.4fr .9fr; gap: 12px; padding: 12px; }
+.left { display: grid; gap: 12px; }
+.panel {
+  background: linear-gradient(180deg, var(--panel), var(--panel-2));
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 12px;
+}
+.sticky { position: sticky; top: 12px; height: calc(100vh - 24px); }
+
+h2 { margin: 0 0 10px; font-size: 16px; }
+h3 { margin: 10px 0 8px; font-size: 14px; color: var(--sub); }
+
+.row { display: flex; gap: 8px; margin-bottom: 8px; }
+input, select, textarea, button {
+  border-radius: 9px;
+  border: 1px solid #475569;
+  background: #0b1224;
+  color: var(--text);
+  padding: 8px 10px;
+}
+input, select, textarea { width: 100%; }
+textarea { resize: vertical; min-height: 120px; }
+button { cursor: pointer; background: #0c4a6e; border-color: #0369a1; }
+button:hover { filter: brightness(1.08); }
+
+.list {
+  min-height: 90px;
+  list-style: none;
+  padding: 8px;
+  margin: 0;
+  border: 1px dashed #475569;
+  border-radius: 8px;
+}
+.item {
+  padding: 8px;
+  margin: 6px 0;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 7px;
+  cursor: grab;
+}
+.group { border: 1px solid #475569; border-radius: 8px; padding: 8px; margin: 8px 0; }
+.group h4 { margin: 0 0 8px; color: #7dd3fc; cursor: grab; }
+.group .list { min-height: 55px; }
+
+.warnings { margin: 0; padding-left: 18px; color: #fda4af; }
+.warnings .ok { color: #86efac; list-style: none; margin-left: -18px; }
+
+@media (max-width: 1100px) {
+  .layout { grid-template-columns: 1fr; }
+  .sticky { position: static; height: auto; }
+}

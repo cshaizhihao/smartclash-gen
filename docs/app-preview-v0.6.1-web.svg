@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720">
+  <rect width="1200" height="720" fill="#0b1224"/>
+  <text x="30" y="46" fill="#e2e8f0" font-size="28" font-family="Arial">smartclash-gen v0.6.1 - Publish Gate Prototype</text>
+  <rect x="30" y="80" width="760" height="600" rx="12" fill="#111a2e" stroke="#334155"/>
+  <rect x="810" y="80" width="360" height="600" rx="12" fill="#111a2e" stroke="#334155"/>
+  <text x="50" y="120" fill="#7dd3fc" font-size="18" font-family="Arial">左侧：编辑 / 拖拽 / 校验告警</text>
+  <text x="830" y="120" fill="#7dd3fc" font-size="18" font-family="Arial">右侧：Markdown 可编辑预览</text>
+  <rect x="50" y="145" width="720" height="450" rx="8" fill="#0f172a" stroke="#475569"/>
+  <rect x="50" y="610" width="720" height="52" rx="8" fill="#0f172a" stroke="#475569"/>
+  <text x="70" y="642" fill="#fda4af" font-size="15" font-family="Arial">⛔ 发布阻塞：当 Smart 组为空 / 规则异常 / 引用无效时禁止发布</text>
+  <rect x="830" y="145" width="320" height="510" rx="8" fill="#0f172a" stroke="#475569"/>
+  <text x="845" y="640" fill="#86efac" font-size="14" font-family="Arial">发布通过时显示：配置已通过校验（模拟发布）</text>
+</svg>

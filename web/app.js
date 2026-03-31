@@ -22,6 +22,8 @@ const el = {
   rules: document.getElementById('rules'),
   saveBtn: document.getElementById('saveBtn'),
   copyBtn: document.getElementById('copyBtn'),
+  publishBtn: document.getElementById('publishBtn'),
+  publishStatus: document.getElementById('publishStatus'),
   markdown: document.getElementById('markdown'),
   warnings: document.getElementById('warnings'),
 };
@@ -141,45 +143,77 @@ function buildMarkdown() {
 
 function validateState() {
   const warnings = [];
+  const blockers = [];
+  const knownNodeIds = new Set(state.nodes.map((n) => n.id));
+  const knownGroupNames = new Set(state.groups.map((g) => g.name));
 
   state.groups.forEach((g) => {
     if (g.type === 'smart' && g.members.length === 0) {
       warnings.push(`Smart 组「${g.name}」当前为空成员`);
+      blockers.push(`Smart 组「${g.name}」为空，禁止发布`);
     }
 
     g.members.forEach((id) => {
-      if (!state.nodes.some((n) => n.id === id)) {
+      if (!knownNodeIds.has(id)) {
         warnings.push(`策略组「${g.name}」存在无效节点引用：${id}`);
+        blockers.push(`策略组「${g.name}」含无效节点引用，禁止发布`);
       }
     });
   });
 
-  el.rules.value
+  const lines = el.rules.value
     .split('\n')
     .map((x) => x.trim())
-    .filter(Boolean)
-    .forEach((line, i) => {
-      if (!line.includes(',')) warnings.push(`规则第 ${i + 1} 行格式疑似无效：${line}`);
-    });
+    .filter(Boolean);
 
-  return warnings;
+  lines.forEach((line, i) => {
+    const segs = line.split(',').map((s) => s.trim()).filter(Boolean);
+    if (segs.length < 2) {
+      warnings.push(`规则第 ${i + 1} 行格式疑似无效：${line}`);
+      blockers.push(`规则第 ${i + 1} 行格式错误，禁止发布`);
+      return;
+    }
+    if (segs.length >= 3) {
+      const target = segs[2];
+      if (target !== 'DIRECT' && !knownGroupNames.has(target)) {
+        warnings.push(`规则第 ${i + 1} 行策略组不存在：${target}`);
+        blockers.push(`规则第 ${i + 1} 行引用不存在策略组，禁止发布`);
+      }
+    }
+  });
+
+  if (!lines.some((line) => line.startsWith('MATCH,'))) {
+    warnings.push('未显式填写 MATCH 规则，保存时会自动补全');
+  }
+
+  return { warnings, blockers };
 }
 
-function renderWarnings(warnings) {
-  if (!warnings.length) {
-    el.warnings.innerHTML = '<li class="ok">✅ 状态校验通过，可安全保存</li>';
+function renderWarnings(result) {
+  const items = [];
+  if (result.blockers.length) {
+    result.blockers.forEach((x) => items.push(`<li>⛔ ${x}</li>`));
+  }
+  if (result.warnings.length) {
+    result.warnings.forEach((x) => items.push(`<li>⚠️ ${x}</li>`));
+  }
+  if (!items.length) {
+    el.warnings.innerHTML = '<li class="ok">✅ 状态校验通过，可保存可发布</li>';
     return;
   }
-  el.warnings.innerHTML = warnings.map((w) => `<li>⚠️ ${w}</li>`).join('');
+  el.warnings.innerHTML = items.join('');
 }
 
 function refreshMarkdownPreview() {
-  // 仅在用户没有手动改写输出区时自动刷新
   if (!el.markdown.dataset.manualEdit) {
     el.markdown.value = buildMarkdown();
   }
-  const warnings = validateState();
-  renderWarnings(warnings);
+  renderWarnings(validateState());
+}
+
+function setPublishStatus(text, type = 'idle') {
+  el.publishStatus.textContent = text;
+  el.publishStatus.dataset.type = type;
 }
 
 el.addNode.addEventListener('click', () => {
@@ -204,10 +238,21 @@ el.addGroup.addEventListener('click', () => {
 });
 
 el.saveBtn.addEventListener('click', () => {
-  const warnings = validateState();
-  renderWarnings(warnings);
+  const result = validateState();
+  renderWarnings(result);
   el.markdown.dataset.manualEdit = '';
   el.markdown.value = buildMarkdown();
+  setPublishStatus('已保存最新 Markdown，等待发布', 'idle');
+});
+
+el.publishBtn.addEventListener('click', () => {
+  const result = validateState();
+  renderWarnings(result);
+  if (result.blockers.length) {
+    setPublishStatus(`发布失败：存在 ${result.blockers.length} 个阻塞问题`, 'error');
+    return;
+  }
+  setPublishStatus('发布成功：配置已通过校验（模拟发布）', 'success');
 });
 
 el.copyBtn.addEventListener('click', async () => {
@@ -227,3 +272,4 @@ el.markdown.addEventListener('input', () => {
 });
 
 render();
+setPublishStatus('尚未发布', 'idle');

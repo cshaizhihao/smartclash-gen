@@ -44,6 +44,14 @@ textarea { resize: vertical; min-height: 120px; }
 button { cursor: pointer; background: #0c4a6e; border-color: #0369a1; }
 button:hover { filter: brightness(1.08); }
 
+.publish-status {
+  margin: 8px 0 0;
+  font-size: 13px;
+  color: var(--sub);
+}
+.publish-status[data-type="success"] { color: #86efac; }
+.publish-status[data-type="error"] { color: #fda4af; }
+
 .list {
   min-height: 90px;
   list-style: none;

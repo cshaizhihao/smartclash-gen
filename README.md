@@ -1,6 +1,6 @@
 # smartclash-gen
 
-> 版本：**v0.2.0**
+> 版本：**v0.3.0**
 
 一个面向 **OpenClash + mihomo(type: smart)** 的配置生成器：
 
@@ -55,8 +55,27 @@ MATCH,Smart-AUTO
 
 ## 生成命令
 
+### 方式 A：本地 urls.txt
+
 ```bash
 python3 generate.py --urls urls.txt --rules rules.txt --port 10801 --output openclash.yaml
+```
+
+### 方式 B：订阅 URL 自动拉取（新增）
+
+```bash
+python3 generate.py \
+  --sub-url "https://example.com/sub1" \
+  --sub-url "https://example.com/sub2" \
+  --rules rules.txt \
+  --port 10801 \
+  --output openclash.yaml
+```
+
+### 方式 C：订阅列表文件（每行一个订阅 URL）
+
+```bash
+python3 generate.py --sub-file subscriptions.txt --rules rules.txt --port 10801 --output openclash.yaml
 ```
 
 生成结果：
@@ -90,6 +109,12 @@ python3 generate.py --urls urls.txt --rules rules.txt --port 10801 --output open
 ---
 
 ## 版本更新说明
+
+### v0.3.0
+- 新增 `--sub-url`：支持直接拉取订阅链接并自动解析
+- 新增 `--sub-file`：支持订阅链接列表批量导入
+- 自动识别订阅内容（明文/整段Base64）并转为节点列表
+- README 更新版本号与示意图版本
 
 ### v0.2.0
 - 增加默认 `rule-providers`

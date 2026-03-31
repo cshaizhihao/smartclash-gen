@@ -6,10 +6,11 @@ import re
 import uuid
 from pathlib import Path
 from urllib.parse import parse_qs, unquote, urlparse
+from urllib.request import Request, urlopen
 
 import yaml
 
-VERSION = "0.2.0"
+VERSION = "0.3.0"
 
 DEFAULT_RULE_PROVIDERS = {
     "BanAD": {
@@ -174,6 +175,34 @@ def parse_urls(lines):
     return proxies
 
 
+def maybe_decode_subscription(text: str) -> list[str]:
+    raw = text.strip()
+    if not raw:
+        return []
+
+    # plain list already
+    if '://' in raw and '\n' in raw:
+        return [x.strip() for x in raw.splitlines() if x.strip()]
+
+    # try base64 subscription blob
+    try:
+        decoded = b64_decode(raw)
+        if '://' in decoded:
+            return [x.strip() for x in decoded.splitlines() if x.strip()]
+    except Exception:
+        pass
+
+    # fallback as single line
+    return [raw]
+
+
+def fetch_subscription_lines(sub_url: str) -> list[str]:
+    req = Request(sub_url, headers={'User-Agent': 'smartclash-gen/0.3.0'})
+    with urlopen(req, timeout=20) as resp:
+        body = resp.read().decode('utf-8', errors='ignore')
+    return maybe_decode_subscription(body)
+
+
 def parse_rules(lines):
     out = []
     for raw in lines:
@@ -247,17 +276,41 @@ def build_config(proxies, rules, port):
 
 
 def main():
-    ap = argparse.ArgumentParser(description='smartclash-gen v0.2.0')
-    ap.add_argument('--urls', required=True, help='urls.txt path')
+    ap = argparse.ArgumentParser(description='smartclash-gen v0.3.0')
+    ap.add_argument('--urls', help='urls.txt path (one url per line)')
+    ap.add_argument('--sub-url', action='append', default=[], help='subscription url, can repeat')
+    ap.add_argument('--sub-file', help='file contains subscription urls, one per line')
     ap.add_argument('--rules', help='rules/rul path')
     ap.add_argument('--port', type=int, default=7892, help='mixed-port')
     ap.add_argument('--output', default='openclash.yaml', help='output yaml file')
     args = ap.parse_args()
 
-    urls = Path(args.urls).read_text(encoding='utf-8', errors='ignore').splitlines()
-    proxies = parse_urls(urls)
+    url_lines = []
+    if args.urls and Path(args.urls).exists():
+        url_lines.extend(Path(args.urls).read_text(encoding='utf-8', errors='ignore').splitlines())
+
+    sub_urls = list(args.sub_url or [])
+    if args.sub_file and Path(args.sub_file).exists():
+        sub_urls.extend([x.strip() for x in Path(args.sub_file).read_text(encoding='utf-8', errors='ignore').splitlines() if x.strip()])
+
+    for su in sub_urls:
+        try:
+            url_lines.extend(fetch_subscription_lines(su))
+        except Exception as e:
+            print(f'[WARN] failed sub-url: {su} -> {e}')
+
+    # 去重，保持顺序
+    dedup = []
+    seen = set()
+    for line in url_lines:
+        t = line.strip()
+        if t and t not in seen:
+            seen.add(t)
+            dedup.append(t)
+
+    proxies = parse_urls(dedup)
     if not proxies:
-        raise SystemExit('No valid urls parsed')
+        raise SystemExit('No valid urls parsed (check --urls / --sub-url / --sub-file).')
 
     rules = []
     if args.rules and Path(args.rules).exists():

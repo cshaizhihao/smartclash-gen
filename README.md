@@ -1,6 +1,6 @@
 # smartclash-gen
 
-> 版本：**v0.6.3**
+> 版本：**v0.6.4**
 
 一个面向 **OpenClash + mihomo(type: smart)** 的配置生成器：
 
@@ -15,7 +15,7 @@
 
 ## 安装后应用示意图
 
-![应用示意图](docs/app-preview-v0.6.3-web.svg)
+![应用示意图](docs/app-preview-v0.6.4-web.svg)
 
 ---
 
@@ -130,6 +130,13 @@ python3 generate.py \
 ---
 
 ## 版本更新说明
+
+### v0.6.4
+- 恢复“粘贴节点 URL”批量导入功能（节点模块区）
+- 支持协议：`vless://`、`vmess://`、`trojan://`、`ss://`
+- 按节点名自动去重，重复节点跳过，不影响其他条目导入
+- 增加导入状态提示：成功数 / 重复数 / 失败数
+- README 版本号、变更说明与截图同步到 v0.6.4
 
 ### v0.6.3
 - 新增 `下载 YAML` 按钮，可直接导出 `smartclash-config.yaml`

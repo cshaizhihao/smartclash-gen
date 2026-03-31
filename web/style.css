@@ -31,7 +31,7 @@ header p { margin: 6px 0 0; color: var(--sub); }
 h2 { margin: 0 0 10px; font-size: 16px; }
 h3 { margin: 10px 0 8px; font-size: 14px; color: var(--sub); }
 
-.row { display: flex; gap: 8px; margin-bottom: 8px; }
+.row { display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; align-items: center; }
 input, select, textarea, button {
   border-radius: 9px;
   border: 1px solid #475569;
@@ -51,6 +51,10 @@ button:hover { filter: brightness(1.08); }
 }
 .publish-status[data-type="success"] { color: #86efac; }
 .publish-status[data-type="error"] { color: #fda4af; }
+
+.import-status { font-size: 13px; color: var(--sub); }
+.import-status[data-type="success"] { color: #86efac; }
+.import-status[data-type="error"] { color: #fda4af; }
 
 .list {
   min-height: 90px;

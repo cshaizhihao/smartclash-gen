@@ -8,7 +8,7 @@
 </head>
 <body>
   <header>
-    <h1>smartclash-gen v0.6.3</h1>
+    <h1>smartclash-gen v0.6.4</h1>
     <p>页面内模块化编辑 → 拖拽排序 → 保存生成可编辑 Markdown</p>
   </header>
 
@@ -19,6 +19,11 @@
         <div class="row">
           <input id="nodeName" placeholder="节点名称，如 HK-01" />
           <button id="addNode">添加节点</button>
+        </div>
+        <textarea id="nodeUrls" rows="4" placeholder="粘贴节点 URL（每行一条，支持 vless/vmess/trojan/ss）"></textarea>
+        <div class="row">
+          <button id="importUrlsBtn">批量导入 URL</button>
+          <span id="importStatus" class="import-status">未导入</span>
         </div>
         <ul id="nodePool" class="list"></ul>
       </article>

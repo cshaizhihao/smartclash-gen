@@ -17,6 +17,9 @@ const state = {
 const el = {
   nodeName: document.getElementById('nodeName'),
   addNode: document.getElementById('addNode'),
+  nodeUrls: document.getElementById('nodeUrls'),
+  importUrlsBtn: document.getElementById('importUrlsBtn'),
+  importStatus: document.getElementById('importStatus'),
   groupName: document.getElementById('groupName'),
   groupType: document.getElementById('groupType'),
   addGroup: document.getElementById('addGroup'),
@@ -40,6 +43,22 @@ function mkNodeLi(node) {
   li.dataset.id = node.id;
   li.textContent = node.name;
   return li;
+}
+
+function setImportStatus(text, type = 'idle') {
+  el.importStatus.textContent = text;
+  el.importStatus.dataset.type = type;
+}
+
+function parseNodeUrl(line, index) {
+  const raw = line.trim();
+  if (!raw) return null;
+  const m = raw.match(/^(vless|vmess|trojan|ss):\/\//i);
+  if (!m) return { ok: false, error: `第 ${index + 1} 行协议不支持` };
+  const nameMatch = raw.match(/#(.+)$/);
+  const name = nameMatch ? decodeURIComponent(nameMatch[1]).trim() : `${m[1].toUpperCase()}-${index + 1}`;
+  if (!name) return { ok: false, error: `第 ${index + 1} 行节点名为空` };
+  return { ok: true, name };
 }
 
 function syncGroupOrder() {
@@ -81,6 +100,7 @@ function persistState() {
       groups: state.groups,
       rules: el.rules.value.split('\n'),
       mixedPort: Number(el.mixedPort.value || state.mixedPort || 7892),
+      nodeUrls: el.nodeUrls.value || '',
     })
   );
 }
@@ -94,6 +114,7 @@ function hydrateState() {
     if (Array.isArray(parsed.groups)) state.groups = parsed.groups;
     if (Array.isArray(parsed.rules)) state.rules = parsed.rules;
     if (parsed.mixedPort) state.mixedPort = Number(parsed.mixedPort);
+    if (typeof parsed.nodeUrls === 'string') el.nodeUrls.value = parsed.nodeUrls;
   } catch (_) {
     // ignore broken cache
   }
@@ -131,6 +152,7 @@ function render() {
 
   el.rules.value = state.rules.join('\n');
   el.mixedPort.value = state.mixedPort;
+  if (!el.nodeUrls.value) el.nodeUrls.value = '';
   refreshMarkdownPreview();
 }
 
@@ -279,6 +301,44 @@ el.addGroup.addEventListener('click', () => {
   persistState();
 });
 
+el.importUrlsBtn.addEventListener('click', () => {
+  const lines = el.nodeUrls.value.split('\n').map((x) => x.trim()).filter(Boolean);
+  if (!lines.length) {
+    setImportStatus('请先粘贴节点 URL', 'error');
+    return;
+  }
+
+  const exists = new Set(state.nodes.map((n) => n.name));
+  let okCount = 0;
+  let dupCount = 0;
+  const errors = [];
+
+  lines.forEach((line, i) => {
+    const parsed = parseNodeUrl(line, i);
+    if (!parsed) return;
+    if (!parsed.ok) {
+      errors.push(parsed.error);
+      return;
+    }
+    if (exists.has(parsed.name)) {
+      dupCount += 1;
+      return;
+    }
+    exists.add(parsed.name);
+    state.nodes.push({ id: crypto.randomUUID(), name: parsed.name });
+    okCount += 1;
+  });
+
+  render();
+  persistState();
+
+  if (errors.length) {
+    setImportStatus(`导入 ${okCount} 条，重复 ${dupCount} 条，失败 ${errors.length} 条`, 'error');
+    return;
+  }
+  setImportStatus(`导入成功 ${okCount} 条，重复跳过 ${dupCount} 条`, 'success');
+});
+
 el.saveBtn.addEventListener('click', () => {
   const result = validateState();
   renderWarnings(result);
@@ -342,6 +402,10 @@ el.mixedPort.addEventListener('input', () => {
   persistState();
 });
 
+el.nodeUrls.addEventListener('input', () => {
+  persistState();
+});
+
 el.markdown.addEventListener('input', () => {
   el.markdown.dataset.manualEdit = '1';
 });
@@ -349,3 +413,4 @@ el.markdown.addEventListener('input', () => {
 hydrateState();
 render();
 setPublishStatus('尚未发布', 'idle');
+setImportStatus('未导入', 'idle');

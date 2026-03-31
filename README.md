@@ -1,6 +1,6 @@
 # smartclash-gen
 
-> 版本：**v0.3.0**
+> 版本：**v0.4.0**
 
 一个面向 **OpenClash + mihomo(type: smart)** 的配置生成器：
 
@@ -82,6 +82,13 @@ python3 generate.py --sub-file subscriptions.txt --rules rules.txt --port 10801 
 
 - `openclash.yaml`（可直接编辑）
 - `openclash.md`（Markdown 代码块版 YAML）
+- `report.json`（输入校验/告警报告）
+
+可指定报告输出路径：
+
+```bash
+python3 generate.py --urls urls.txt --rules rules.txt --report build/report.json
+```
 
 ---
 
@@ -109,6 +116,14 @@ python3 generate.py --sub-file subscriptions.txt --rules rules.txt --port 10801 
 ---
 
 ## 版本更新说明
+
+### v0.4.0
+- 增加输入校验报告：`report.json`
+- 增加 URL 解析失败清单、规则格式错误清单
+- 增加重复 URL 去重统计与告警
+- 增加输出 YAML 自检（结构/Smart 组空组校验）
+- 增加标准退出码：`0=成功`、`10=成功但有告警`、`1=失败`
+- README 与示意图版本同步更新
 
 ### v0.3.0
 - 新增 `--sub-url`：支持直接拉取订阅链接并自动解析

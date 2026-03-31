@@ -7,7 +7,7 @@
   </defs>
   <rect width="1200" height="700" fill="url(#bg)"/>
   <rect x="40" y="40" width="1120" height="620" rx="14" fill="#0b1220" stroke="#334155"/>
-  <text x="70" y="90" fill="#e2e8f0" font-size="30" font-family="Arial">smartclash-gen v0.3.0</text>
+  <text x="70" y="90" fill="#e2e8f0" font-size="30" font-family="Arial">smartclash-gen v0.4.0</text>
   <text x="70" y="125" fill="#94a3b8" font-size="18" font-family="Arial">URL → Smart YAML 自动生成（含 rule-providers / smart 分组）</text>
 
   <rect x="70" y="160" width="500" height="440" rx="10" fill="#111827" stroke="#374151"/>

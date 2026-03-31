@@ -1,18 +1,27 @@
 # smartclash-gen
 
+> 版本：**v0.2.0**
+
 一个面向 **OpenClash + mihomo(type: smart)** 的配置生成器：
 
-- 输入常用订阅 URL（`vless://`、`vmess://`、`trojan://`、`ss://`），一行一条
-- 自动生成可编辑的 `.yaml`
+- 输入常用节点 URL（`vless://`、`vmess://`、`trojan://`、`ss://`），一行一条
+- 自动生成可编辑 `.yaml`
 - 自动输出 Markdown 版 YAML（代码块）
-- 输入 `rul`/`rules`（一行一条）后，自动转为 YAML 规则并注入 Smart 策略组
-- 内置 Smart 策略组（含正则优先级）用于自动分类与智能选路
+- 输入 `rul/rules`（一行一条）后，自动转为 YAML 规则并注入 Smart 策略组
+- 内置默认 `rule-providers`（ACL4SSR + blackmatrix7 + MetaCubeX）
+- 生成 `type: smart` 策略组，支持正则优先级、自动分区（HK/SG/JP）
+
+---
+
+## 安装后应用示意图
+
+![应用示意图](docs/app-preview.svg)
 
 ---
 
 ## 一键安装（支持自定义端口）
 
-> 默认端口 7890，可通过 `-p` 自定义。
+> 默认端口 `7892`，可通过 `-p` 自定义。
 
 ```bash
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/cshaizhihao/smartclash-gen/main/install.sh)" -- -p 10801
@@ -22,9 +31,7 @@ bash -c "$(curl -fsSL https://raw.githubusercontent.com/cshaizhihao/smartclash-g
 
 ## 输入文件格式
 
-### 1) URLs 文件（`urls.txt`）
-
-一行一个节点 URL，例如：
+### 1) URL 文件（`urls.txt`）
 
 ```text
 vless://uuid@host:443?type=ws&security=tls&sni=example.com&path=%2Fws#HK-01
@@ -33,9 +40,7 @@ trojan://password@host:443?sni=example.com#SG-01
 ss://xxxxx#JP-01
 ```
 
-### 2) Rules 文件（`rules.txt` 或 `rul.txt`）
-
-一行一个规则，例如：
+### 2) 规则文件（`rules.txt` 或 `rul.txt`）
 
 ```text
 DOMAIN-SUFFIX,google.com,Smart-AUTO
@@ -44,7 +49,7 @@ IP-CIDR,8.8.8.8/32,Smart-JP,no-resolve
 MATCH,Smart-AUTO
 ```
 
-> 若规则只写两段（如 `DOMAIN-SUFFIX,google.com`），默认策略组会补成 `Smart-AUTO`。
+> 若只写两段，如 `DOMAIN-SUFFIX,google.com`，默认补策略组为 `Smart-AUTO`。
 
 ---
 
@@ -56,32 +61,44 @@ python3 generate.py --urls urls.txt --rules rules.txt --port 10801 --output open
 
 生成结果：
 
-- `openclash.yaml`（可直接编辑、用于 OpenClash）
-- `openclash.md`（Markdown 包裹的 YAML）
+- `openclash.yaml`（可直接编辑）
+- `openclash.md`（Markdown 代码块版 YAML）
 
 ---
 
-## 生成内容说明
+## 默认生成能力
 
-会自动生成：
+- 全局基础项（含你给定默认值）：
+  - `mixed-port`（可自定义）
+  - `external-controller: ':9090'`
+  - `ipv6: false`
+  - `keep-alive-interval: 15`
+  - `tcp-concurrent: true`
+  - `unified-delay: true`
+  - `dns.enhanced-mode: redir-host`
 
-- `proxies`
-- `proxy-groups`
+- `rule-providers` 默认内置：
+  - BanAD / BanProgramAD / ChinaCompanyIp / ChinaDomain / GoogleCN / LocalAreaNetwork / ProxyLite / ProxyMedia / SteamCN / Telegram / UnBan
+  - Netflix / Gemini
+  - openai / category-ai-!cn
+
+- `proxy-groups`：
   - `Smart-AUTO`（`type: smart`）
   - `Smart-HK` / `Smart-SG` / `Smart-JP`
-  - 默认带 `policy-priority` 正则优先级
-- `rules`
-  - 来自你的 `rules.txt`
-  - 自动补一条兜底：`MATCH,Smart-AUTO`
+  - `DIRECT`
 
 ---
 
-## 适配说明
+## 版本更新说明
 
-- Smart 策略组依赖 **mihomo 内核**（OpenClash 的 mihomo 分支）
-- 如需 LightGBM：
-  - `uselightgbm: true`
-  - 模型文件：`/etc/openclash/Model.bin`
+### v0.2.0
+- 增加默认 `rule-providers`
+- 增加规则行转 YAML 规则结构注入
+- 增加 Smart 分组自动分类
+- README 增加版本号与安装后应用示意图
+
+### v0.1.0
+- 首个可用版本：URL -> YAML / Markdown YAML
 
 ---
 

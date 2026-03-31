@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700" viewBox="0 0 1200 700">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="700" fill="url(#bg)"/>
+  <rect x="40" y="40" width="1120" height="620" rx="14" fill="#0b1220" stroke="#334155"/>
+  <text x="70" y="90" fill="#e2e8f0" font-size="30" font-family="Arial">smartclash-gen v0.2.0</text>
+  <text x="70" y="125" fill="#94a3b8" font-size="18" font-family="Arial">URL → Smart YAML 自动生成（含 rule-providers / smart 分组）</text>
+
+  <rect x="70" y="160" width="500" height="440" rx="10" fill="#111827" stroke="#374151"/>
+  <text x="90" y="195" fill="#93c5fd" font-size="20" font-family="monospace">urls.txt（输入）</text>
+  <text x="90" y="230" fill="#cbd5e1" font-size="16" font-family="monospace">vless://...#HK-01</text>
+  <text x="90" y="255" fill="#cbd5e1" font-size="16" font-family="monospace">vmess://...</text>
+  <text x="90" y="280" fill="#cbd5e1" font-size="16" font-family="monospace">trojan://...#SG-01</text>
+  <text x="90" y="305" fill="#cbd5e1" font-size="16" font-family="monospace">ss://...#JP-01</text>
+
+  <rect x="630" y="160" width="500" height="440" rx="10" fill="#111827" stroke="#374151"/>
+  <text x="650" y="195" fill="#86efac" font-size="20" font-family="monospace">openclash.yaml（输出）</text>
+  <text x="650" y="230" fill="#cbd5e1" font-size="15" font-family="monospace">proxy-groups:</text>
+  <text x="670" y="255" fill="#cbd5e1" font-size="15" font-family="monospace">- name: Smart-AUTO</text>
+  <text x="690" y="280" fill="#cbd5e1" font-size="15" font-family="monospace">type: smart</text>
+  <text x="670" y="305" fill="#cbd5e1" font-size="15" font-family="monospace">- name: Smart-HK</text>
+  <text x="670" y="330" fill="#cbd5e1" font-size="15" font-family="monospace">- name: Smart-SG</text>
+  <text x="670" y="355" fill="#cbd5e1" font-size="15" font-family="monospace">- name: Smart-JP</text>
+  <text x="650" y="390" fill="#cbd5e1" font-size="15" font-family="monospace">rule-providers: (内置默认)</text>
+  <text x="650" y="420" fill="#cbd5e1" font-size="15" font-family="monospace">rules: (自动注入 + MATCH 兜底)</text>
+
+  <rect x="420" y="620" width="360" height="50" rx="8" fill="#1d4ed8"/>
+  <text x="445" y="652" fill="#fff" font-size="20" font-family="monospace">python3 generate.py --port 10801</text>
+</svg>

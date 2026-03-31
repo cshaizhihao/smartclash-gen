@@ -29,10 +29,10 @@ if [ ! -f generate.py ]; then
   curl -fsSL -o generate.py https://raw.githubusercontent.com/cshaizhihao/smartclash-gen/main/generate.py
 fi
 
-python3 -m pip install --user --quiet pyyaml
+python3 -m pip install --user --quiet -r <(curl -fsSL https://raw.githubusercontent.com/cshaizhihao/smartclash-gen/main/requirements.txt)
 chmod +x generate.py
 
-echo "✅ 安装完成"
+echo "✅ 安装完成 smartclash-gen v0.2.0"
 echo "默认端口: $PORT"
 echo "用法示例:"
 echo "  python3 generate.py --urls urls.txt --rules rules.txt --port $PORT --output openclash.yaml"

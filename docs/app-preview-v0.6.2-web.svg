@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720">
+  <rect width="1200" height="720" fill="#0b1224"/>
+  <text x="30" y="46" fill="#e2e8f0" font-size="28" font-family="Arial">smartclash-gen v0.6.2 - Port & Persistence</text>
+  <rect x="30" y="80" width="760" height="600" rx="12" fill="#111a2e" stroke="#334155"/>
+  <rect x="810" y="80" width="360" height="600" rx="12" fill="#111a2e" stroke="#334155"/>
+  <text x="50" y="120" fill="#7dd3fc" font-size="18" font-family="Arial">新增 mixed-port 输入 / 下载 Markdown / 本地自动保存</text>
+  <rect x="50" y="150" width="720" height="90" rx="8" fill="#0f172a" stroke="#475569"/>
+  <text x="70" y="204" fill="#94a3b8" font-size="14" font-family="Arial">端口非法时阻塞发布；刷新页面后继续上次编辑状态</text>
+  <rect x="50" y="260" width="720" height="390" rx="8" fill="#0f172a" stroke="#475569"/>
+  <rect x="830" y="150" width="320" height="500" rx="8" fill="#0f172a" stroke="#475569"/>
+  <text x="845" y="182" fill="#94a3b8" font-size="14" font-family="Arial">右侧 Markdown 可编辑预览</text>
+  <text x="70" y="640" fill="#86efac" font-size="14" font-family="Arial">发布门禁 + 保存门禁持续生效</text>
+</svg>

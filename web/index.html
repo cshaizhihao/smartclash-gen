@@ -8,7 +8,7 @@
 </head>
 <body>
   <header>
-    <h1>smartclash-gen v0.6.0</h1>
+    <h1>smartclash-gen v0.6.2</h1>
     <p>页面内模块化编辑 → 拖拽排序 → 保存生成可编辑 Markdown</p>
   </header>
 
@@ -46,8 +46,10 @@
         <ul id="warnings" class="warnings"></ul>
 
         <div class="row">
+          <input id="mixedPort" type="number" min="1" max="65535" placeholder="mixed-port，默认 7892" />
           <button id="saveBtn">保存并生成 Markdown</button>
           <button id="copyBtn">复制 Markdown</button>
+          <button id="downloadBtn">下载 Markdown</button>
           <button id="publishBtn">发布配置</button>
         </div>
         <p id="publishStatus" class="publish-status">尚未发布</p>

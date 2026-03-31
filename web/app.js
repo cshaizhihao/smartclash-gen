@@ -1,3 +1,5 @@
+const STORAGE_KEY = 'smartclash-web-v062';
+
 const state = {
   nodes: [
     { id: crypto.randomUUID(), name: 'HK-01' },
@@ -9,6 +11,7 @@ const state = {
     { id: crypto.randomUUID(), name: 'Smart-HK', type: 'select', members: [] },
   ],
   rules: ['DOMAIN-SUFFIX,google.com,Smart-AUTO', 'MATCH,Smart-AUTO'],
+  mixedPort: 7892,
 };
 
 const el = {
@@ -20,8 +23,10 @@ const el = {
   nodePool: document.getElementById('nodePool'),
   groups: document.getElementById('groups'),
   rules: document.getElementById('rules'),
+  mixedPort: document.getElementById('mixedPort'),
   saveBtn: document.getElementById('saveBtn'),
   copyBtn: document.getElementById('copyBtn'),
+  downloadBtn: document.getElementById('downloadBtn'),
   publishBtn: document.getElementById('publishBtn'),
   publishStatus: document.getElementById('publishStatus'),
   markdown: document.getElementById('markdown'),
@@ -40,6 +45,7 @@ function syncGroupOrder() {
   const ids = [...el.groups.children].map((x) => x.dataset.id);
   state.groups.sort((a, b) => ids.indexOf(a.id) - ids.indexOf(b.id));
   refreshMarkdownPreview();
+  persistState();
 }
 
 function syncFromDom() {
@@ -63,6 +69,33 @@ function syncFromDom() {
   });
 
   refreshMarkdownPreview();
+  persistState();
+}
+
+function persistState() {
+  localStorage.setItem(
+    STORAGE_KEY,
+    JSON.stringify({
+      nodes: state.nodes,
+      groups: state.groups,
+      rules: el.rules.value.split('\n'),
+      mixedPort: Number(el.mixedPort.value || state.mixedPort || 7892),
+    })
+  );
+}
+
+function hydrateState() {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (!raw) return;
+  try {
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed.nodes)) state.nodes = parsed.nodes;
+    if (Array.isArray(parsed.groups)) state.groups = parsed.groups;
+    if (Array.isArray(parsed.rules)) state.rules = parsed.rules;
+    if (parsed.mixedPort) state.mixedPort = Number(parsed.mixedPort);
+  } catch (_) {
+    // ignore broken cache
+  }
 }
 
 function render() {
@@ -96,6 +129,7 @@ function render() {
   new Sortable(el.groups, { animation: 150, handle: 'h4', onSort: syncGroupOrder });
 
   el.rules.value = state.rules.join('\n');
+  el.mixedPort.value = state.mixedPort;
   refreshMarkdownPreview();
 }
 
@@ -127,7 +161,7 @@ function buildYamlObject() {
   }
 
   return {
-    'mixed-port': 7892,
+    'mixed-port': Number(el.mixedPort.value || state.mixedPort || 7892),
     'allow-lan': true,
     mode: 'rule',
     proxies,
@@ -186,6 +220,11 @@ function validateState() {
     warnings.push('未显式填写 MATCH 规则，保存时会自动补全');
   }
 
+  const p = Number(el.mixedPort.value || 0);
+  if (!Number.isInteger(p) || p < 1 || p > 65535) {
+    blockers.push('mixed-port 必须是 1-65535 之间的整数，禁止发布');
+  }
+
   return { warnings, blockers };
 }
 
@@ -222,6 +261,7 @@ el.addNode.addEventListener('click', () => {
   state.nodes.push({ id: crypto.randomUUID(), name });
   el.nodeName.value = '';
   render();
+  persistState();
 });
 
 el.addGroup.addEventListener('click', () => {
@@ -235,6 +275,7 @@ el.addGroup.addEventListener('click', () => {
   });
   el.groupName.value = '';
   render();
+  persistState();
 });
 
 el.saveBtn.addEventListener('click', () => {
@@ -242,6 +283,8 @@ el.saveBtn.addEventListener('click', () => {
   renderWarnings(result);
   el.markdown.dataset.manualEdit = '';
   el.markdown.value = buildMarkdown();
+  state.mixedPort = Number(el.mixedPort.value || 7892);
+  persistState();
   setPublishStatus('已保存最新 Markdown，等待发布', 'idle');
 });
 
@@ -252,6 +295,8 @@ el.publishBtn.addEventListener('click', () => {
     setPublishStatus(`发布失败：存在 ${result.blockers.length} 个阻塞问题`, 'error');
     return;
   }
+  state.mixedPort = Number(el.mixedPort.value || 7892);
+  persistState();
   setPublishStatus('发布成功：配置已通过校验（模拟发布）', 'success');
 });
 
@@ -262,14 +307,32 @@ el.copyBtn.addEventListener('click', async () => {
   setTimeout(() => (el.copyBtn.textContent = '复制 Markdown'), 1200);
 });
 
+el.downloadBtn.addEventListener('click', () => {
+  const blob = new Blob([el.markdown.value], { type: 'text/markdown;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'smartclash-config.md';
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
 el.rules.addEventListener('input', () => {
   state.rules = el.rules.value.split('\n');
   refreshMarkdownPreview();
+  persistState();
+});
+
+el.mixedPort.addEventListener('input', () => {
+  state.mixedPort = Number(el.mixedPort.value || 7892);
+  refreshMarkdownPreview();
+  persistState();
 });
 
 el.markdown.addEventListener('input', () => {
   el.markdown.dataset.manualEdit = '1';
 });
 
+hydrateState();
 render();
 setPublishStatus('尚未发布', 'idle');

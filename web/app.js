@@ -124,6 +124,9 @@ const el = {
   warnings: document.getElementById('warnings'),
   publishChecklist: document.getElementById('publishChecklist'),
   diffSummary: document.getElementById('diffSummary'),
+  qcRules: document.getElementById('qcRules'),
+  qcNodes: document.getElementById('qcNodes'),
+  qcPort: document.getElementById('qcPort'),
   exportDiffBtn: document.getElementById('exportDiffBtn'),
 };
 
@@ -826,6 +829,14 @@ function validateState() {
   return { warnings, blockers, suggestions, risks };
 }
 
+function renderQuickChecks(result) {
+  if (el.qcRules) el.qcRules.textContent = result.blockers.length ? `有 ${result.blockers.length} 条阻塞` : '规则无阻塞';
+  const smart = state.groups.find((g) => g.name === 'Smart-AUTO');
+  if (el.qcNodes) el.qcNodes.textContent = smart?.members?.length ? `Smart-AUTO 已分配 ${smart.members.length} 节点` : 'Smart-AUTO 暂无节点';
+  const p = Number(el.mixedPort.value || 0);
+  if (el.qcPort) el.qcPort.textContent = Number.isInteger(p) && p >= 1 && p <= 65535 ? `端口 ${p} 有效` : '端口无效';
+}
+
 function renderWarnings(result) {
   const items = [];
   result.blockers.forEach((x) => items.push(`<li>⛔ ${x}</li>`));
@@ -833,6 +844,7 @@ function renderWarnings(result) {
   result.suggestions.forEach((x) => items.push(`<li>💡 ${x}</li>`));
   result.risks?.forEach((x) => items.push(`<li>🚨 ${x}</li>`));
   el.warnings.innerHTML = items.length ? items.join('') : '<li class="ok">✅ 状态校验通过，可保存可发布</li>';
+  renderQuickChecks(result);
 
   if (el.publishChecklist) {
     const checks = [
@@ -1197,6 +1209,11 @@ el.stepNext?.addEventListener('click', () => {
 el.quickFlowBtn?.addEventListener('click', () => {
   jumpTo('nodes', 'import', 'quick');
   setPublishStatus('已进入三步流程：1导入节点 → 2生成模块 → 3发布', 'success');
+});
+
+el.stepNext?.addEventListener('dblclick', () => {
+  if (viewState.main === 'nodes' && viewState.sub === 'import') jumpTo('nodes', 'generator', 'region');
+  else if (viewState.main === 'nodes' && viewState.sub === 'generator') jumpTo('publish', 'actions', 'output');
 });
 
 el.undoBtn?.addEventListener('click', () => {

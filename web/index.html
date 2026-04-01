@@ -29,7 +29,7 @@
   </div>
 
   <header>
-    <h1>smartclash-gen v0.8.2</h1>
+    <h1>smartclash-gen v0.8.3</h1>
     <p>模块化编辑 · 拖拽编排 · Markdown/YAML 交付 · 隐私登录保护</p>
   </header>
 
@@ -71,6 +71,14 @@
           <span id="importStatus" class="import-status">未导入</span>
         </div>
         <p class="helper-text">流程：先导入节点，再进入“节点编辑”补充元信息。</p>
+        <div class="conflict-box">
+          <h3>新手模式：只做这三步</h3>
+          <ul class="warnings">
+            <li>1) 粘贴节点 URL 并点击「批量导入 URL」</li>
+            <li>2) 点击顶部「进入三步流程」跳到生成模块</li>
+            <li>3) 在发布模块点击「发布配置」</li>
+          </ul>
+        </div>
         <div id="importConflictBox" class="conflict-box hidden">
           <h3>导入冲突清单（可恢复）</h3>
           <ul id="importConflicts" class="warnings"></ul>
@@ -141,6 +149,11 @@
           <button id="downloadYamlBtn">下载 YAML</button>
           <button id="publishBtn">发布配置</button>
           <button id="autoFixBtn" class="ghost">自动修复引用</button>
+        </div>
+        <div class="publish-quickcheck">
+          <div><b>确认1</b><span id="qcRules">规则未阻塞</span></div>
+          <div><b>确认2</b><span id="qcNodes">节点已分配</span></div>
+          <div><b>确认3</b><span id="qcPort">端口有效</span></div>
         </div>
         <p id="publishStatus" class="publish-status">尚未发布</p>
         <h3>发布前清单确认</h3>

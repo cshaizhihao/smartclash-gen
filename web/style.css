@@ -121,6 +121,10 @@ button.ghost {
 .warnings .ok { color: #86efac; list-style: none; margin-left: -18px; }
 .publish-status, .import-status, .auth-tips, .helper-text { font-size: 13px; color: var(--sub); }
 .conflict-box { margin-top: 10px; border: 1px dashed #475569; border-radius: 10px; padding: 8px; background: rgba(15,23,42,.5); }
+.publish-quickcheck { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 8px; margin: 10px 0; }
+.publish-quickcheck > div { border: 1px solid #334155; border-radius: 10px; padding: 8px; background: #0b1224; display: grid; gap: 4px; }
+.publish-quickcheck b { color: #93c5fd; font-size: 12px; }
+.publish-quickcheck span { color: #cbd5e1; font-size: 13px; }
 .hidden { display: none !important; }
 .publish-status[data-type="success"], .import-status[data-type="success"] { color: #86efac; }
 .publish-status[data-type="error"], .import-status[data-type="error"] { color: #fda4af; }

@@ -607,6 +607,14 @@ h3 { margin: 0 0 8px; font-size: 13px; color: var(--sub); }
 .stack-row { display: grid; gap: 6px; }
 .rule-presets-row { margin-bottom: 8px; }
 .sub-link-box { margin: 8px 0 0; }
+.sub-link-anchor {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 8px;
+  color: #7dd3fc;
+  text-decoration: none;
+  font-size: 13px;
+}
 input, select, textarea, button {
   border-radius: 12px;
   border: 1px solid rgba(71, 85, 105, 0.8);

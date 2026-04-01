@@ -1,5 +1,5 @@
-const STORAGE_KEY = 'smartclash-web-v128';
-const APP_VERSION = '0.12.8';
+const STORAGE_KEY = 'smartclash-web-v129';
+const APP_VERSION = '0.12.9';
 const UPDATE_CMD = 'bash -c "$(curl -fsSL https://raw.githubusercontent.com/cshaizhihao/smartclash-gen/main/install.sh)" -- --update -d ~/.smartclash-gen';
 const AUTH_DISABLED = true;
 const AUTH_KEY = 'smartclash-web-auth';
@@ -576,6 +576,9 @@ function syncFromDom() {
     group.members = [...ul.children].map((x) => normalizeMemberKey(x.dataset.key || x.dataset.id, x.dataset.kind || 'node'));
   });
 
+  const chainGroup = state.groups.find((group) => group.name === (state.chainGroupName || 'Smart-Chain'));
+  if (chainGroup) chainGroup.members = [];
+
   refreshMarkdownPreview();
   render();
   persistState();
@@ -776,13 +779,8 @@ function render() {
 
   el.nodePool.innerHTML = '';
   if (el.groupPool) el.groupPool.innerHTML = '';
-  const usedNodeIds = new Set(
-    state.groups.flatMap((g) => (g.members || []).map((member) => String(member || '')))
-      .filter((member) => !member.startsWith('group:'))
-      .map((member) => member.startsWith('node:') ? member.slice(5) : member)
-  );
-  const unassignedNodes = state.nodes.filter((n) => !usedNodeIds.has(n.id));
-  unassignedNodes.forEach((n) => el.nodePool.appendChild(mkNodeLi(n)));
+  const availableNodes = state.nodes.slice();
+  availableNodes.forEach((n) => el.nodePool.appendChild(mkNodeLi(n)));
 
   const preferredOrder = [transitGroupName, egressGroupName, chainGroupName, 'Smart-AUTO'];
   const orderedGroups = [
@@ -821,14 +819,14 @@ function render() {
       persistState();
     });
     el.groups.appendChild(box);
-    new Sortable(ul, { group: 'nodes-and-groups', animation: 150, onSort: syncFromDom });
+    new Sortable(ul, { group: { name: 'nodes-and-groups', pull: true, put: true }, animation: 150, onSort: syncFromDom });
     if (el.groupPool && !['Smart-AUTO', transitGroupName, egressGroupName, chainGroupName].includes(g.name)) {
       el.groupPool.appendChild(makeGroupRefLi(g));
     }
   });
 
-  new Sortable(el.nodePool, { group: 'nodes-and-groups', animation: 150, sort: false, onSort: syncFromDom });
-  if (el.groupPool) new Sortable(el.groupPool, { group: 'nodes-and-groups', animation: 150, sort: false, onSort: syncFromDom });
+  new Sortable(el.nodePool, { group: { name: 'nodes-and-groups', pull: 'clone', put: false }, animation: 150, sort: false, onSort: syncFromDom, onEnd: render });
+  if (el.groupPool) new Sortable(el.groupPool, { group: { name: 'nodes-and-groups', pull: 'clone', put: false }, animation: 150, sort: false, onSort: syncFromDom, onEnd: render });
   new Sortable(el.groups, { animation: 150, handle: 'h4', onSort: syncGroupOrder });
 
   const transitMembers = state.groups.find((g) => g.name === transitGroupName)?.members?.length || 0;
@@ -848,7 +846,7 @@ function render() {
     }
     chainGroup.members = generated;
   }
-  if (el.composeUnassignedCount) el.composeUnassignedCount.textContent = String(unassignedNodes.length);
+  if (el.composeUnassignedCount) el.composeUnassignedCount.textContent = String(availableNodes.length);
   if (el.composeTransitCount) el.composeTransitCount.textContent = String(transitMembers);
   if (el.composeEgressCount) el.composeEgressCount.textContent = String(egressMembers);
   if (el.composeChainCount) el.composeChainCount.textContent = chainCount ? `${chainCount}` : '0';

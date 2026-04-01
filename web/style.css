@@ -193,6 +193,32 @@ header p { margin: 6px 0 0; color: var(--sub); }
   margin-bottom: 0;
 }
 .hint-inline { color: var(--sub); font-size: 13px; }
+.compose-guide-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 14px 0 12px;
+}
+.guide-step {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(71,85,105,.45);
+  background: rgba(8,15,29,.42);
+  color: #cbd5e1;
+}
+.guide-step b {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #2563eb, #38bdf8);
+  color: white;
+}
 .compose-status-row {
   display: flex;
   flex-wrap: wrap;
@@ -243,6 +269,35 @@ header p { margin: 6px 0 0; color: var(--sub); }
   gap: 14px;
   align-self: start;
   min-width: 0;
+}
+.stage-body-compose-workbench {
+  grid-template-columns: minmax(0, 1.35fr) minmax(320px, .72fr);
+  align-items: stretch;
+  min-height: 620px;
+  max-height: 620px;
+}
+.compose-main-column,
+.compose-side-column {
+  min-width: 0;
+  display: grid;
+  gap: 14px;
+  height: 100%;
+}
+.compose-main-column {
+  grid-template-rows: minmax(0, 1fr) auto;
+}
+.compose-side-column {
+  grid-template-rows: minmax(0, 1fr) auto;
+}
+.compose-workbench-panel,
+.node-pool-panel {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.rules-editor-panel,
+.node-editor-panel {
+  align-self: start;
 }
 .wide-compose {
   grid-template-rows: auto auto;
@@ -356,8 +411,8 @@ button.ghost {
   background: rgba(8, 15, 29, 0.58);
 }
 .node-pool {
-  min-height: 180px;
-  max-height: 360px;
+  min-height: 0;
+  flex: 1 1 auto;
   overflow-y: auto;
   overscroll-behavior: contain;
 }
@@ -386,6 +441,9 @@ button.ghost {
   display: grid;
   gap: 10px;
   align-content: start;
+  overflow-y: auto;
+  min-height: 0;
+  padding-right: 4px;
 }
 .group {
   border: 1px solid rgba(71,85,105,.58);
@@ -478,8 +536,15 @@ button.ghost {
   .stage-body-import,
   .stage-body-compose,
   .stage-body-publish,
-  .publish-hero-grid { grid-template-columns: 1fr; }
-  .node-pool { max-height: 300px; }
+  .publish-hero-grid,
+  .compose-guide-strip,
+  .stage-body-compose-workbench { grid-template-columns: 1fr; }
+  .stage-body-compose-workbench {
+    min-height: auto;
+    max-height: none;
+  }
+  .compose-main-column,
+  .compose-side-column { height: auto; }
 }
 @media (max-width: 900px) {
   .wizard-steps,

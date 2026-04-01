@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>smartclash-gen 可视化编排器</title>
-  <link rel="stylesheet" href="./style.css?v=0.12.11" />
+  <link rel="stylesheet" href="./style.css?v=0.12.12" />
 </head>
 <body>
   <div class="ambient-grid" aria-hidden="true"></div>
@@ -35,7 +35,7 @@
   <div class="app-window-shell">
     <div class="app-window">
       <header>
-        <h1>smartclash-gen v0.12.11</h1>
+        <h1>smartclash-gen v0.12.12</h1>
         <p>单页流程 · 极简编排 · 动画过渡 · YAML 即时交付</p>
       </header>
 
@@ -143,7 +143,8 @@
           </div>
         </div>
 
-        <div class="stage-body stage-body-compose stage-body-compose-workbench">
+        <div class="stage-body stage-body-compose-shell">
+          <div class="stage-body stage-body-compose stage-body-compose-workbench">
           <section class="compose-main-column">
             <div class="mini-panel compose-workbench-panel">
               <div class="section-head">
@@ -215,6 +216,7 @@
               </div>
             </div>
           </aside>
+          </div>
         </div>
 
         <div class="flow-footer">
@@ -295,7 +297,7 @@
                 <h3>YAML / Markdown 预览</h3>
                 <p class="helper-text">当前导出内容会实时映射到这里。</p>
               </div>
-              <span id="updateStatus" class="helper-text">当前版本：v0.12.11</span>
+              <span id="updateStatus" class="helper-text">当前版本：v0.12.12</span>
             </div>
             <textarea id="markdown" class="code-preview" rows="24"></textarea>
           </section>
@@ -328,6 +330,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
-  <script src="./app.js?v=0.12.11"></script>
+  <script src="./app.js?v=0.12.12"></script>
 </body>
 </html>

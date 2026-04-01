@@ -158,12 +158,17 @@ header p { margin: 6px 0 0; color: var(--sub); }
   display: flex;
   flex-direction: column;
 }
-.stage-pane[data-main="groups"] .stage-card,
 .stage-pane[data-main="groups"] {
+  height: calc(100vh - 170px);
   max-height: calc(100vh - 170px);
   overflow: hidden;
 }
-.stage-pane[data-main="groups"] .stage-body {
+.stage-pane[data-main="groups"].stage-card {
+  height: calc(100vh - 170px);
+  max-height: calc(100vh - 170px);
+}
+.stage-pane[data-main="groups"] > .stage-body,
+.stage-pane[data-main="groups"] .stage-body-compose-shell {
   flex: 1 1 auto;
   min-height: 0;
   overflow: hidden;
@@ -187,6 +192,11 @@ header p { margin: 6px 0 0; color: var(--sub); }
   flex: 0 0 auto;
 }
 .stage-body-import { display: grid; grid-template-columns: 1fr 1.2fr; gap: 14px; align-items: start; }
+.stage-body-compose-shell {
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow: hidden;
+}
 .stage-body-compose { display: grid; grid-template-columns: .92fr 1.28fr; gap: 14px; align-items: start; }
 .stage-body-publish { display: grid; grid-template-columns: .9fr 1.1fr; gap: 14px; align-items: start; }
 .flow-footer {
@@ -559,8 +569,9 @@ button.ghost {
   .publish-hero-grid,
   .compose-guide-strip,
   .stage-body-compose-workbench { grid-template-columns: 1fr; }
-  .stage-pane[data-main="groups"] .stage-card,
-  .stage-pane[data-main="groups"] {
+  .stage-pane[data-main="groups"],
+  .stage-pane[data-main="groups"].stage-card {
+    height: auto;
     max-height: none;
     overflow: visible;
   }

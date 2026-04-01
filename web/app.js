@@ -1,5 +1,5 @@
-const STORAGE_KEY = 'smartclash-web-v1320';
-const APP_VERSION = '0.13.20';
+const STORAGE_KEY = 'smartclash-web-v1321';
+const APP_VERSION = '0.13.21';
 const UPDATE_CMD = 'bash -c "$(curl -fsSL https://raw.githubusercontent.com/cshaizhihao/smartclash-gen/main/install.sh)" -- --update -d ~/.smartclash-gen';
 const AUTH_DISABLED = true;
 const AUTH_KEY = 'smartclash-web-auth';
@@ -1696,12 +1696,34 @@ el.generateSubBtn?.addEventListener('click', async () => {
   }
 });
 
+async function copyTextSmart(text, inputEl) {
+  if (navigator?.clipboard?.writeText) {
+    await navigator.clipboard.writeText(text);
+    return true;
+  }
+  const target = inputEl || document.createElement('textarea');
+  const useTemp = !inputEl;
+  if (useTemp) {
+    target.value = text;
+    target.setAttribute('readonly', 'readonly');
+    target.style.position = 'fixed';
+    target.style.opacity = '0';
+    document.body.appendChild(target);
+  }
+  target.focus();
+  target.select();
+  target.setSelectionRange?.(0, text.length);
+  const ok = document.execCommand('copy');
+  if (useTemp) target.remove();
+  return ok;
+}
+
 el.copySubBtn?.addEventListener('click', async () => {
   try {
     const url = el.subLinkOutput?.value || await generateSubscriptionLink();
     if (!url) return;
-    await navigator.clipboard.writeText(url);
-    setPublishStatus('订阅链接已复制，可直接粘贴到 Clash', 'success');
+    const ok = await copyTextSmart(url, el.subLinkOutput);
+    setPublishStatus(ok ? '订阅链接已复制，可直接粘贴到 Clash' : '订阅链接已生成，请手动长按复制', ok ? 'success' : 'idle');
   } catch (error) {
     setPublishStatus(`复制订阅链接失败：${error.message}`, 'error');
   }

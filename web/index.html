@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>smartclash-gen 可视化编排器</title>
-  <link rel="stylesheet" href="./style.css?v=0.13.15" />
+  <link rel="stylesheet" href="./style.css?v=0.13.16" />
 </head>
 <body>
   <div class="ambient-grid" aria-hidden="true"></div>
@@ -35,8 +35,18 @@
   <div class="app-window-shell">
     <div class="app-window">
       <header>
-        <h1>smartclash-gen v0.13.15</h1>
-        <p>单页流程 · 极简编排 · 动画过渡 · YAML 即时交付</p>
+        <div class="header-bar">
+          <div>
+            <h1>Clash smart 分组编辑器 V0.13.16</h1>
+            <p>极简编排 · YAML 即时交付</p>
+          </div>
+          <div class="header-links">
+            <a class="header-link" href="https://www.nodeseek.com/space/38057#/general" target="_blank" rel="noreferrer">@cshaizhihao</a>
+            <a class="header-icon-link" href="https://github.com/cshaizhihao/smartclash-gen" target="_blank" rel="noreferrer" aria-label="GitHub">
+              <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="currentColor"><path d="M12 .5a12 12 0 0 0-3.79 23.39c.6.11.82-.26.82-.58l-.01-2.04c-3.34.73-4.04-1.61-4.04-1.61-.55-1.38-1.33-1.75-1.33-1.75-1.09-.74.08-.72.08-.72 1.2.08 1.84 1.23 1.84 1.23 1.08 1.84 2.82 1.31 3.5 1 .11-.77.42-1.31.76-1.61-2.67-.3-5.48-1.33-5.48-5.92 0-1.31.47-2.38 1.23-3.22-.12-.3-.53-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.4 11.4 0 0 1 6 0c2.29-1.55 3.29-1.23 3.29-1.23.66 1.66.25 2.88.13 3.18.77.84 1.23 1.91 1.23 3.22 0 4.6-2.81 5.61-5.49 5.91.43.37.82 1.1.82 2.23l-.01 3.31c0 .32.22.7.82.58A12 12 0 0 0 12 .5Z"/></svg>
+            </a>
+          </div>
+        </div>
       </header>
 
       <main class="flow-shell" id="appShell">
@@ -342,7 +352,7 @@
                 <h3>YAML / Markdown 预览</h3>
                 <p class="helper-text">当前导出内容会实时映射到这里。</p>
               </div>
-              <span id="updateStatus" class="helper-text">当前版本：v0.13.15</span>
+              <span id="updateStatus" class="helper-text">当前版本：v0.13.16</span>
             </div>
             <textarea id="markdown" class="code-preview" rows="24"></textarea>
           </section>
@@ -375,6 +385,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
-  <script src="./app.js?v=0.13.15"></script>
+  <script src="./app.js?v=0.13.16"></script>
 </body>
 </html>

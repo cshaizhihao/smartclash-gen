@@ -111,32 +111,36 @@ class Handler(SimpleHTTPRequestHandler):
         txt = (text or '').strip()
         if not txt:
             return []
-        direct = [x.strip() for x in txt.splitlines() if x.strip().startswith(('vless://', 'vmess://', 'trojan://', 'ss://'))]
-        if direct:
-            return direct
+
+        candidates = [txt]
         try:
-            data = base64.b64decode(txt + '===', validate=False).decode('utf-8', errors='ignore')
-            direct = [x.strip() for x in data.splitlines() if x.strip().startswith(('vless://', 'vmess://', 'trojan://', 'ss://'))]
-            if direct:
-                return direct
-            txt = data
+            data = base64.b64decode(txt + '===', validate=False).decode('utf-8', errors='ignore').strip()
+            if data and data not in candidates:
+                candidates.insert(0, data)
         except Exception:
             pass
-        if yaml is not None:
-            try:
-                obj = yaml.safe_load(txt)
-                proxies = obj.get('proxies') if isinstance(obj, dict) else None
-                if isinstance(proxies, list):
-                    lines = []
-                    for i, proxy in enumerate(proxies):
-                        if isinstance(proxy, dict):
-                            line = self._proxy_to_url(proxy, i)
-                            if line:
-                                lines.append(line)
-                    if lines:
-                        return lines
-            except Exception:
-                pass
+
+        for candidate in candidates:
+            if yaml is not None:
+                try:
+                    obj = yaml.safe_load(candidate)
+                    proxies = obj.get('proxies') if isinstance(obj, dict) else None
+                    if isinstance(proxies, list):
+                        lines = []
+                        for i, proxy in enumerate(proxies):
+                            if isinstance(proxy, dict):
+                                line = self._proxy_to_url(proxy, i)
+                                if line:
+                                    lines.append(line)
+                        if lines:
+                            return lines
+                except Exception:
+                    pass
+
+            direct = [x.strip() for x in candidate.splitlines() if x.strip().startswith(('vless://', 'vmess://', 'trojan://', 'ss://'))]
+            if direct:
+                return direct
+
         return []
 
     def do_POST(self):

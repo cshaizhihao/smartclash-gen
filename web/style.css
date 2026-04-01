@@ -159,12 +159,14 @@ header p { margin: 6px 0 0; color: var(--sub); }
   flex-direction: column;
 }
 .stage-pane[data-main="groups"] {
-  height: calc(100vh - 170px);
+  height: min(820px, calc(100vh - 170px));
+  min-height: 700px;
   max-height: calc(100vh - 170px);
   overflow: hidden;
 }
 .stage-pane[data-main="groups"].stage-card {
-  height: calc(100vh - 170px);
+  height: min(820px, calc(100vh - 170px));
+  min-height: 700px;
   max-height: calc(100vh - 170px);
 }
 .stage-pane[data-main="groups"] > .stage-body,
@@ -218,6 +220,12 @@ header p { margin: 6px 0 0; color: var(--sub); }
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
   margin: 14px 0 12px;
+}
+.compose-guide-strip-strong .guide-step {
+  min-height: 78px;
+}
+.compose-guide-strip-strong .guide-step strong {
+  color: #f8fafc;
 }
 .guide-step {
   display: flex;
@@ -273,6 +281,28 @@ header p { margin: 6px 0 0; color: var(--sub); }
   gap: 10px;
   align-content: flex-start;
 }
+.compose-route-hint-vertical {
+  display: grid;
+  justify-items: stretch;
+  align-content: start;
+}
+.route-card {
+  border: 1px solid rgba(56,189,248,.28);
+  background: linear-gradient(180deg, rgba(14,165,233,.14), rgba(8,15,29,.5));
+  border-radius: 18px;
+  padding: 14px;
+  display: grid;
+  gap: 6px;
+}
+.route-card-label {
+  color: #7dd3fc;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+.route-card small {
+  color: #9fb1c7;
+}
 .route-chip {
   display: inline-flex;
   align-items: center;
@@ -284,18 +314,21 @@ header p { margin: 6px 0 0; color: var(--sub); }
   color: #cbd5e1;
 }
 .route-chip b { color: #f8fafc; }
+.route-action-btn {
+  width: 100%;
+}
 .compose-column {
   display: grid;
   gap: 14px;
   align-self: start;
   min-width: 0;
 }
-.stage-body-compose-workbench {
-  grid-template-columns: minmax(0, 1.35fr) minmax(320px, .72fr);
-  align-items: stretch;
-  min-height: 0;
+.compose-workbench-frame {
+  display: grid;
+  grid-template-columns: minmax(0, 1.32fr) minmax(340px, .78fr);
+  gap: 14px;
   height: 100%;
-  max-height: 100%;
+  min-height: 0;
   overflow: hidden;
 }
 .compose-main-column,
@@ -307,7 +340,7 @@ header p { margin: 6px 0 0; color: var(--sub); }
   height: 100%;
 }
 .compose-main-column {
-  grid-template-rows: minmax(0, 1fr) auto;
+  grid-template-rows: minmax(0, 1fr);
 }
 .compose-side-column {
   grid-template-rows: minmax(0, 1fr) auto;
@@ -319,6 +352,9 @@ header p { margin: 6px 0 0; color: var(--sub); }
   display: flex;
   flex-direction: column;
   overflow: hidden;
+}
+.compose-workbench-head {
+  align-items: flex-start;
 }
 .rules-editor-panel,
 .node-editor-panel {
@@ -445,7 +481,7 @@ button.ghost {
 }
 .group-pool {
   min-height: 72px;
-  max-height: 180px;
+  max-height: 160px;
   overflow-y: auto;
 }
 .group-meta-zone {
@@ -474,6 +510,7 @@ button.ghost {
   max-height: 100%;
   flex: 1 1 auto;
   padding-right: 4px;
+  overscroll-behavior: contain;
 }
 .group {
   border: 1px solid rgba(71,85,105,.58);
@@ -568,14 +605,15 @@ button.ghost {
   .stage-body-publish,
   .publish-hero-grid,
   .compose-guide-strip,
-  .stage-body-compose-workbench { grid-template-columns: 1fr; }
+  .compose-workbench-frame { grid-template-columns: 1fr; }
   .stage-pane[data-main="groups"],
   .stage-pane[data-main="groups"].stage-card {
     height: auto;
+    min-height: 0;
     max-height: none;
     overflow: visible;
   }
-  .stage-body-compose-workbench {
+  .compose-workbench-frame {
     min-height: auto;
     height: auto;
     max-height: none;

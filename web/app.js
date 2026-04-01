@@ -1,5 +1,5 @@
-const STORAGE_KEY = 'smartclash-web-v1212';
-const APP_VERSION = '0.12.12';
+const STORAGE_KEY = 'smartclash-web-v1300';
+const APP_VERSION = '0.13.0';
 const UPDATE_CMD = 'bash -c "$(curl -fsSL https://raw.githubusercontent.com/cshaizhihao/smartclash-gen/main/install.sh)" -- --update -d ~/.smartclash-gen';
 const AUTH_DISABLED = true;
 const AUTH_KEY = 'smartclash-web-auth';
@@ -55,7 +55,7 @@ const NAV_SCHEMA = {
   },
   groups: { label: '策略组模块', subs: { canvas: { label: '编排策略', thirds: { drag: '拖拽画布' } } } },
   rules: { label: '规则模块', subs: { editor: { label: '规则检查', thirds: { line: '规则列表' } } } },
-  publish: { label: '发布模块', subs: { actions: { label: '确认发布', thirds: { output: '导出与发布' } } } },
+  publish: { label: '发布模块', subs: { actions: { label: '规则校验 / 导出发布', thirds: { output: '导出与发布' } } } },
 };
 
 const viewState = { main: 'nodes', sub: 'import', third: 'quick' };
@@ -829,22 +829,21 @@ function render() {
   if (el.groupPool) new Sortable(el.groupPool, { group: { name: 'nodes-and-groups', pull: 'clone', put: false }, animation: 150, sort: false, onSort: syncFromDom, onEnd: render });
   new Sortable(el.groups, { animation: 150, handle: 'h4', onSort: syncGroupOrder });
 
-  const transitMembers = state.groups.find((g) => g.name === transitGroupName)?.members?.length || 0;
-  const egressMembers = state.groups.find((g) => g.name === egressGroupName)?.members?.length || 0;
+  const transitNames = getGroupProxyNames(transitGroupName);
+  const egressNames = getGroupProxyNames(egressGroupName);
+  const transitMembers = transitNames.length;
+  const egressMembers = egressNames.length;
   const chainGroup = state.groups.find((g) => g.name === chainGroupName);
-  const chainCount = chainGroup?.members?.length || (transitMembers && egressMembers ? Math.min(transitMembers, 8) * Math.min(egressMembers, 8) : 0);
-  if (chainGroup && (!chainGroup.members || chainGroup.members.length === 0) && transitMembers && egressMembers) {
-    const generated = [];
+  const chainCount = transitMembers && egressMembers ? Math.min(transitMembers, 8) * Math.min(egressMembers, 8) : 0;
+  if (chainGroup) {
+    chainGroup.members = [];
     let combo = 0;
-    const transitNames = getGroupProxyNames(transitGroupName);
-    const egressNames = getGroupProxyNames(egressGroupName);
     for (const t of transitNames.slice(0, 8)) {
       for (const e of egressNames.slice(0, 8)) {
         combo += 1;
-        generated.push(`relay:${t}=>${e}#${combo}`);
+        chainGroup.members.push(`relay:${t}=>${e}#${combo}`);
       }
     }
-    chainGroup.members = generated;
   }
   if (el.composeUnassignedCount) el.composeUnassignedCount.textContent = String(availableNodes.length);
   if (el.composeTransitCount) el.composeTransitCount.textContent = String(transitMembers);
@@ -1077,7 +1076,9 @@ function validateState() {
   const transitCount = getGroupProxyNames(transitGroupName).length;
   const egressCount = getGroupProxyNames(egressGroupName).length;
   if (!transitCount || !egressCount) {
-    suggestions.push(`链式代理待激活：请将节点拖入「${transitGroupName}」和「${egressGroupName}」`);
+    suggestions.push(`链式代理待激活：请先把“入口跳板”拖入「${transitGroupName}」，再把“最终落点”拖入「${egressGroupName}」`);
+  } else {
+    suggestions.push(`链式代理已就绪：当前会按「${transitGroupName} → ${egressGroupName}」自动生成组合`);
   }
 
   return { warnings, blockers, suggestions, risks };

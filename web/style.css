@@ -132,7 +132,12 @@ header {
   background: rgba(8,15,29,.72);
 }
 h1 { margin: 0; font-size: 24px; }
-header p { margin: 6px 0 0; color: var(--sub); }
+header p {
+  margin: 6px 0 0;
+  color: var(--sub);
+  font-size: 14px;
+  letter-spacing: .02em;
+}
 
 .flow-shell {
   width: 100%;
@@ -146,8 +151,15 @@ header p { margin: 6px 0 0; color: var(--sub); }
   gap: 18px;
   align-items: end;
 }
-.flow-title h2 { margin: 0 0 6px; font-size: 20px; }
-.flow-title p { margin: 0; }
+.flow-title h2 {
+  margin: 0 0 6px;
+  font-size: 20px;
+  letter-spacing: .01em;
+}
+.flow-title p {
+  margin: 0;
+  color: #a9b8cc;
+}
 .flow-progress-wrap { display: grid; gap: 10px; }
 .wizard-steps { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 10px; }
 .wiz-step {

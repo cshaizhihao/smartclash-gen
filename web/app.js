@@ -1,5 +1,5 @@
-const STORAGE_KEY = 'smartclash-web-v123';
-const APP_VERSION = '0.12.3';
+const STORAGE_KEY = 'smartclash-web-v124';
+const APP_VERSION = '0.12.4';
 const UPDATE_CMD = 'bash -c "$(curl -fsSL https://raw.githubusercontent.com/cshaizhihao/smartclash-gen/main/install.sh)" -- --update -d ~/.smartclash-gen';
 const AUTH_DISABLED = true;
 const AUTH_KEY = 'smartclash-web-auth';
@@ -146,6 +146,10 @@ const el = {
   warnings: document.getElementById('warnings'),
   publishChecklist: document.getElementById('publishChecklist'),
   diffSummary: document.getElementById('diffSummary'),
+  publishHeroState: document.getElementById('publishHeroState'),
+  publishHeroHint: document.getElementById('publishHeroHint'),
+  publishBlockerCount: document.getElementById('publishBlockerCount'),
+  publishWarningCount: document.getElementById('publishWarningCount'),
   qcRules: document.getElementById('qcRules'),
   qcNodes: document.getElementById('qcNodes'),
   qcPort: document.getElementById('qcPort'),
@@ -1028,6 +1032,18 @@ function renderQuickChecks(result) {
   if (el.doneImport) el.doneImport.textContent = state.nodes.some((n) => n.url) ? '✅ 已完成' : '⏳ 未完成';
   if (el.doneGenerate) el.doneGenerate.textContent = smart?.members?.length ? '✅ 已完成' : '⏳ 未完成';
   if (el.donePublish) el.donePublish.textContent = result.blockers.length ? '⏳ 待处理' : '✅ 可发布';
+  if (el.publishBlockerCount) el.publishBlockerCount.textContent = String(result.blockers.length);
+  if (el.publishWarningCount) el.publishWarningCount.textContent = String(result.warnings.length);
+  if (el.publishHeroState) {
+    el.publishHeroState.textContent = result.blockers.length ? '需修复后发布' : '可以进入发布';
+  }
+  if (el.publishHeroHint) {
+    el.publishHeroHint.textContent = result.blockers.length
+      ? `当前仍有 ${result.blockers.length} 条阻塞，建议先处理后再导出`
+      : result.warnings.length
+        ? `当前无阻塞，剩余 ${result.warnings.length} 条提醒可按需处理`
+        : '当前状态干净，可直接保存、导出或发布';
+  }
   updateSmartActionLabel(result);
 }
 

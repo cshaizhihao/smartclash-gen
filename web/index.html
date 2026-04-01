@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>smartclash-gen 可视化编排器</title>
-  <link rel="stylesheet" href="./style.css?v=0.12.3" />
+  <link rel="stylesheet" href="./style.css?v=0.12.4" />
 </head>
 <body>
   <div class="ambient-grid" aria-hidden="true"></div>
@@ -35,7 +35,7 @@
   <div class="app-window-shell">
     <div class="app-window">
       <header>
-        <h1>smartclash-gen v0.12.3</h1>
+        <h1>smartclash-gen v0.12.4</h1>
         <p>单页流程 · 极简编排 · 动画过渡 · YAML 即时交付</p>
       </header>
 
@@ -216,36 +216,73 @@
       </article>
 
       <article class="panel stage-card pane stage-pane" data-main="publish" data-sub="actions" data-third="output" hidden>
-        <div class="stage-head">
+        <div class="stage-head stage-head-publish">
           <div>
             <h2>步骤 3：生成并发布 <span id="donePublish" class="helper-text"></span></h2>
             <p class="helper-text">检查状态、查看 YAML、确认无误后导出或发布。</p>
+            <div class="publish-hero-grid">
+              <div class="hero-metric-card hero-metric-accent">
+                <span class="hero-metric-label">发布状态</span>
+                <strong id="publishHeroState">待校验</strong>
+                <small id="publishHeroHint">先检查阻塞项，再决定导出或发布</small>
+              </div>
+              <div class="hero-metric-card">
+                <span class="hero-metric-label">阻塞项</span>
+                <strong id="publishBlockerCount">0</strong>
+                <small>阻塞越少，越接近可发布</small>
+              </div>
+              <div class="hero-metric-card">
+                <span class="hero-metric-label">警告项</span>
+                <strong id="publishWarningCount">0</strong>
+                <small>建议处理，但不一定阻止导出</small>
+              </div>
+              <div class="hero-metric-card">
+                <span class="hero-metric-label">输出格式</span>
+                <strong>YAML + MD</strong>
+                <small>结果会同步生成可复制与可下载内容</small>
+              </div>
+            </div>
           </div>
-          <div class="row compact-row">
-            <input id="mixedPort" type="number" min="1" max="65535" placeholder="mixed-port，默认 7892" />
-            <button id="smartActionBtn">自动推进</button>
-            <button id="toggleAdvanced" class="ghost">高级</button>
+          <div class="publish-control-stack">
+            <div class="row compact-row">
+              <input id="mixedPort" type="number" min="1" max="65535" placeholder="mixed-port，默认 7892" />
+              <button id="smartActionBtn">自动推进</button>
+              <button id="toggleAdvanced" class="ghost">高级</button>
+            </div>
+            <div id="advancedOps" class="row hidden">
+              <button id="saveBtn" class="ghost">保存并生成 Markdown</button>
+              <button id="downloadYamlBtn" class="ghost">下载 YAML</button>
+              <button id="publishBtn" class="ghost">发布配置</button>
+              <button id="autoFixBtn" class="ghost">自动修复引用</button>
+            </div>
           </div>
         </div>
 
         <div class="stage-body stage-body-publish">
-          <section class="mini-panel">
+          <section class="mini-panel publish-overview-panel">
             <div class="publish-quickcheck">
               <div><b>规则</b><span id="qcRules">规则未阻塞</span></div>
               <div><b>节点</b><span id="qcNodes">节点已分配</span></div>
               <div><b>端口</b><span id="qcPort">端口有效</span></div>
             </div>
             <p id="publishStatus" class="publish-status">尚未发布</p>
-            <ul id="publishChecklist" class="warnings"></ul>
-            <ul id="diffSummary" class="warnings"></ul>
+            <div class="publish-list-block">
+              <h3>发布前检查</h3>
+              <ul id="publishChecklist" class="warnings"></ul>
+            </div>
+            <div class="publish-list-block">
+              <h3>与上次保存相比</h3>
+              <ul id="diffSummary" class="warnings"></ul>
+            </div>
           </section>
 
-          <section class="mini-panel">
-            <div id="advancedOps" class="row hidden">
-              <button id="saveBtn" class="ghost">保存并生成 Markdown</button>
-              <button id="downloadYamlBtn" class="ghost">下载 YAML</button>
-              <button id="publishBtn" class="ghost">发布配置</button>
-              <button id="autoFixBtn" class="ghost">自动修复引用</button>
+          <section class="mini-panel publish-code-panel">
+            <div class="code-panel-head">
+              <div>
+                <h3>YAML / Markdown 预览</h3>
+                <p class="helper-text">当前导出内容会实时映射到这里。</p>
+              </div>
+              <span id="updateStatus" class="helper-text">当前版本：v0.12.4</span>
             </div>
             <textarea id="markdown" class="code-preview" rows="24"></textarea>
           </section>
@@ -256,7 +293,6 @@
             <button id="smartUpdateBtn">一键检查并更新</button>
             <button id="checkUpdateBtn" class="ghost">仅检查更新</button>
             <button id="copyUpdateCmdBtn" class="ghost">复制更新命令</button>
-            <span id="updateStatus" class="helper-text">当前版本：v0.12.0</span>
           </div>
           <div class="row compact-row">
             <button id="stepPrevPublish" class="ghost">上一步</button>
@@ -279,6 +315,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
-  <script src="./app.js?v=0.12.3"></script>
+  <script src="./app.js?v=0.12.4"></script>
 </body>
 </html>

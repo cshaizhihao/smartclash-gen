@@ -15,6 +15,51 @@ try:
 except Exception:
     yaml = None
 
+
+def _split_flow_style_fields(text):
+    fields = []
+    buf = []
+    depth = 0
+    in_single = False
+    in_double = False
+    prev = ''
+    for ch in text:
+        if ch == "'" and not in_double and prev != '\\':
+            in_single = not in_single
+        elif ch == '"' and not in_single and prev != '\\':
+            in_double = not in_double
+        elif not in_single and not in_double:
+            if ch in '{[':
+                depth += 1
+            elif ch in '}]' and depth > 0:
+                depth -= 1
+            elif ch == ',' and depth == 0:
+                fields.append(''.join(buf).strip())
+                buf = []
+                prev = ch
+                continue
+        buf.append(ch)
+        prev = ch
+    if buf:
+        fields.append(''.join(buf).strip())
+    return fields
+
+
+def _parse_flow_style_mapping(text):
+    text = (text or '').strip()
+    if text.startswith('{') and text.endswith('}'):
+        text = text[1:-1]
+    result = {}
+    for item in _split_flow_style_fields(text):
+        if ':' not in item:
+            continue
+        key, value = item.split(':', 1)
+        key = key.strip().strip("'\"")
+        value = value.strip().strip(',').strip()
+        value = value.strip("'\"")
+        result[key] = value
+    return result
+
 ROOT = Path(__file__).resolve().parent
 PROJECT_ROOT = ROOT.parent
 VERSION_FILE = PROJECT_ROOT / 'VERSION'
@@ -125,8 +170,8 @@ class Handler(SimpleHTTPRequestHandler):
         yaml_like_markers = ('proxies:', 'proxy-groups:', 'rules:', 'rule-providers:', 'port:', 'socks-port:', 'mixed-port:')
 
         for candidate in candidates:
-            lines_only = [line.strip() for line in candidate.splitlines() if line.strip()]
-            direct = [x for x in lines_only if x.startswith(('vless://', 'vmess://', 'trojan://', 'ss://'))]
+            lines_only = [line.rstrip() for line in candidate.splitlines() if line.strip()]
+            direct = [x.strip() for x in lines_only if x.strip().startswith(('vless://', 'vmess://', 'trojan://', 'ss://'))]
             if direct and len(direct) == len(lines_only):
                 return direct
 
@@ -152,6 +197,22 @@ class Handler(SimpleHTTPRequestHandler):
                         continue
 
             if is_yaml_like:
+                in_proxies = False
+                lines = []
+                for raw_line in lines_only:
+                    stripped = raw_line.strip()
+                    if stripped == 'proxies:':
+                        in_proxies = True
+                        continue
+                    if in_proxies and stripped.startswith(('proxy-groups:', 'rules:', 'rule-providers:')):
+                        break
+                    if in_proxies and stripped.startswith('- {') and stripped.endswith('}'):
+                        proxy = _parse_flow_style_mapping(stripped[1:].strip())
+                        line = self._proxy_to_url(proxy, len(lines))
+                        if line:
+                            lines.append(line)
+                if lines:
+                    return lines
                 continue
 
             if direct:

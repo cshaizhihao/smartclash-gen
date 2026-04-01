@@ -29,7 +29,7 @@
   </div>
 
   <header>
-    <h1>smartclash-gen v0.7.9</h1>
+    <h1>smartclash-gen v0.8.0</h1>
     <p>模块化编辑 · 拖拽编排 · Markdown/YAML 交付 · 隐私登录保护</p>
   </header>
 
@@ -74,6 +74,10 @@
         <div id="importConflictBox" class="conflict-box hidden">
           <h3>导入冲突清单（可恢复）</h3>
           <ul id="importConflicts" class="warnings"></ul>
+          <div class="row">
+            <input id="dupEditName" placeholder="重复节点新名称（逐条编辑）" />
+            <button id="applyDupEdit" class="ghost">用新名称导入当前重复</button>
+          </div>
         </div>
       </article>
 
@@ -148,6 +152,9 @@
         <ul id="publishChecklist" class="warnings"></ul>
         <h3>发布前差异（相对上次保存）</h3>
         <ul id="diffSummary" class="warnings"></ul>
+        <div class="row">
+          <button id="exportDiffBtn" class="ghost">导出变更报告</button>
+        </div>
       </article>
     </section>
 

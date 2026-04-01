@@ -59,7 +59,7 @@ const NAV_SCHEMA = {
 
 const viewState = { main: 'nodes', sub: 'import', third: 'quick' };
 const importConflictState = { dupEntries: [], errors: [] };
-const historyState = { undo: [], redo: [] };
+const historyState = { undo: [], redo: [], undoAction: [], redoAction: [] };
 let savedBaseline = null;
 
 const el = {
@@ -93,6 +93,8 @@ const el = {
   resolveAllDup: document.getElementById('resolveAllDup'),
   resolveOneDup: document.getElementById('resolveOneDup'),
   ignoreConflicts: document.getElementById('ignoreConflicts'),
+  dupEditName: document.getElementById('dupEditName'),
+  applyDupEdit: document.getElementById('applyDupEdit'),
 
   groupName: document.getElementById('groupName'),
   groupType: document.getElementById('groupType'),
@@ -120,6 +122,7 @@ const el = {
   warnings: document.getElementById('warnings'),
   publishChecklist: document.getElementById('publishChecklist'),
   diffSummary: document.getElementById('diffSummary'),
+  exportDiffBtn: document.getElementById('exportDiffBtn'),
 };
 
 function simpleHash(input) {
@@ -318,6 +321,17 @@ function setImportStatus(text, type = 'idle') {
   el.importStatus.dataset.type = type;
 }
 
+function refreshConflictPanel() {
+  if (!el.importConflictBox || !el.importConflicts) return;
+  const conflictItems = [
+    ...importConflictState.dupEntries.map((d) => `🔁 重名节点：${d.name}`),
+    ...importConflictState.errors.map((e) => `⛔ ${e}`),
+  ];
+  el.importConflictBox.classList.toggle('hidden', conflictItems.length === 0);
+  el.importConflicts.innerHTML = conflictItems.map((x) => `<li>${x}</li>`).join('');
+  if (el.dupEditName) el.dupEditName.value = importConflictState.dupEntries[0]?.name ? `${importConflictState.dupEntries[0].name}-edited` : '';
+}
+
 function safeDecodeBase64(input) {
   const normalized = input.trim().replace(/-/g, '+').replace(/_/g, '/');
   const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, '=');
@@ -504,10 +518,15 @@ function getSerializableState() {
   };
 }
 
-function pushHistory() {
+function pushHistory(action = '编辑') {
   historyState.undo.push(getSerializableState());
-  if (historyState.undo.length > 50) historyState.undo.shift();
+  historyState.undoAction.push(action);
+  if (historyState.undo.length > 50) {
+    historyState.undo.shift();
+    historyState.undoAction.shift();
+  }
   historyState.redo = [];
+  historyState.redoAction = [];
 }
 
 function applySnapshot(snap) {
@@ -868,14 +887,7 @@ el.importUrlsBtn.addEventListener('click', () => {
   render();
   persistState();
 
-  if (el.importConflictBox && el.importConflicts) {
-    const conflictItems = [
-      ...dupEntries.map((item) => `🔁 重名节点：${item.name}`),
-      ...errors.map((e) => `⛔ ${e}`),
-    ];
-    el.importConflictBox.classList.toggle('hidden', conflictItems.length === 0);
-    el.importConflicts.innerHTML = conflictItems.map((x) => `<li>${x}</li>`).join('');
-  }
+  refreshConflictPanel();
 
   if (errors.length || dupCount) setImportStatus(`导入 ${okCount}，重复 ${dupCount}，失败 ${errors.length}`, 'error');
   else setImportStatus(`导入成功 ${okCount}，重复跳过 ${dupCount}`, 'success');
@@ -929,10 +941,7 @@ el.clearUrlsBtn.addEventListener('click', () => {
   persistState();
   importConflictState.dupEntries = [];
   importConflictState.errors = [];
-  if (el.importConflictBox && el.importConflicts) {
-    el.importConflictBox.classList.add('hidden');
-    el.importConflicts.innerHTML = '';
-  }
+  refreshConflictPanel();
   setImportStatus('已清空已导入 URL', 'idle');
   setPublishStatus('已清空节点 URL，请重新导入后再发布', 'idle');
 });
@@ -956,9 +965,7 @@ el.resolveAllDup?.addEventListener('click', () => {
   importConflictState.dupEntries = [];
   render();
   persistState();
-  const conflictItems = importConflictState.errors.map((e) => `⛔ ${e}`);
-  if (el.importConflicts) el.importConflicts.innerHTML = conflictItems.map((x) => `<li>${x}</li>`).join('');
-  if (el.importConflictBox) el.importConflictBox.classList.toggle('hidden', conflictItems.length === 0);
+  refreshConflictPanel();
   setImportStatus(`重复节点已重命名导入 ${imported} 条`, 'success');
 });
 
@@ -976,22 +983,33 @@ el.resolveOneDup?.addEventListener('click', () => {
   state.nodes.push({ id: makeId(), name, url: item.url, region: inferRegion(name) });
   render();
   persistState();
-  const conflictItems = [
-    ...importConflictState.dupEntries.map((d) => `🔁 重名节点：${d.name}`),
-    ...importConflictState.errors.map((e) => `⛔ ${e}`),
-  ];
-  if (el.importConflicts) el.importConflicts.innerHTML = conflictItems.map((x) => `<li>${x}</li>`).join('');
-  if (el.importConflictBox) el.importConflictBox.classList.toggle('hidden', conflictItems.length === 0);
+  refreshConflictPanel();
   setImportStatus(`已处理 1 条重复节点，剩余 ${importConflictState.dupEntries.length} 条`, 'success');
+});
+
+el.applyDupEdit?.addEventListener('click', () => {
+  if (!importConflictState.dupEntries.length) return setImportStatus('没有待编辑的重复节点', 'idle');
+  const customName = (el.dupEditName?.value || '').trim();
+  if (!customName) return setImportStatus('请先输入新名称', 'error');
+  pushHistory('逐条冲突编辑');
+  const item = importConflictState.dupEntries.shift();
+  const exists = new Set(state.nodes.map((n) => n.name));
+  let finalName = customName;
+  let i = 2;
+  while (exists.has(finalName)) {
+    finalName = `${customName}-${i++}`;
+  }
+  state.nodes.push({ id: makeId(), name: finalName, url: item.url, region: inferRegion(finalName) });
+  render();
+  persistState();
+  refreshConflictPanel();
+  setImportStatus(`已按自定义名称导入：${finalName}`, 'success');
 });
 
 el.ignoreConflicts?.addEventListener('click', () => {
   importConflictState.dupEntries = [];
   importConflictState.errors = [];
-  if (el.importConflictBox && el.importConflicts) {
-    el.importConflictBox.classList.add('hidden');
-    el.importConflicts.innerHTML = '';
-  }
+  refreshConflictPanel();
   setImportStatus('已忽略当前冲突提示', 'idle');
 });
 
@@ -1040,6 +1058,18 @@ el.downloadYamlBtn.addEventListener('click', () => {
   const a = document.createElement('a');
   a.href = url;
   a.download = 'smartclash-config.yaml';
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
+el.exportDiffBtn?.addEventListener('click', () => {
+  const text = (el.diffSummary?.innerText || '暂无变更').trim();
+  const report = `# smartclash-gen 变更报告\n\n${text}\n`;
+  const blob = new Blob([report], { type: 'text/markdown;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'smartclash-diff-report.md';
   a.click();
   URL.revokeObjectURL(url);
 });
@@ -1125,18 +1155,22 @@ el.undoBtn?.addEventListener('click', () => {
   if (!historyState.undo.length) return setPublishStatus('没有可撤销的操作', 'idle');
   const current = getSerializableState();
   historyState.redo.push(current);
+  const action = historyState.undoAction.pop() || '编辑';
+  historyState.redoAction.push(action);
   const prev = historyState.undo.pop();
   applySnapshot(prev);
-  setPublishStatus('已撤销一步', 'success');
+  setPublishStatus(`已撤销：${action}`, 'success');
 });
 
 el.redoBtn?.addEventListener('click', () => {
   if (!historyState.redo.length) return setPublishStatus('没有可重做的操作', 'idle');
   const current = getSerializableState();
   historyState.undo.push(current);
+  const action = historyState.redoAction.pop() || '编辑';
+  historyState.undoAction.push(action);
   const next = historyState.redo.pop();
   applySnapshot(next);
-  setPublishStatus('已重做一步', 'success');
+  setPublishStatus(`已重做：${action}`, 'success');
 });
 
 hydrateState();

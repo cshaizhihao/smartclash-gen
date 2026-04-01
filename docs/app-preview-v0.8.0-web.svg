@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
+  <rect width="1600" height="900" fill="#0a1224"/>
+  <rect x="48" y="48" width="1504" height="804" rx="20" fill="#121d36" stroke="#334155"/>
+  <text x="96" y="116" fill="#7dd3fc" font-size="40" font-family="Inter,Arial">smartclash-gen v0.8.0</text>
+  <text x="96" y="158" fill="#94a3b8" font-size="22" font-family="Inter,Arial">逐条冲突编辑导入 + 动作可追踪撤销重做 + 变更报告导出</text>
+  <rect x="96" y="210" width="880" height="590" rx="12" fill="#0b1224" stroke="#475569"/>
+  <text x="126" y="252" fill="#cbd5e1" font-size="20">导入冲突清单</text>
+  <text x="126" y="290" fill="#f87171" font-size="17">🔁 重名节点：HK-01</text>
+  <text x="126" y="322" fill="#f87171" font-size="17">输入新名称：HK-01-Office</text>
+  <text x="126" y="354" fill="#86efac" font-size="17">[用新名称导入当前重复] [处理下一条重复]</text>
+  <text x="126" y="410" fill="#93c5fd" font-size="17">撤销提示：已撤销：逐条冲突编辑</text>
+  <text x="126" y="442" fill="#93c5fd" font-size="17">重做提示：已重做：逐条冲突编辑</text>
+  <rect x="1010" y="210" width="494" height="590" rx="12" fill="#0b1224" stroke="#475569"/>
+  <text x="1040" y="252" fill="#cbd5e1" font-size="20">发布前差异</text>
+  <text x="1040" y="290" fill="#86efac" font-size="17">🧾 节点数量：10 → 12</text>
+  <text x="1040" y="322" fill="#86efac" font-size="17">🧾 规则内容已变更</text>
+  <text x="1040" y="354" fill="#86efac" font-size="17">🧾 mixed-port：7892 → 10100</text>
+  <text x="1040" y="398" fill="#cbd5e1" font-size="17">[导出变更报告]</text>
+</svg>

@@ -58,6 +58,7 @@ const NAV_SCHEMA = {
 };
 
 const viewState = { main: 'nodes', sub: 'import', third: 'quick' };
+const importConflictState = { dupEntries: [], errors: [] };
 
 const el = {
   authGate: document.getElementById('authGate'),
@@ -74,6 +75,8 @@ const el = {
   breadcrumbText: document.getElementById('breadcrumbText'),
   stepProgressText: document.getElementById('stepProgressText'),
   stepProgressFill: document.getElementById('stepProgressFill'),
+  stepPrev: document.getElementById('stepPrev'),
+  stepNext: document.getElementById('stepNext'),
 
   nodeName: document.getElementById('nodeName'),
   addNode: document.getElementById('addNode'),
@@ -83,6 +86,8 @@ const el = {
   importStatus: document.getElementById('importStatus'),
   importConflictBox: document.getElementById('importConflictBox'),
   importConflicts: document.getElementById('importConflicts'),
+  resolveAllDup: document.getElementById('resolveAllDup'),
+  ignoreConflicts: document.getElementById('ignoreConflicts'),
 
   groupName: document.getElementById('groupName'),
   groupType: document.getElementById('groupType'),
@@ -253,6 +258,26 @@ function updatePathline() {
   const step = idx + 1;
   if (el.stepProgressText) el.stepProgressText.textContent = `Step ${step} / ${order.length}`;
   if (el.stepProgressFill) el.stepProgressFill.style.width = `${(step / order.length) * 100}%`;
+}
+
+function getNavTriples() {
+  const triples = [];
+  Object.entries(NAV_SCHEMA).forEach(([mainId, mainCfg]) => {
+    Object.entries(mainCfg.subs).forEach(([subId, subCfg]) => {
+      Object.keys(subCfg.thirds).forEach((thirdId) => {
+        triples.push({ main: mainId, sub: subId, third: thirdId });
+      });
+    });
+  });
+  return triples;
+}
+
+function jumpTo(main, sub, third) {
+  viewState.main = main;
+  viewState.sub = sub;
+  viewState.third = third;
+  renderNavigation();
+  renderPanes();
 }
 
 function renderPanes() {
@@ -730,12 +755,25 @@ function renderWarnings(result) {
 
   if (el.publishChecklist) {
     const checks = [
-      result.blockers.length ? `⛔ 阻塞项 ${result.blockers.length} 条（需先修复）` : '✅ 无阻塞项，可发布',
-      result.warnings.length ? `⚠️ 警告 ${result.warnings.length} 条（建议处理）` : '✅ 无警告项',
-      '📦 已确认导出格式：YAML + Markdown',
-      '🧪 已完成规则与引用一致性检查',
+      {
+        text: result.blockers.length ? `⛔ 阻塞项 ${result.blockers.length} 条（需先修复）` : '✅ 无阻塞项，可发布',
+        jump: 'nodes/import/quick',
+      },
+      {
+        text: result.warnings.length ? `⚠️ 警告 ${result.warnings.length} 条（建议处理）` : '✅ 无警告项',
+        jump: 'rules/editor/line',
+      },
+      { text: '📦 已确认导出格式：YAML + Markdown', jump: 'publish/actions/output' },
+      { text: '🧪 已完成规则与引用一致性检查', jump: 'rules/editor/line' },
     ];
-    el.publishChecklist.innerHTML = checks.map((x) => `<li>${x}</li>`).join('');
+    el.publishChecklist.innerHTML = checks.map((x) => `<li data-jump="${x.jump}">${x.text}</li>`).join('');
+    el.publishChecklist.querySelectorAll('li[data-jump]').forEach((li) => {
+      li.style.cursor = 'pointer';
+      li.addEventListener('click', () => {
+        const [m, s, t] = li.dataset.jump.split('/');
+        jumpTo(m, s, t);
+      });
+    });
   }
 }
 
@@ -766,7 +804,7 @@ el.importUrlsBtn.addEventListener('click', () => {
   let okCount = 0;
   let dupCount = 0;
   const errors = [];
-  const dupNames = [];
+  const dupEntries = [];
 
   lines.forEach((line, i) => {
     const parsed = parseNodeUrl(line, i);
@@ -774,20 +812,22 @@ el.importUrlsBtn.addEventListener('click', () => {
     if (!parsed.ok) return errors.push(parsed.error);
     if (exists.has(parsed.name)) {
       dupCount++;
-      dupNames.push(parsed.name);
+      dupEntries.push(parsed);
       return;
     }
     exists.add(parsed.name);
     state.nodes.push({ id: makeId(), name: parsed.name, url: parsed.url, region: inferRegion(parsed.name) });
     okCount++;
   });
+  importConflictState.dupEntries = dupEntries;
+  importConflictState.errors = errors;
 
   render();
   persistState();
 
   if (el.importConflictBox && el.importConflicts) {
     const conflictItems = [
-      ...dupNames.map((name) => `🔁 重名节点：${name}`),
+      ...dupEntries.map((item) => `🔁 重名节点：${item.name}`),
       ...errors.map((e) => `⛔ ${e}`),
     ];
     el.importConflictBox.classList.toggle('hidden', conflictItems.length === 0);
@@ -840,12 +880,48 @@ el.clearUrlsBtn.addEventListener('click', () => {
   el.nodeUrls.value = '';
   render();
   persistState();
+  importConflictState.dupEntries = [];
+  importConflictState.errors = [];
   if (el.importConflictBox && el.importConflicts) {
     el.importConflictBox.classList.add('hidden');
     el.importConflicts.innerHTML = '';
   }
   setImportStatus('已清空已导入 URL', 'idle');
   setPublishStatus('已清空节点 URL，请重新导入后再发布', 'idle');
+});
+
+el.resolveAllDup?.addEventListener('click', () => {
+  if (!importConflictState.dupEntries.length) return setImportStatus('没有待处理的重复节点', 'idle');
+  const exists = new Set(state.nodes.map((n) => n.name));
+  let imported = 0;
+  importConflictState.dupEntries.forEach((item) => {
+    let idx = 2;
+    let name = `${item.name}-dup${idx}`;
+    while (exists.has(name)) {
+      idx += 1;
+      name = `${item.name}-dup${idx}`;
+    }
+    exists.add(name);
+    state.nodes.push({ id: makeId(), name, url: item.url, region: inferRegion(name) });
+    imported += 1;
+  });
+  importConflictState.dupEntries = [];
+  render();
+  persistState();
+  const conflictItems = importConflictState.errors.map((e) => `⛔ ${e}`);
+  if (el.importConflicts) el.importConflicts.innerHTML = conflictItems.map((x) => `<li>${x}</li>`).join('');
+  if (el.importConflictBox) el.importConflictBox.classList.toggle('hidden', conflictItems.length === 0);
+  setImportStatus(`重复节点已重命名导入 ${imported} 条`, 'success');
+});
+
+el.ignoreConflicts?.addEventListener('click', () => {
+  importConflictState.dupEntries = [];
+  importConflictState.errors = [];
+  if (el.importConflictBox && el.importConflicts) {
+    el.importConflictBox.classList.add('hidden');
+    el.importConflicts.innerHTML = '';
+  }
+  setImportStatus('已忽略当前冲突提示', 'idle');
 });
 
 el.saveBtn.addEventListener('click', () => {
@@ -954,6 +1030,22 @@ el.resetBtn.addEventListener('click', () => {
 
 el.nodeUrls.addEventListener('input', persistState);
 el.markdown.addEventListener('input', () => (el.markdown.dataset.manualEdit = '1'));
+
+el.stepPrev?.addEventListener('click', () => {
+  const triples = getNavTriples();
+  const idx = triples.findIndex((t) => t.main === viewState.main && t.sub === viewState.sub && t.third === viewState.third);
+  if (idx <= 0) return;
+  const prev = triples[idx - 1];
+  jumpTo(prev.main, prev.sub, prev.third);
+});
+
+el.stepNext?.addEventListener('click', () => {
+  const triples = getNavTriples();
+  const idx = triples.findIndex((t) => t.main === viewState.main && t.sub === viewState.sub && t.third === viewState.third);
+  if (idx < 0 || idx >= triples.length - 1) return;
+  const next = triples[idx + 1];
+  jumpTo(next.main, next.sub, next.third);
+});
 
 hydrateState();
 render();

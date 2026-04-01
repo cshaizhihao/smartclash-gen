@@ -29,7 +29,7 @@
   </div>
 
   <header>
-    <h1>smartclash-gen v0.7.7</h1>
+    <h1>smartclash-gen v0.7.8</h1>
     <p>模块化编辑 · 拖拽编排 · Markdown/YAML 交付 · 隐私登录保护</p>
   </header>
 
@@ -39,6 +39,10 @@
         <div class="pathline">
           <span id="breadcrumbText">路径：节点模块 / 导入 / 快速导入</span>
           <span id="stepProgressText">Step 1 / 4</span>
+        </div>
+        <div class="row">
+          <button id="stepPrev" class="ghost">上一步</button>
+          <button id="stepNext" class="ghost">下一步</button>
         </div>
         <div class="progress-track"><i id="stepProgressFill"></i></div>
         <div id="mainTabs" class="tabs level-1">
@@ -61,6 +65,8 @@
         <div class="row">
           <button id="importUrlsBtn">批量导入 URL</button>
           <button id="clearUrlsBtn" class="ghost">清空已导入 URL</button>
+          <button id="resolveAllDup" class="ghost">重复节点自动重命名导入</button>
+          <button id="ignoreConflicts" class="ghost">忽略冲突提示</button>
           <span id="importStatus" class="import-status">未导入</span>
         </div>
         <p class="helper-text">流程：先导入节点，再进入“节点编辑”补充元信息。</p>

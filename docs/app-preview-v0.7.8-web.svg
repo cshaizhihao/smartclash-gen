@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
+  <rect width="1600" height="900" fill="#090f1f"/>
+  <rect x="48" y="48" width="1504" height="804" rx="20" fill="#121b33" stroke="#334155"/>
+  <text x="96" y="116" fill="#7dd3fc" font-size="40" font-family="Inter,Arial">smartclash-gen v0.7.8</text>
+  <text x="96" y="158" fill="#94a3b8" font-size="22" font-family="Inter,Arial">冲突一键处理 + 可点击清单跳转 + 上一步/下一步</text>
+
+  <rect x="96" y="196" width="1408" height="84" rx="12" fill="#0b1224" stroke="#475569"/>
+  <text x="124" y="230" fill="#e2e8f0" font-size="17">路径：节点模块 / 导入 / 快速导入</text>
+  <text x="124" y="258" fill="#93c5fd" font-size="16">[上一步] [下一步]   Step 1 / 4</text>
+
+  <rect x="96" y="300" width="900" height="500" rx="12" fill="#0b1224" stroke="#475569"/>
+  <text x="126" y="344" fill="#fbbf24" font-size="20">导入冲突清单（可恢复）</text>
+  <text x="126" y="382" fill="#f87171" font-size="18">🔁 重名节点：HK-01</text>
+  <text x="126" y="418" fill="#f87171" font-size="18">⛔ 第 4 行协议不支持</text>
+  <text x="126" y="462" fill="#cbd5e1" font-size="17">[重复节点自动重命名导入]  [忽略冲突提示]</text>
+
+  <rect x="1024" y="300" width="480" height="500" rx="12" fill="#0b1224" stroke="#475569"/>
+  <text x="1052" y="344" fill="#cbd5e1" font-size="20">发布前清单确认（可点击跳转）</text>
+  <text x="1052" y="382" fill="#86efac" font-size="17">⛔ 阻塞项 1 条（点击跳转修复）</text>
+  <text x="1052" y="416" fill="#86efac" font-size="17">⚠️ 警告 2 条（点击跳转修复）</text>
+  <text x="1052" y="450" fill="#86efac" font-size="17">📦 已确认导出格式</text>
+</svg>

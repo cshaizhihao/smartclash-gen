@@ -1,6 +1,6 @@
 # smartclash-gen
 
-> 版本：**v0.8.9**
+> 版本：**v0.9.0**
 
 一个面向 **OpenClash + mihomo(type: smart)** 的配置生成器：
 
@@ -15,9 +15,13 @@
 
 ## 安装后应用示意图
 
-![应用示意图](docs/app-preview-v0.8.9-web.svg)
+![应用示意图](docs/app-preview-v0.9.0-web.svg)
 
 ---
+
+## 在线访问（本次部署）
+
+- 访问地址：**http://smart.zze.cc**
 
 ## 一键安装（支持自定义端口）
 
@@ -139,6 +143,12 @@ python3 generate.py \
 ---
 
 ## 版本更新说明
+
+### v0.9.0
+- 修复 `web/app.js` 的 ID 生成逻辑：在支持 `crypto.randomUUID` 的浏览器中不再递归调用导致潜在栈溢出
+- Web 端版本号与存储 key 同步升级到 v0.9.0，避免历史状态与新逻辑混淆
+- README 新增在线访问地址，便于每轮推送后直接验收
+- README 版本号与截图引用同步到 v0.9.0
 
 ### v0.8.9
 - 更新体验再简化：新增“一键检查并更新”主按钮，减少操作步骤

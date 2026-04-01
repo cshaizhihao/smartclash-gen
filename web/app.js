@@ -1,11 +1,11 @@
-const STORAGE_KEY = 'smartclash-web-v089';
-const APP_VERSION = '0.8.9';
+const STORAGE_KEY = 'smartclash-web-v090';
+const APP_VERSION = '0.9.0';
 const UPDATE_CMD = 'bash -c "$(curl -fsSL https://raw.githubusercontent.com/cshaizhihao/smartclash-gen/main/install.sh)" -- --update -d ~/.smartclash-gen';
 const AUTH_KEY = 'smartclash-web-auth';
 const AUTH_SESSION_KEY = 'smartclash-web-auth-session';
 
 function makeId() {
-  if (typeof crypto !== 'undefined' && crypto.randomUUID) return makeId();
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();
   return `id-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
 }
 

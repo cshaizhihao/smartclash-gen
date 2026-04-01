@@ -1,5 +1,5 @@
-const STORAGE_KEY = 'smartclash-web-v1328';
-const APP_VERSION = '0.13.28';
+const STORAGE_KEY = 'smartclash-web-v1329';
+const APP_VERSION = '0.13.29';
 const UPDATE_CMD = 'bash -c "$(curl -fsSL https://raw.githubusercontent.com/cshaizhihao/smartclash-gen/main/install.sh)" -- --update -d ~/.smartclash-gen';
 const AUTH_DISABLED = true;
 const AUTH_KEY = 'smartclash-web-auth';
@@ -1183,8 +1183,7 @@ function buildYamlObject() {
 }
 
 function buildMarkdown() {
-  const yaml = jsyaml.dump(buildYamlObject(), { noRefs: true });
-  return `# smartclash-gen 可编辑配置\n\n\`\`\`yaml\n${yaml}\`\`\`\n`;
+  return jsyaml.dump(buildYamlObject(), { noRefs: true });
 }
 
 function validateState() {
@@ -1657,7 +1656,7 @@ el.saveBtn.addEventListener('click', () => {
   state.mixedPort = Number(el.mixedPort.value || 7892);
   savedBaseline = getSerializableState();
   persistState();
-  setPublishStatus('已保存最新 Markdown，等待发布', 'idle');
+  setPublishStatus('已保存最新 YAML，等待发布', 'idle');
 });
 
 function focusAndSelectInput(input) {
@@ -1772,7 +1771,7 @@ el.copyBtn?.addEventListener('click', async () => {
   } catch {
     el.copyBtn.textContent = '请手动复制';
   }
-  setTimeout(() => (el.copyBtn.textContent = '复制 Markdown'), 1200);
+  setTimeout(() => (el.copyBtn.textContent = '复制 YAML'), 1200);
 });
 
 el.downloadBtn?.addEventListener('click', () => {
@@ -1780,7 +1779,7 @@ el.downloadBtn?.addEventListener('click', () => {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'smartclash-config.md';
+  a.download = 'smartclash-config.yaml';
   a.click();
   URL.revokeObjectURL(url);
 });

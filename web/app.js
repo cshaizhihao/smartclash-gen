@@ -1,4 +1,6 @@
-const STORAGE_KEY = 'smartclash-web-v075';
+const STORAGE_KEY = 'smartclash-web-v087';
+const APP_VERSION = '0.8.7';
+const UPDATE_CMD = 'bash -c "$(curl -fsSL https://raw.githubusercontent.com/cshaizhihao/smartclash-gen/main/install.sh)" -- --update -d ~/.smartclash-gen';
 const AUTH_KEY = 'smartclash-web-auth';
 const AUTH_SESSION_KEY = 'smartclash-web-auth-session';
 
@@ -136,6 +138,9 @@ const el = {
   doneImport: document.getElementById('doneImport'),
   doneGenerate: document.getElementById('doneGenerate'),
   donePublish: document.getElementById('donePublish'),
+  checkUpdateBtn: document.getElementById('checkUpdateBtn'),
+  copyUpdateCmdBtn: document.getElementById('copyUpdateCmdBtn'),
+  updateStatus: document.getElementById('updateStatus'),
   exportDiffBtn: document.getElementById('exportDiffBtn'),
 };
 
@@ -937,6 +942,23 @@ function setPublishStatus(text, type = 'idle') {
   el.publishStatus.dataset.type = type;
 }
 
+async function checkUpdate() {
+  if (!el.updateStatus) return;
+  el.updateStatus.textContent = '正在检查更新...';
+  try {
+    const resp = await fetch('https://raw.githubusercontent.com/cshaizhihao/smartclash-gen/main/VERSION', { cache: 'no-store' });
+    const latest = (await resp.text()).trim();
+    if (!latest) throw new Error('empty version');
+    if (latest === APP_VERSION) {
+      el.updateStatus.textContent = `已是最新版本 v${APP_VERSION}`;
+    } else {
+      el.updateStatus.textContent = `发现新版本 v${latest}（当前 v${APP_VERSION}），可执行更新命令`;
+    }
+  } catch {
+    el.updateStatus.textContent = '检查更新失败，请稍后重试';
+  }
+}
+
 el.addNode.addEventListener('click', () => {
   const name = el.nodeName.value.trim();
   if (!name) return;
@@ -1270,6 +1292,16 @@ el.toggleAdvanced?.addEventListener('click', () => {
   el.advancedOps?.classList.toggle('hidden');
 });
 
+el.checkUpdateBtn?.addEventListener('click', checkUpdate);
+el.copyUpdateCmdBtn?.addEventListener('click', async () => {
+  try {
+    await navigator.clipboard.writeText(UPDATE_CMD);
+    if (el.updateStatus) el.updateStatus.textContent = '更新命令已复制，粘贴到终端执行即可';
+  } catch {
+    if (el.updateStatus) el.updateStatus.textContent = `复制失败，请手动执行：${UPDATE_CMD}`;
+  }
+});
+
 el.smartActionBtn?.addEventListener('click', () => {
   const result = validateState();
   const hasImported = state.nodes.some((n) => n.url);
@@ -1335,6 +1367,7 @@ renderNavigation();
 renderPanes();
 setPublishStatus('尚未发布', 'idle');
 setImportStatus('未导入', 'idle');
+if (el.updateStatus) el.updateStatus.textContent = `当前版本：v${APP_VERSION}`;
 
 if (isAuthed()) showApp();
 else showAuth('请先登录，首次使用会自动初始化账户');

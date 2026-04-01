@@ -1,21 +1,23 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-VERSION="0.7.1"
+VERSION="0.8.7"
 PORT=7892
 TARGET_DIR="$HOME/.smartclash-gen"
 BASE_URL="https://raw.githubusercontent.com/cshaizhihao/smartclash-gen/main"
+MODE="install"
 
 usage() {
   cat <<EOF
 smartclash-gen installer v${VERSION}
 
 Usage:
-  bash install.sh [-p PORT] [-d TARGET_DIR]
+  bash install.sh [-p PORT] [-d TARGET_DIR] [--update]
 
 Options:
   -p, --port   Default mixed-port used in example command output (default: 7892)
   -d, --dir    Install directory (default: ~/.smartclash-gen)
+  --update     Update existing installation in place
   -h, --help   Show this help
 EOF
 }
@@ -31,6 +33,10 @@ while [[ $# -gt 0 ]]; do
       [[ $# -ge 2 ]] || { echo "Missing value for $1" >&2; exit 1; }
       TARGET_DIR="$2"
       shift 2
+      ;;
+    --update)
+      MODE="update"
+      shift
       ;;
     -h|--help)
       usage
@@ -67,10 +73,16 @@ fi
 
 curl -fsSL -o generate.py "${BASE_URL}/generate.py"
 curl -fsSL -o requirements.txt "${BASE_URL}/requirements.txt"
+curl -fsSL -o VERSION "${BASE_URL}/VERSION" || echo "$VERSION" > VERSION
 chmod +x generate.py
 python3 -m pip install --user --quiet -r requirements.txt
 
-echo "smartclash-gen v${VERSION} installed to: $TARGET_DIR"
-echo "Suggested command:"
-echo "  python3 generate.py --urls urls.txt --rules rules.txt --port $PORT --output openclash.yaml"
-echo "You can override the port later with --port <1-65535>."
+if [[ "$MODE" == "update" ]]; then
+  echo "smartclash-gen updated to: v$(cat VERSION 2>/dev/null || echo "$VERSION")"
+  echo "Path: $TARGET_DIR"
+else
+  echo "smartclash-gen v${VERSION} installed to: $TARGET_DIR"
+  echo "Suggested command:"
+  echo "  python3 generate.py --urls urls.txt --rules rules.txt --port $PORT --output openclash.yaml"
+  echo "You can override the port later with --port <1-65535>."
+fi

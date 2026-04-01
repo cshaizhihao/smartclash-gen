@@ -1,6 +1,6 @@
 # smartclash-gen
 
-> 版本：**v0.8.6**
+> 版本：**v0.8.7**
 
 一个面向 **OpenClash + mihomo(type: smart)** 的配置生成器：
 
@@ -15,7 +15,7 @@
 
 ## 安装后应用示意图
 
-![应用示意图](docs/app-preview-v0.8.6-web.svg)
+![应用示意图](docs/app-preview-v0.8.7-web.svg)
 
 ---
 
@@ -130,6 +130,12 @@ python3 generate.py \
 ---
 
 ## 版本更新说明
+
+### v0.8.7
+- 新增“更新助手”：支持一键检查远端版本、复制更新命令
+- 新增 `VERSION` 文件，作为 Web 与安装脚本统一版本源
+- `install.sh` 新增 `--update` 模式，可原地快速更新已安装目录
+- README 版本号与截图引用同步到 v0.8.7
 
 ### v0.8.6
 - 登录界面体验优化：按钮文案改为“开始使用/登录”，减少理解门槛

@@ -86,9 +86,10 @@ button.danger { background: linear-gradient(135deg, #be123c, #fb7185); }
 
 .warnings { margin: 0; padding-left: 18px; color: #fda4af; }
 .warnings .ok { color: #86efac; list-style: none; margin-left: -18px; }
-.publish-status, .import-status, .auth-tips { font-size: 13px; color: var(--sub); }
+.publish-status, .import-status, .auth-tips, .helper-text { font-size: 13px; color: var(--sub); }
 .publish-status[data-type="success"], .import-status[data-type="success"] { color: #86efac; }
 .publish-status[data-type="error"], .import-status[data-type="error"] { color: #fda4af; }
+.helper-text { margin: 0 0 10px; }
 
 .auth-gate {
   position: fixed;

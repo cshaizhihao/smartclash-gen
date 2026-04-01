@@ -1,12 +1,30 @@
-const STORAGE_KEY = 'smartclash-web-v070';
+const STORAGE_KEY = 'smartclash-web-v071';
 const AUTH_KEY = 'smartclash-web-auth';
 const AUTH_SESSION_KEY = 'smartclash-web-auth-session';
 
+const DEFAULT_RULE_PROVIDERS = {
+  BanAD: { type: 'http', behavior: 'classical', format: 'text', path: './providers/BanAD.txt', url: 'https://cdn.jsdelivr.net/gh/ACL4SSR/ACL4SSR@master/Clash/BanAD.list', interval: 86400 },
+  BanProgramAD: { type: 'http', behavior: 'classical', format: 'text', path: './providers/BanProgramAD.txt', url: 'https://cdn.jsdelivr.net/gh/ACL4SSR/ACL4SSR@master/Clash/BanProgramAD.list', interval: 86400 },
+  ChinaCompanyIp: { type: 'http', behavior: 'classical', format: 'text', path: './providers/ChinaCompanyIp.txt', url: 'https://cdn.jsdelivr.net/gh/ACL4SSR/ACL4SSR@master/Clash/ChinaCompanyIp.list', interval: 86400 },
+  ChinaDomain: { type: 'http', behavior: 'classical', format: 'text', path: './providers/ChinaDomain.txt', url: 'https://cdn.jsdelivr.net/gh/ACL4SSR/ACL4SSR@master/Clash/ChinaDomain.list', interval: 86400 },
+  Gemini: { type: 'http', behavior: 'classical', path: './ruleset/Gemini.yaml', url: 'https://cdn.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Gemini/Gemini.yaml', interval: 86400 },
+  GoogleCN: { type: 'http', behavior: 'classical', format: 'text', path: './providers/GoogleCN.txt', url: 'https://cdn.jsdelivr.net/gh/ACL4SSR/ACL4SSR@master/Clash/GoogleCN.list', interval: 86400 },
+  LocalAreaNetwork: { type: 'http', behavior: 'classical', format: 'text', path: './providers/LocalAreaNetwork.txt', url: 'https://cdn.jsdelivr.net/gh/ACL4SSR/ACL4SSR@master/Clash/LocalAreaNetwork.list', interval: 86400 },
+  Netflix: { type: 'http', behavior: 'classical', path: './ruleset/Netflix.yaml', url: 'https://cdn.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Netflix/Netflix.yaml', interval: 86400 },
+  ProxyLite: { type: 'http', behavior: 'classical', format: 'text', path: './providers/ProxyLite.txt', url: 'https://cdn.jsdelivr.net/gh/ACL4SSR/ACL4SSR@master/Clash/ProxyLite.list', interval: 86400 },
+  ProxyMedia: { type: 'http', behavior: 'classical', format: 'text', path: './providers/ProxyMedia.txt', url: 'https://cdn.jsdelivr.net/gh/ACL4SSR/ACL4SSR@master/Clash/ProxyMedia.list', interval: 86400 },
+  SteamCN: { type: 'http', behavior: 'classical', format: 'text', path: './providers/SteamCN.txt', url: 'https://cdn.jsdelivr.net/gh/ACL4SSR/ACL4SSR@master/Clash/Ruleset/SteamCN.list', interval: 86400 },
+  Telegram: { type: 'http', behavior: 'classical', format: 'text', path: './providers/Telegram.txt', url: 'https://cdn.jsdelivr.net/gh/ACL4SSR/ACL4SSR@master/Clash/Telegram.list', interval: 86400 },
+  UnBan: { type: 'http', behavior: 'classical', format: 'text', path: './providers/UnBan.txt', url: 'https://cdn.jsdelivr.net/gh/ACL4SSR/ACL4SSR@master/Clash/UnBan.list', interval: 86400 },
+  'category-ai-!cn': { type: 'http', format: 'mrs', behavior: 'domain', url: 'https://gh-proxy.com/https://github.com/MetaCubeX/meta-rules-dat/raw/refs/heads/meta/geo/geosite/category-ai-!cn.mrs', path: './ruleset/category-ai-!cn.mrs', interval: 86400 },
+  openai: { type: 'http', format: 'mrs', behavior: 'domain', url: 'https://gh-proxy.com/https://github.com/MetaCubeX/meta-rules-dat/raw/refs/heads/meta/geo/geosite/openai.mrs', path: './ruleset/openai.mrs', interval: 86400 },
+};
+
 const state = {
   nodes: [
-    { id: crypto.randomUUID(), name: 'HK-01' },
-    { id: crypto.randomUUID(), name: 'SG-01' },
-    { id: crypto.randomUUID(), name: 'JP-01' },
+    { id: crypto.randomUUID(), name: 'HK-01', url: '' },
+    { id: crypto.randomUUID(), name: 'SG-01', url: '' },
+    { id: crypto.randomUUID(), name: 'JP-01', url: '' },
   ],
   groups: [
     { id: crypto.randomUUID(), name: 'Smart-AUTO', type: 'smart', members: [] },
@@ -136,6 +154,12 @@ function setImportStatus(text, type = 'idle') {
   el.importStatus.dataset.type = type;
 }
 
+function safeDecodeBase64(input) {
+  const normalized = input.trim().replace(/-/g, '+').replace(/_/g, '/');
+  const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, '=');
+  return atob(padded);
+}
+
 function parseNodeUrl(line, index) {
   const raw = line.trim();
   if (!raw) return null;
@@ -144,7 +168,135 @@ function parseNodeUrl(line, index) {
   const nameMatch = raw.match(/#(.+)$/);
   const name = nameMatch ? decodeURIComponent(nameMatch[1]).trim() : `${m[1].toUpperCase()}-${index + 1}`;
   if (!name) return { ok: false, error: `第 ${index + 1} 行节点名为空` };
-  return { ok: true, name };
+  return { ok: true, name, url: raw };
+}
+
+function parseVmessUrl(url) {
+  const payload = JSON.parse(safeDecodeBase64(url.slice('vmess://'.length)));
+  const network = payload.net || 'tcp';
+  const proxy = {
+    name: payload.ps || 'vmess-node',
+    type: 'vmess',
+    server: payload.add,
+    port: Number(payload.port || 443),
+    uuid: payload.id,
+    alterId: Number(payload.aid || 0),
+    cipher: payload.scy || 'auto',
+    tls: payload.tls === 'tls',
+    network,
+    'skip-cert-verify': true,
+  };
+  if (network === 'ws') {
+    proxy['ws-opts'] = {
+      path: payload.path || '/',
+      headers: { Host: payload.host || '' },
+    };
+  }
+  if (payload.sni) proxy.servername = payload.sni;
+  return proxy;
+}
+
+function parseVlessUrl(url) {
+  const parsed = new URL(url);
+  const security = parsed.searchParams.get('security') || '';
+  const network = parsed.searchParams.get('type') || 'tcp';
+  const proxy = {
+    name: decodeURIComponent(parsed.hash.slice(1) || 'vless-node'),
+    type: 'vless',
+    server: parsed.hostname,
+    port: Number(parsed.port || 443),
+    uuid: parsed.username,
+    udp: true,
+    tls: security === 'tls' || security === 'reality',
+    network,
+    servername: parsed.searchParams.get('sni') || undefined,
+    'skip-cert-verify': true,
+  };
+  if (network === 'ws') {
+    proxy['ws-opts'] = {
+      path: parsed.searchParams.get('path') || '/',
+      headers: {
+        Host: parsed.searchParams.get('host') || parsed.searchParams.get('sni') || '',
+      },
+    };
+  }
+  if (security === 'reality') {
+    proxy['reality-opts'] = {
+      'public-key': parsed.searchParams.get('pbk') || '',
+      'short-id': parsed.searchParams.get('sid') || '',
+    };
+    proxy['client-fingerprint'] = parsed.searchParams.get('fp') || 'chrome';
+  }
+  return proxy;
+}
+
+function parseTrojanUrl(url) {
+  const parsed = new URL(url);
+  const proxy = {
+    name: decodeURIComponent(parsed.hash.slice(1) || 'trojan-node'),
+    type: 'trojan',
+    server: parsed.hostname,
+    port: Number(parsed.port || 443),
+    password: parsed.username,
+    sni: parsed.searchParams.get('sni') || parsed.hostname,
+    'skip-cert-verify': true,
+    udp: true,
+  };
+  if ((parsed.searchParams.get('type') || 'tcp') === 'ws') {
+    proxy.network = 'ws';
+    proxy['ws-opts'] = {
+      path: parsed.searchParams.get('path') || '/',
+      headers: {
+        Host: parsed.searchParams.get('host') || parsed.searchParams.get('sni') || '',
+      },
+    };
+  }
+  return proxy;
+}
+
+function parseSsUrl(url, fallbackName) {
+  const parsed = new URL(url);
+  let method;
+  let password;
+  if (parsed.username && parsed.username.includes(':')) {
+    [method, password] = parsed.username.split(':', 2);
+  } else if (parsed.username) {
+    [method, password] = safeDecodeBase64(parsed.username).split(':', 2);
+  }
+  return {
+    name: decodeURIComponent(parsed.hash.slice(1) || fallbackName || 'ss-node'),
+    type: 'ss',
+    server: parsed.hostname,
+    port: Number(parsed.port || 443),
+    cipher: method || 'aes-128-gcm',
+    password: password || 'change-me',
+    udp: true,
+  };
+}
+
+function compactObject(value) {
+  return Object.fromEntries(Object.entries(value).filter(([, item]) => item !== undefined && item !== null && item !== ''));
+}
+
+function buildProxyFromNode(node, index) {
+  if (!node.url) {
+    return {
+      name: node.name,
+      type: 'ss',
+      server: '127.0.0.1',
+      port: 443,
+      cipher: 'aes-128-gcm',
+      password: 'fill-your-node-url-first',
+      udp: true,
+    };
+  }
+
+  const line = node.url.trim();
+  if (line.startsWith('vmess://')) return compactObject(parseVmessUrl(line));
+  if (line.startsWith('vless://')) return compactObject(parseVlessUrl(line));
+  if (line.startsWith('trojan://')) return compactObject(parseTrojanUrl(line));
+  if (line.startsWith('ss://')) return compactObject(parseSsUrl(line, `${node.name || 'ss'}-${index + 1}`));
+  throw new Error(`不支持的节点协议：${node.name}`);
 }
 
 function syncGroupOrder() {
@@ -236,21 +388,43 @@ function render() {
   refreshMarkdownPreview();
 }
 
-function buildYamlObject() {
-  const proxies = state.nodes.map((n) => ({
-    name: n.name,
-    type: 'ss',
-    server: '1.1.1.1',
-    port: 443,
-    cipher: 'aes-128-gcm',
-    password: 'change-me',
-  }));
+function buildPolicyPriority(names) {
+  const has = (pattern) => names.some((name) => pattern.test(name));
+  const buckets = [];
+  if (has(/HK|Hong\s?Kong|香港/i)) buckets.push('HK|Hong\\s?Kong|香港:1.2');
+  if (has(/SG|Singapore|新加坡/i)) buckets.push('SG|Singapore|新加坡:1.2');
+  if (has(/JP|Japan|日本/i)) buckets.push('JP|Japan|日本:1.1');
+  if (has(/US|America|United\s?States|美国/i)) buckets.push('US|America|United\\s?States|美国:1.0');
+  return buckets.join(';') || 'HK|Hong\\s?Kong|香港:1.2;SG|Singapore|新加坡:1.2;JP|Japan|日本:1.1;US|America|United\\s?States|美国:1.0';
+}
 
-  const proxyGroups = state.groups.map((g) => ({
-    name: g.name,
-    type: g.type,
-    proxies: g.members.map((id) => state.nodes.find((n) => n.id === id)?.name).filter(Boolean),
-  }));
+function buildProxyGroup(group, names) {
+  const proxies = group.members.map((id) => state.nodes.find((node) => node.id === id)?.name).filter(Boolean);
+  const base = {
+    name: group.name,
+    type: group.type,
+    proxies: proxies.length ? proxies : names,
+  };
+
+  if (group.type === 'smart') {
+    base['policy-priority'] = buildPolicyPriority(base.proxies);
+    base['prefer-asn'] = true;
+    base['sample-rate'] = 1;
+    base.collectdata = false;
+    base.uselightgbm = false;
+  }
+
+  return base;
+}
+
+function buildYamlObject() {
+  const proxies = state.nodes.map((node, index) => buildProxyFromNode(node, index));
+  const proxyNames = proxies.map((proxy) => proxy.name);
+  const proxyGroups = state.groups.map((group) => buildProxyGroup(group, proxyNames));
+
+  if (!proxyGroups.some((group) => group.name === 'DIRECT')) {
+    proxyGroups.push({ name: 'DIRECT', type: 'select', proxies: ['DIRECT'] });
+  }
 
   const rules = el.rules.value.split('\n').map((x) => x.trim()).filter(Boolean);
   if (!rules.some((r) => r.startsWith('MATCH,'))) rules.push('MATCH,Smart-AUTO');
@@ -259,9 +433,25 @@ function buildYamlObject() {
     'mixed-port': Number(el.mixedPort.value || state.mixedPort || 7892),
     'allow-lan': true,
     mode: 'rule',
+    'log-level': 'info',
+    'external-controller': ':9090',
+    ipv6: false,
+    'keep-alive-interval': 15,
+    'tcp-concurrent': true,
+    'unified-delay': true,
     proxies,
+    'rule-providers': DEFAULT_RULE_PROVIDERS,
+    dns: { enable: true, 'enhanced-mode': 'redir-host' },
     'proxy-groups': proxyGroups,
-    rules,
+    rules: rules.concat([
+      'RULE-SET,BanAD,DIRECT',
+      'RULE-SET,LocalAreaNetwork,DIRECT',
+      'RULE-SET,Telegram,Smart-AUTO',
+      'RULE-SET,Netflix,Smart-AUTO',
+      'RULE-SET,openai,Smart-AUTO',
+      'RULE-SET,category-ai-!cn,Smart-AUTO',
+      'MATCH,Smart-AUTO',
+    ]),
   };
 }
 
@@ -302,6 +492,18 @@ function validateState() {
     }
   });
 
+  state.nodes.forEach((node, index) => {
+    if (!node.url) {
+      warnings.push(`节点「${node.name}」未填写真实 URL，将以占位配置导出`);
+      return;
+    }
+    try {
+      buildProxyFromNode(node, index);
+    } catch (error) {
+      blockers.push(`节点「${node.name}」解析失败：${error.message}`);
+    }
+  });
+
   const p = Number(el.mixedPort.value || 0);
   if (!Number.isInteger(p) || p < 1 || p > 65535) blockers.push('mixed-port 必须是 1-65535 之间的整数，禁止发布');
 
@@ -328,7 +530,7 @@ function setPublishStatus(text, type = 'idle') {
 el.addNode.addEventListener('click', () => {
   const name = el.nodeName.value.trim();
   if (!name) return;
-  state.nodes.push({ id: crypto.randomUUID(), name });
+  state.nodes.push({ id: crypto.randomUUID(), name, url: '' });
   el.nodeName.value = '';
   render();
   persistState();
@@ -349,7 +551,7 @@ el.importUrlsBtn.addEventListener('click', () => {
     if (!parsed.ok) return errors.push(parsed.error);
     if (exists.has(parsed.name)) return dupCount++;
     exists.add(parsed.name);
-    state.nodes.push({ id: crypto.randomUUID(), name: parsed.name });
+    state.nodes.push({ id: crypto.randomUUID(), name: parsed.name, url: parsed.url });
     okCount++;
   });
 

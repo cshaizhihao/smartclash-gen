@@ -1,38 +1,76 @@
 #!/usr/bin/env bash
-set -e
+set -euo pipefail
 
-PORT=7890
+VERSION="0.7.1"
+PORT=7892
 TARGET_DIR="$HOME/.smartclash-gen"
+BASE_URL="https://raw.githubusercontent.com/cshaizhihao/smartclash-gen/main"
+
+usage() {
+  cat <<EOF
+smartclash-gen installer v${VERSION}
+
+Usage:
+  bash install.sh [-p PORT] [-d TARGET_DIR]
+
+Options:
+  -p, --port   Default mixed-port used in example command output (default: 7892)
+  -d, --dir    Install directory (default: ~/.smartclash-gen)
+  -h, --help   Show this help
+EOF
+}
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
     -p|--port)
-      PORT="$2"; shift 2 ;;
+      [[ $# -ge 2 ]] || { echo "Missing value for $1" >&2; exit 1; }
+      PORT="$2"
+      shift 2
+      ;;
     -d|--dir)
-      TARGET_DIR="$2"; shift 2 ;;
+      [[ $# -ge 2 ]] || { echo "Missing value for $1" >&2; exit 1; }
+      TARGET_DIR="$2"
+      shift 2
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
     *)
-      echo "Unknown arg: $1"; exit 1 ;;
+      echo "Unknown arg: $1" >&2
+      usage
+      exit 1
+      ;;
   esac
 done
+
+case "$PORT" in
+  ''|*[!0-9]*)
+    echo "Port must be an integer: $PORT" >&2
+    exit 1
+    ;;
+esac
+if (( PORT < 1 || PORT > 65535 )); then
+  echo "Port out of range (1-65535): $PORT" >&2
+  exit 1
+fi
 
 mkdir -p "$TARGET_DIR"
 cd "$TARGET_DIR"
 
 if command -v apt-get >/dev/null 2>&1; then
   sudo apt-get update -y >/dev/null 2>&1 || true
-  sudo apt-get install -y python3 python3-pip >/dev/null 2>&1 || true
+  sudo apt-get install -y python3 python3-pip curl >/dev/null 2>&1 || true
 elif command -v apk >/dev/null 2>&1; then
-  sudo apk add --no-cache python3 py3-pip >/dev/null 2>&1 || true
+  sudo apk add --no-cache python3 py3-pip curl >/dev/null 2>&1 || true
 fi
 
-if [ ! -f generate.py ]; then
-  curl -fsSL -o generate.py https://raw.githubusercontent.com/cshaizhihao/smartclash-gen/main/generate.py
-fi
-
-python3 -m pip install --user --quiet -r <(curl -fsSL https://raw.githubusercontent.com/cshaizhihao/smartclash-gen/main/requirements.txt)
+curl -fsSL -o generate.py "${BASE_URL}/generate.py"
+curl -fsSL -o requirements.txt "${BASE_URL}/requirements.txt"
 chmod +x generate.py
+python3 -m pip install --user --quiet -r requirements.txt
 
-echo "✅ 安装完成 smartclash-gen v0.5.0"
-echo "默认端口: $PORT"
-echo "用法示例:"
+echo "smartclash-gen v${VERSION} installed to: $TARGET_DIR"
+echo "Suggested command:"
 echo "  python3 generate.py --urls urls.txt --rules rules.txt --port $PORT --output openclash.yaml"
+echo "You can override the port later with --port <1-65535>."

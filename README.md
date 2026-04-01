@@ -1,6 +1,6 @@
 # smartclash-gen
 
-> 版本：**v0.7.0**
+> 版本：**v0.7.1**
 
 一个面向 **OpenClash + mihomo(type: smart)** 的配置生成器：
 
@@ -15,7 +15,7 @@
 
 ## 安装后应用示意图
 
-![应用示意图](docs/app-preview-v0.7.0-web.svg)
+![应用示意图](docs/app-preview-v0.7.1-web.svg)
 
 ---
 
@@ -130,6 +130,12 @@ python3 generate.py \
 ---
 
 ## 版本更新说明
+
+### v0.7.1
+- 修复一键安装脚本：默认端口统一为 `7892`，并补齐 `-p/--port` 参数校验与帮助信息
+- Web 端 YAML 生成链路升级：从占位节点改为解析真实 `vless/vmess/trojan/ss` URL 后再导出
+- Web 端新增节点 URL 解析校验，导入真实节点后可直接下载更接近 CLI 输出结构的 YAML/Markdown
+- README 安装命令、截图引用与版本号同步到 v0.7.1
 
 ### v0.7.0
 - 页面视觉重构：统一卡片层级、控制区分层、布局连贯性优化

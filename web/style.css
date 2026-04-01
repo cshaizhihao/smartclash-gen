@@ -194,10 +194,10 @@ header p { margin: 6px 0 0; color: var(--sub); }
 }
 .stage-head-compose {
   align-items: start;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
   display: grid;
-  grid-template-columns: minmax(0, 1.28fr) minmax(260px, .8fr);
-  gap: 8px;
+  grid-template-columns: minmax(0, 1.32fr) minmax(240px, .76fr);
+  gap: 6px;
 }
 .stage-head-publish {
   align-items: stretch;
@@ -247,15 +247,15 @@ header p { margin: 6px 0 0; color: var(--sub); }
   color: #f8fafc;
 }
 .compose-guide-strip-compact {
-  margin: 8px 0 6px;
+  margin: 6px 0 4px;
 }
 .compose-guide-strip-compact .guide-step {
-  min-height: 52px;
-  padding: 8px 10px;
+  min-height: 46px;
+  padding: 7px 9px;
 }
 .compose-guide-strip-compact .guide-step span {
-  font-size: 12px;
-  line-height: 1.3;
+  font-size: 11px;
+  line-height: 1.25;
 }
 .guide-step {
   display: flex;
@@ -280,20 +280,20 @@ header p { margin: 6px 0 0; color: var(--sub); }
 .compose-status-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 6px;
+  gap: 5px;
+  margin-top: 4px;
 }
 .status-chip {
-  min-width: 92px;
-  padding: 7px 9px;
-  border-radius: 12px;
+  min-width: 86px;
+  padding: 6px 8px;
+  border-radius: 10px;
   border: 1px solid rgba(71,85,105,.45);
   background: rgba(8,15,29,.48);
   display: grid;
-  gap: 3px;
+  gap: 2px;
 }
 .status-chip strong {
-  font-size: 16px;
+  font-size: 14px;
   line-height: 1;
 }
 .status-chip-label {
@@ -406,11 +406,11 @@ header p { margin: 6px 0 0; color: var(--sub); }
 }
 .compose-workbench-frame {
   display: grid;
-  grid-template-columns: minmax(0, 1.58fr) minmax(260px, .64fr);
-  gap: 8px;
-  height: clamp(312px, 40vh, 400px);
-  min-height: 312px;
-  max-height: 400px;
+  grid-template-columns: minmax(0, 1.62fr) minmax(240px, .6fr);
+  gap: 6px;
+  height: clamp(300px, 38vh, 380px);
+  min-height: 300px;
+  max-height: 380px;
   overflow: hidden;
 }
 .compose-main-column,
@@ -418,7 +418,7 @@ header p { margin: 6px 0 0; color: var(--sub); }
   min-width: 0;
   min-height: 0;
   display: grid;
-  gap: 8px;
+  gap: 6px;
   height: 100%;
 }
 .compose-main-column {
@@ -876,10 +876,10 @@ button.ghost {
     overflow: visible;
   }
   .compose-workbench-frame {
-    grid-template-columns: minmax(0, 1.3fr) minmax(210px, .7fr);
-    height: clamp(248px, 32vh, 300px);
-    min-height: 248px;
-    max-height: 300px;
+    grid-template-columns: minmax(0, 1.34fr) minmax(198px, .66fr);
+    height: clamp(236px, 30vh, 280px);
+    min-height: 236px;
+    max-height: 280px;
     overflow: hidden;
   }
   .compose-main-column,

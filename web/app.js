@@ -1,5 +1,5 @@
-const STORAGE_KEY = 'smartclash-web-v126';
-const APP_VERSION = '0.12.6';
+const STORAGE_KEY = 'smartclash-web-v127';
+const APP_VERSION = '0.12.7';
 const UPDATE_CMD = 'bash -c "$(curl -fsSL https://raw.githubusercontent.com/cshaizhihao/smartclash-gen/main/install.sh)" -- --update -d ~/.smartclash-gen';
 const AUTH_DISABLED = true;
 const AUTH_KEY = 'smartclash-web-auth';
@@ -127,6 +127,7 @@ const el = {
   deleteNodeBtn: document.getElementById('deleteNodeBtn'),
   applyRegionModules: document.getElementById('applyRegionModules'),
   groups: document.getElementById('groups'),
+  groupPool: document.getElementById('groupPool'),
 
   rules: document.getElementById('rules'),
   mixedPort: document.getElementById('mixedPort'),
@@ -387,6 +388,8 @@ function mkNodeLi(node) {
   const li = document.createElement('li');
   li.className = 'item';
   li.dataset.id = node.id;
+  li.dataset.key = `node:${node.id}`;
+  li.dataset.kind = 'node';
   li.textContent = `[${node.region || 'AUTO'}] ${node.name}`;
   return li;
 }
@@ -567,27 +570,21 @@ function syncGroupOrder() {
   persistState();
 }
 
+function normalizeMemberKey(raw, kind = 'node') {
+  if (!raw) return '';
+  if (String(raw).startsWith('node:') || String(raw).startsWith('group:')) return String(raw);
+  return `${kind}:${raw}`;
+}
+
 function syncFromDom() {
   state.groups.forEach((group) => {
     const ul = document.getElementById(`group-${group.id}`);
     if (!ul) return;
-    group.members = [...ul.children].map((x) => x.dataset.id);
-  });
-
-  const used = new Set(state.groups.flatMap((g) => g.members));
-  const poolIds = [...el.nodePool.children].map((x) => x.dataset.id);
-  const keepPool = poolIds.filter((id) => !used.has(id));
-  const missing = state.nodes
-    .filter((n) => !used.has(n.id) && !keepPool.includes(n.id))
-    .map((n) => n.id);
-
-  el.nodePool.innerHTML = '';
-  [...keepPool, ...missing].forEach((id) => {
-    const node = state.nodes.find((n) => n.id === id);
-    if (node) el.nodePool.appendChild(mkNodeLi(node));
+    group.members = [...ul.children].map((x) => normalizeMemberKey(x.dataset.key || x.dataset.id, x.dataset.kind || 'node'));
   });
 
   refreshMarkdownPreview();
+  render();
   persistState();
 }
 
@@ -761,15 +758,39 @@ function hydrateState() {
   }
 }
 
-function render() {
-  el.nodePool.innerHTML = '';
-  const used = new Set(state.groups.flatMap((g) => g.members));
-  const unassignedNodes = state.nodes.filter((n) => !used.has(n.id));
-  unassignedNodes.forEach((n) => el.nodePool.appendChild(mkNodeLi(n)));
+function makeGroupRefLi(group) {
+  const li = document.createElement('li');
+  li.className = 'item group-ref';
+  li.dataset.key = `group:${group.id}`;
+  li.dataset.kind = 'group';
+  li.textContent = `🧩 ${group.name} (${group.type})`;
+  return li;
+}
 
+function render() {
   const transitGroupName = state.transitGroupName || 'Smart-Transit';
   const egressGroupName = state.egressGroupName || 'Smart-Egress';
   const chainGroupName = state.chainGroupName || 'Smart-Chain';
+  const guaranteed = [
+    { name: 'Smart-AUTO', type: 'smart' },
+    { name: transitGroupName, type: 'select' },
+    { name: egressGroupName, type: 'select' },
+    { name: chainGroupName, type: 'select' },
+  ];
+  guaranteed.forEach(({ name, type }) => {
+    if (!state.groups.find((g) => g.name === name)) state.groups.push({ id: makeId(), name, type, members: [] });
+  });
+
+  el.nodePool.innerHTML = '';
+  if (el.groupPool) el.groupPool.innerHTML = '';
+  const usedNodeIds = new Set(
+    state.groups.flatMap((g) => (g.members || []).map((member) => String(member || '')))
+      .filter((member) => !member.startsWith('group:'))
+      .map((member) => member.startsWith('node:') ? member.slice(5) : member)
+  );
+  const unassignedNodes = state.nodes.filter((n) => !usedNodeIds.has(n.id));
+  unassignedNodes.forEach((n) => el.nodePool.appendChild(mkNodeLi(n)));
+
   const preferredOrder = [transitGroupName, egressGroupName, chainGroupName, 'Smart-AUTO'];
   const orderedGroups = [
     ...preferredOrder.map((name) => state.groups.find((g) => g.name === name)).filter(Boolean),
@@ -783,22 +804,57 @@ function render() {
     box.className = 'group';
     box.dataset.id = g.id;
     const memberCount = Array.isArray(g.members) ? g.members.length : 0;
-    box.innerHTML = `<h4>${g.name} <small>(${g.type}) · ${memberCount} 节点</small></h4><ul class="list" id="group-${g.id}"></ul>`;
+    const canDelete = !['Smart-AUTO', transitGroupName, egressGroupName, chainGroupName].includes(g.name);
+    box.innerHTML = `<div class="group-head"><h4>${g.name} <small>(${g.type}) · ${memberCount} 项</small></h4><div class="group-actions">${canDelete ? '<button class="ghost group-action-btn" data-action="delete-group">删除组</button>' : ''}</div></div><ul class="list" id="group-${g.id}"></ul>`;
     const ul = box.querySelector('ul');
-    g.members.forEach((id) => {
-      const node = state.nodes.find((n) => n.id === id);
+    (g.members || []).forEach((member) => {
+      const key = String(member || '');
+      if (key.startsWith('group:')) {
+        const ref = state.groups.find((item) => item.id === key.slice(6));
+        if (ref) ul.appendChild(makeGroupRefLi(ref));
+        return;
+      }
+      const nodeId = key.startsWith('node:') ? key.slice(5) : key;
+      const node = state.nodes.find((n) => n.id === nodeId);
       if (node) ul.appendChild(mkNodeLi(node));
     });
+    const deleteBtn = box.querySelector('[data-action="delete-group"]');
+    deleteBtn?.addEventListener('click', () => {
+      state.groups.forEach((group) => {
+        group.members = (group.members || []).filter((member) => String(member) !== `group:${g.id}`);
+      });
+      state.groups.splice(state.groups.findIndex((item) => item.id === g.id), 1);
+      render();
+      persistState();
+    });
     el.groups.appendChild(box);
-    new Sortable(ul, { group: 'nodes', animation: 150, onSort: syncFromDom });
+    new Sortable(ul, { group: 'nodes-and-groups', animation: 150, onSort: syncFromDom });
+    if (el.groupPool && !['Smart-AUTO', transitGroupName, egressGroupName, chainGroupName].includes(g.name)) {
+      el.groupPool.appendChild(makeGroupRefLi(g));
+    }
   });
 
-  new Sortable(el.nodePool, { group: 'nodes', animation: 150, onSort: syncFromDom });
+  new Sortable(el.nodePool, { group: 'nodes-and-groups', animation: 150, sort: false, onSort: syncFromDom });
+  if (el.groupPool) new Sortable(el.groupPool, { group: 'nodes-and-groups', animation: 150, sort: false, onSort: syncFromDom });
   new Sortable(el.groups, { animation: 150, handle: 'h4', onSort: syncGroupOrder });
 
   const transitMembers = state.groups.find((g) => g.name === transitGroupName)?.members?.length || 0;
   const egressMembers = state.groups.find((g) => g.name === egressGroupName)?.members?.length || 0;
-  const chainCount = transitMembers && egressMembers ? Math.min(transitMembers, 8) * Math.min(egressMembers, 8) : 0;
+  const chainGroup = state.groups.find((g) => g.name === chainGroupName);
+  const chainCount = chainGroup?.members?.length || (transitMembers && egressMembers ? Math.min(transitMembers, 8) * Math.min(egressMembers, 8) : 0);
+  if (chainGroup && (!chainGroup.members || chainGroup.members.length === 0) && transitMembers && egressMembers) {
+    const generated = [];
+    let combo = 0;
+    const transitNames = getGroupProxyNames(transitGroupName);
+    const egressNames = getGroupProxyNames(egressGroupName);
+    for (const t of transitNames.slice(0, 8)) {
+      for (const e of egressNames.slice(0, 8)) {
+        combo += 1;
+        generated.push(`relay:${t}=>${e}#${combo}`);
+      }
+    }
+    chainGroup.members = generated;
+  }
   if (el.composeUnassignedCount) el.composeUnassignedCount.textContent = String(unassignedNodes.length);
   if (el.composeTransitCount) el.composeTransitCount.textContent = String(transitMembers);
   if (el.composeEgressCount) el.composeEgressCount.textContent = String(egressMembers);
@@ -809,6 +865,12 @@ function render() {
   if (el.transitGroupName) el.transitGroupName.value = state.transitGroupName || 'Smart-Transit';
   if (el.egressGroupName) el.egressGroupName.value = state.egressGroupName || 'Smart-Egress';
   if (el.chainGroupName) el.chainGroupName.value = state.chainGroupName || 'Smart-Chain';
+  const transitLabel = document.getElementById('transitGroupLabel');
+  const egressLabel = document.getElementById('egressGroupLabel');
+  const chainLabel = document.getElementById('chainGroupLabel');
+  if (transitLabel) transitLabel.textContent = transitGroupName;
+  if (egressLabel) egressLabel.textContent = egressGroupName;
+  if (chainLabel) chainLabel.textContent = chainGroupName;
   syncNodeEditorOptions();
   refreshMarkdownPreview();
 }
@@ -823,8 +885,27 @@ function buildPolicyPriority(names) {
   return buckets.join(';') || 'HK|Hong\\s?Kong|香港:1.2;SG|Singapore|新加坡:1.2;JP|Japan|日本:1.1;US|America|United\\s?States|美国:1.0';
 }
 
+function resolveGroupMembers(group, seen = new Set()) {
+  if (!group || seen.has(group.id)) return [];
+  seen.add(group.id);
+  const proxies = [];
+  (group.members || []).forEach((member) => {
+    const key = String(member || '');
+    if (key.startsWith('group:')) {
+      const ref = state.groups.find((g) => g.id === key.slice(6));
+      if (ref) proxies.push(ref.name);
+      return;
+    }
+    if (key.startsWith('relay:')) return;
+    const nodeId = key.startsWith('node:') ? key.slice(5) : key;
+    const node = state.nodes.find((item) => item.id === nodeId);
+    if (node) proxies.push(node.name);
+  });
+  return proxies;
+}
+
 function buildProxyGroup(group, names) {
-  const proxies = group.members.map((id) => state.nodes.find((node) => node.id === id)?.name).filter(Boolean);
+  const proxies = resolveGroupMembers(group);
   const base = {
     name: group.name,
     type: group.type,
@@ -845,9 +926,7 @@ function buildProxyGroup(group, names) {
 function getGroupProxyNames(groupName) {
   const group = state.groups.find((g) => g.name === groupName);
   if (!group) return [];
-  return group.members
-    .map((id) => state.nodes.find((node) => node.id === id)?.name)
-    .filter(Boolean);
+  return resolveGroupMembers(group);
 }
 
 function injectChainGroups(proxyGroups) {

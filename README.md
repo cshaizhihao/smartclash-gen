@@ -1,6 +1,6 @@
 # smartclash-gen
 
-> 版本：**v0.12.6**
+> 版本：**v0.12.7**
 
 一个面向 **OpenClash + mihomo(type: smart)** 的配置生成器：
 
@@ -143,6 +143,12 @@ python3 generate.py \
 ---
 
 ## 版本更新说明
+
+### v0.12.7
+- 编排页补完真实工作流：`Smart-Transit / Smart-Egress / Smart-Chain` 作为真实策略组常驻显示，不再只是上方三个无效占位输入
+- 新增“组引用池”，支持把策略组拖进其他策略组，实现组中套组（如 `111(smart)` 放入 `Smart-AUTO`）
+- 策略组增加删除按钮；删除组时会同步清理其他组中对它的引用
+- 节点拖拽与未分配计数逻辑统一改为前缀化 member key（`node:` / `group:`），为节点与组混拖打基础
 
 ### v0.12.6
 - 继续修复编排页/导入页底部大面积空白：把 Stage 卡片从 `grid(auto / 1fr / auto)` 改为真正按内容流动的 `flex column`，彻底移除中间层被强行拉满的问题

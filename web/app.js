@@ -1,5 +1,5 @@
-const STORAGE_KEY = 'smartclash-web-v124';
-const APP_VERSION = '0.12.4';
+const STORAGE_KEY = 'smartclash-web-v125';
+const APP_VERSION = '0.12.5';
 const UPDATE_CMD = 'bash -c "$(curl -fsSL https://raw.githubusercontent.com/cshaizhihao/smartclash-gen/main/install.sh)" -- --update -d ~/.smartclash-gen';
 const AUTH_DISABLED = true;
 const AUTH_KEY = 'smartclash-web-auth';
@@ -33,7 +33,6 @@ function createDefaultState() {
     nodes: [],
     groups: [
       { id: makeId(), name: 'Smart-AUTO', type: 'smart', members: [] },
-      { id: makeId(), name: 'Smart-HK', type: 'select', members: [] },
     ],
     rules: ['DOMAIN-SUFFIX,google.com,Smart-AUTO', 'MATCH,Smart-AUTO'],
     mixedPort: 7892,
@@ -364,6 +363,14 @@ function jumpTo(main, sub, third) {
   renderPanes();
 }
 
+function syncStageHeight() {
+  if (!el.flowStage) return;
+  const activePane = el.flowStage.querySelector('.pane.active');
+  if (!activePane) return;
+  const nextHeight = Math.ceil(activePane.scrollHeight);
+  if (nextHeight > 0) el.flowStage.style.height = `${nextHeight}px`;
+}
+
 function renderPanes() {
   document.querySelectorAll('.pane').forEach((pane) => {
     const main = pane.dataset.main;
@@ -373,6 +380,7 @@ function renderPanes() {
     pane.setAttribute('aria-hidden', show ? 'false' : 'true');
   });
   updatePathline();
+  requestAnimationFrame(syncStageHeight);
 }
 
 function mkNodeLi(node) {
@@ -732,9 +740,14 @@ function hydrateState() {
   if (!raw) return;
   try {
     const parsed = JSON.parse(raw);
+    const nextGroups = Array.isArray(parsed.groups) ? parsed.groups : createDefaultState().groups;
+    const filteredGroups = nextGroups.filter((group) => {
+      if (group?.name !== 'Smart-HK') return true;
+      return Array.isArray(group.members) && group.members.length > 0;
+    });
     replaceState({
       nodes: Array.isArray(parsed.nodes) ? parsed.nodes : createDefaultState().nodes,
-      groups: Array.isArray(parsed.groups) ? parsed.groups : createDefaultState().groups,
+      groups: filteredGroups.length ? filteredGroups : createDefaultState().groups,
       rules: Array.isArray(parsed.rules) ? parsed.rules : createDefaultState().rules,
       mixedPort: parsed.mixedPort || 7892,
       transitGroupName: parsed.transitGroupName || 'Smart-Transit',
@@ -1257,7 +1270,7 @@ el.applyRegionModules?.addEventListener('click', () => {
   applyRegionModulesFromNodes();
   render();
   persistState();
-  setPublishStatus('已按节点分区重建策略组模块（Smart-HK/SG/JP/US/OTHER）', 'success');
+  setPublishStatus('已按节点分区重建策略组模块（Smart-AUTO + Transit/Egress/Chain）', 'success');
 });
 
 el.clearUrlsBtn.addEventListener('click', () => {
@@ -1643,6 +1656,7 @@ savedBaseline = getSerializableState();
 render();
 renderNavigation();
 renderPanes();
+window.addEventListener('resize', () => requestAnimationFrame(syncStageHeight));
 setPublishStatus('尚未发布', 'idle');
 setImportStatus('未导入', 'idle');
 if (el.updateStatus) el.updateStatus.textContent = `当前版本：v${APP_VERSION}`;

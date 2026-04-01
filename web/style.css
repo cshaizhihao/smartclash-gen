@@ -125,8 +125,9 @@ header p { margin: 6px 0 0; color: var(--sub); }
 
 .flow-stage {
   position: relative;
-  min-height: 720px;
+  min-height: 0;
   isolation: isolate;
+  transition: height .32s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .stage-pane {
   position: absolute;
@@ -161,7 +162,7 @@ header p { margin: 6px 0 0; color: var(--sub); }
   -webkit-backdrop-filter: blur(22px) saturate(130%);
 }
 .stage-card {
-  min-height: 720px;
+  min-height: 0;
   display: grid;
   grid-template-rows: auto 1fr auto;
 }
@@ -181,7 +182,7 @@ header p { margin: 6px 0 0; color: var(--sub); }
 }
 .stage-body { min-height: 0; }
 .stage-body-import { display: grid; grid-template-columns: 1fr 1.2fr; gap: 14px; }
-.stage-body-compose { display: grid; grid-template-columns: .92fr 1.28fr; gap: 14px; }
+.stage-body-compose { display: grid; grid-template-columns: .92fr 1.28fr; gap: 14px; align-items: start; }
 .stage-body-publish { display: grid; grid-template-columns: .9fr 1.1fr; gap: 14px; }
 .flow-footer {
   display: flex;
@@ -227,9 +228,10 @@ header p { margin: 6px 0 0; color: var(--sub); }
   display: grid;
   gap: 14px;
   align-self: start;
+  min-width: 0;
 }
 .wide-compose {
-  grid-template-rows: 1.15fr .9fr;
+  grid-template-rows: auto auto;
 }
 .publish-hero-grid {
   display: grid;
@@ -327,6 +329,7 @@ button.ghost {
   border-radius: 14px;
   padding: 12px;
   background: rgba(8, 15, 29, 0.42);
+  overflow: hidden;
 }
 .list {
   min-height: 96px;
@@ -337,7 +340,12 @@ button.ghost {
   border-radius: 12px;
   background: rgba(8, 15, 29, 0.58);
 }
-.node-pool { min-height: 280px; }
+.node-pool {
+  min-height: 280px;
+  max-height: 360px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
 .item {
   padding: 10px 12px;
   margin: 8px 0;
@@ -346,7 +354,11 @@ button.ghost {
   border-radius: 10px;
   cursor: grab;
 }
-.group-canvas { display: grid; gap: 10px; }
+.group-canvas {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+}
 .group {
   border: 1px solid rgba(71,85,105,.58);
   border-radius: 12px;
@@ -422,6 +434,7 @@ button.ghost {
   .stage-body-compose,
   .stage-body-publish,
   .publish-hero-grid { grid-template-columns: 1fr; }
+  .node-pool { max-height: 300px; }
 }
 @media (max-width: 900px) {
   .wizard-steps,
@@ -433,6 +446,8 @@ button.ghost {
   .compose-name-row,
   .status-chip,
   .publish-control-stack { width: 100%; }
+  .flow-stage,
+  .stage-card { min-height: 0; }
   .app-window { border-radius: 24px; }
   .flow-shell { padding: 16px; }
 }

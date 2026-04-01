@@ -158,6 +158,16 @@ header p { margin: 6px 0 0; color: var(--sub); }
   display: flex;
   flex-direction: column;
 }
+.stage-pane[data-main="groups"] .stage-card,
+.stage-pane[data-main="groups"] {
+  max-height: calc(100vh - 170px);
+  overflow: hidden;
+}
+.stage-pane[data-main="groups"] .stage-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
 .stage-head {
   display: flex;
   justify-content: space-between;
@@ -273,8 +283,9 @@ header p { margin: 6px 0 0; color: var(--sub); }
 .stage-body-compose-workbench {
   grid-template-columns: minmax(0, 1.35fr) minmax(320px, .72fr);
   align-items: stretch;
-  min-height: 620px;
-  max-height: 620px;
+  min-height: 0;
+  height: 100%;
+  max-height: 100%;
   overflow: hidden;
 }
 .compose-main-column,
@@ -294,6 +305,7 @@ header p { margin: 6px 0 0; color: var(--sub); }
 .compose-workbench-panel,
 .node-pool-panel {
   min-height: 0;
+  height: 100%;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -416,6 +428,7 @@ button.ghost {
 }
 .node-pool {
   min-height: 0;
+  max-height: 100%;
   flex: 1 1 auto;
   overflow-y: auto;
   overscroll-behavior: contain;
@@ -448,6 +461,7 @@ button.ghost {
   align-content: start;
   overflow-y: auto;
   min-height: 0;
+  max-height: 100%;
   flex: 1 1 auto;
   padding-right: 4px;
 }
@@ -545,8 +559,14 @@ button.ghost {
   .publish-hero-grid,
   .compose-guide-strip,
   .stage-body-compose-workbench { grid-template-columns: 1fr; }
+  .stage-pane[data-main="groups"] .stage-card,
+  .stage-pane[data-main="groups"] {
+    max-height: none;
+    overflow: visible;
+  }
   .stage-body-compose-workbench {
     min-height: auto;
+    height: auto;
     max-height: none;
     overflow: visible;
   }

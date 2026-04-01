@@ -1,5 +1,5 @@
-const STORAGE_KEY = 'smartclash-web-v120';
-const APP_VERSION = '0.12.0';
+const STORAGE_KEY = 'smartclash-web-v121';
+const APP_VERSION = '0.12.1';
 const UPDATE_CMD = 'bash -c "$(curl -fsSL https://raw.githubusercontent.com/cshaizhihao/smartclash-gen/main/install.sh)" -- --update -d ~/.smartclash-gen';
 const AUTH_DISABLED = true;
 const AUTH_KEY = 'smartclash-web-auth';
@@ -151,6 +151,10 @@ const el = {
   doneImport: document.getElementById('doneImport'),
   doneGenerate: document.getElementById('doneGenerate'),
   donePublish: document.getElementById('donePublish'),
+  composeUnassignedCount: document.getElementById('composeUnassignedCount'),
+  composeTransitCount: document.getElementById('composeTransitCount'),
+  composeEgressCount: document.getElementById('composeEgressCount'),
+  composeChainCount: document.getElementById('composeChainCount'),
   checkUpdateBtn: document.getElementById('checkUpdateBtn'),
   smartUpdateBtn: document.getElementById('smartUpdateBtn'),
   copyUpdateCmdBtn: document.getElementById('copyUpdateCmdBtn'),
@@ -737,9 +741,8 @@ function hydrateState() {
 function render() {
   el.nodePool.innerHTML = '';
   const used = new Set(state.groups.flatMap((g) => g.members));
-  state.nodes
-    .filter((n) => !used.has(n.id))
-    .forEach((n) => el.nodePool.appendChild(mkNodeLi(n)));
+  const unassignedNodes = state.nodes.filter((n) => !used.has(n.id));
+  unassignedNodes.forEach((n) => el.nodePool.appendChild(mkNodeLi(n)));
 
   const transitGroupName = state.transitGroupName || 'Smart-Transit';
   const egressGroupName = state.egressGroupName || 'Smart-Egress';
@@ -756,7 +759,8 @@ function render() {
     const box = document.createElement('article');
     box.className = 'group';
     box.dataset.id = g.id;
-    box.innerHTML = `<h4>${g.name} <small>(${g.type})</small></h4><ul class="list" id="group-${g.id}"></ul>`;
+    const memberCount = Array.isArray(g.members) ? g.members.length : 0;
+    box.innerHTML = `<h4>${g.name} <small>(${g.type}) · ${memberCount} 节点</small></h4><ul class="list" id="group-${g.id}"></ul>`;
     const ul = box.querySelector('ul');
     g.members.forEach((id) => {
       const node = state.nodes.find((n) => n.id === id);
@@ -768,6 +772,14 @@ function render() {
 
   new Sortable(el.nodePool, { group: 'nodes', animation: 150, onSort: syncFromDom });
   new Sortable(el.groups, { animation: 150, handle: 'h4', onSort: syncGroupOrder });
+
+  const transitMembers = state.groups.find((g) => g.name === transitGroupName)?.members?.length || 0;
+  const egressMembers = state.groups.find((g) => g.name === egressGroupName)?.members?.length || 0;
+  const chainCount = transitMembers && egressMembers ? Math.min(transitMembers, 8) * Math.min(egressMembers, 8) : 0;
+  if (el.composeUnassignedCount) el.composeUnassignedCount.textContent = String(unassignedNodes.length);
+  if (el.composeTransitCount) el.composeTransitCount.textContent = String(transitMembers);
+  if (el.composeEgressCount) el.composeEgressCount.textContent = String(egressMembers);
+  if (el.composeChainCount) el.composeChainCount.textContent = chainCount ? `${chainCount}` : '0';
 
   el.rules.value = state.rules.join('\n');
   el.mixedPort.value = state.mixedPort;

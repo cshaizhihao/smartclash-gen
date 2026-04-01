@@ -106,6 +106,9 @@ header p { margin: 6px 0 0; color: var(--sub); }
   gap: 16px;
   margin-bottom: 14px;
 }
+.stage-head-compose {
+  align-items: stretch;
+}
 .stage-body { min-height: 0; }
 .stage-body-import { display: grid; grid-template-columns: 1fr 1.2fr; gap: 14px; }
 .stage-body-compose { display: grid; grid-template-columns: .92fr 1.28fr; gap: 14px; }
@@ -120,6 +123,44 @@ header p { margin: 6px 0 0; color: var(--sub); }
   border-top: 1px dashed rgba(148,163,184,.2);
 }
 .hint-inline { color: var(--sub); font-size: 13px; }
+.compose-status-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+}
+.status-chip {
+  min-width: 118px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(71,85,105,.45);
+  background: rgba(8,15,29,.48);
+  display: grid;
+  gap: 4px;
+}
+.status-chip strong {
+  font-size: 22px;
+  line-height: 1;
+}
+.status-chip-label {
+  color: var(--sub);
+  font-size: 12px;
+}
+.status-chip-accent {
+  border-color: rgba(56,189,248,.35);
+  background: linear-gradient(180deg, rgba(14,165,233,.12), rgba(8,15,29,.48));
+}
+.compose-name-row {
+  width: min(560px, 100%);
+}
+.compose-column {
+  display: grid;
+  gap: 14px;
+  align-self: start;
+}
+.wide-compose {
+  grid-template-rows: 1.15fr .9fr;
+}
 
 .preview-head, .section-head {
   display: flex;
@@ -263,4 +304,6 @@ button.ghost {
   .compact-row { flex-wrap: wrap; }
   .stage-head,
   .flow-footer { flex-direction: column; align-items: stretch; }
+  .compose-name-row,
+  .status-chip { width: 100%; }
 }

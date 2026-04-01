@@ -1,0 +1,85 @@
+<svg width="1600" height="900" viewBox="0 0 1600 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1600" height="900" fill="#020817"/>
+  <defs>
+    <radialGradient id="g1" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(220 40) rotate(35) scale(520 320)">
+      <stop stop-color="#0EA5E9" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#0EA5E9" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="g2" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(1370 120) rotate(140) scale(420 280)">
+      <stop stop-color="#8B5CF6" stop-opacity="0.18"/>
+      <stop offset="1" stop-color="#8B5CF6" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="line" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#2563EB"/>
+      <stop offset="1" stop-color="#38BDF8"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#g1)"/>
+  <rect width="1600" height="900" fill="url(#g2)"/>
+  <rect x="92" y="74" width="1416" height="74" rx="20" fill="#081120" stroke="#1E293B"/>
+  <text x="126" y="118" fill="#E2E8F0" font-size="30" font-family="Arial, sans-serif" font-weight="700">smartclash-gen v0.12.1</text>
+  <text x="126" y="140" fill="#94A3B8" font-size="15" font-family="Arial, sans-serif">单页流程 · Step 2 状态条 · 工作区聚焦加强</text>
+
+  <rect x="92" y="176" width="420" height="92" rx="24" fill="#081120" stroke="#1E293B"/>
+  <text x="126" y="214" fill="#E2E8F0" font-size="24" font-family="Arial, sans-serif" font-weight="700">配置生成流程</text>
+  <text x="126" y="240" fill="#94A3B8" font-size="15" font-family="Arial, sans-serif">路径：策略模块 / 编排 / 工作区</text>
+
+  <rect x="540" y="176" width="968" height="92" rx="24" fill="#081120" stroke="#1E293B"/>
+  <rect x="572" y="202" width="280" height="40" rx="14" fill="#0F172A" stroke="#334155"/>
+  <rect x="884" y="202" width="280" height="40" rx="14" fill="url(#line)"/>
+  <rect x="1196" y="202" width="280" height="40" rx="14" fill="#0F172A" stroke="#334155"/>
+  <text x="712" y="227" text-anchor="middle" fill="#CBD5E1" font-size="16" font-family="Arial, sans-serif" font-weight="700">① 导入</text>
+  <text x="1024" y="227" text-anchor="middle" fill="white" font-size="16" font-family="Arial, sans-serif" font-weight="700">② 编排</text>
+  <text x="1336" y="227" text-anchor="middle" fill="#CBD5E1" font-size="16" font-family="Arial, sans-serif" font-weight="700">③ 发布</text>
+  <rect x="572" y="252" width="904" height="8" rx="4" fill="#0F172A"/>
+  <rect x="572" y="252" width="602" height="8" rx="4" fill="url(#line)"/>
+
+  <rect x="92" y="294" width="1416" height="520" rx="28" fill="#081120" stroke="#1E293B"/>
+  <text x="126" y="342" fill="#E2E8F0" font-size="28" font-family="Arial, sans-serif" font-weight="700">步骤 2：中转 / 落地编排</text>
+  <text x="126" y="370" fill="#94A3B8" font-size="16" font-family="Arial, sans-serif">只保留当前编排任务所需信息，状态一眼可见。</text>
+
+  <rect x="126" y="394" width="120" height="72" rx="18" fill="#0B1224" stroke="#334155"/>
+  <rect x="260" y="394" width="120" height="72" rx="18" fill="#0B1224" stroke="#334155"/>
+  <rect x="394" y="394" width="120" height="72" rx="18" fill="#0B1224" stroke="#334155"/>
+  <rect x="528" y="394" width="154" height="72" rx="18" fill="#0B1224" stroke="#38BDF8"/>
+  <text x="146" y="422" fill="#94A3B8" font-size="13" font-family="Arial, sans-serif">未分配</text>
+  <text x="294" y="422" fill="#94A3B8" font-size="13" font-family="Arial, sans-serif">中转</text>
+  <text x="428" y="422" fill="#94A3B8" font-size="13" font-family="Arial, sans-serif">落地</text>
+  <text x="548" y="422" fill="#94A3B8" font-size="13" font-family="Arial, sans-serif">链式结果</text>
+  <text x="186" y="454" fill="#E2E8F0" font-size="28" font-family="Arial, sans-serif" font-weight="700">12</text>
+  <text x="334" y="454" fill="#E2E8F0" font-size="28" font-family="Arial, sans-serif" font-weight="700">3</text>
+  <text x="468" y="454" fill="#E2E8F0" font-size="28" font-family="Arial, sans-serif" font-weight="700">4</text>
+  <text x="620" y="454" fill="#E2E8F0" font-size="28" font-family="Arial, sans-serif" font-weight="700">12</text>
+
+  <rect x="982" y="394" width="494" height="72" rx="18" fill="#0B1224" stroke="#334155"/>
+  <text x="1008" y="422" fill="#94A3B8" font-size="13" font-family="Arial, sans-serif">命名区</text>
+  <rect x="1008" y="434" width="140" height="16" rx="8" fill="#111827"/>
+  <rect x="1162" y="434" width="140" height="16" rx="8" fill="#111827"/>
+  <rect x="1316" y="434" width="140" height="16" rx="8" fill="#111827"/>
+
+  <rect x="126" y="496" width="412" height="252" rx="22" fill="#0B1224" stroke="#334155"/>
+  <text x="154" y="532" fill="#CBD5E1" font-size="18" font-family="Arial, sans-serif" font-weight="700">未分配节点池</text>
+  <rect x="154" y="552" width="356" height="168" rx="16" fill="#020817" stroke="#334155"/>
+  <rect x="174" y="574" width="316" height="32" rx="12" fill="#111827"/>
+  <rect x="174" y="618" width="316" height="32" rx="12" fill="#111827"/>
+  <rect x="174" y="662" width="252" height="32" rx="12" fill="#111827"/>
+
+  <rect x="562" y="496" width="914" height="252" rx="22" fill="#0B1224" stroke="#334155"/>
+  <text x="590" y="532" fill="#CBD5E1" font-size="18" font-family="Arial, sans-serif" font-weight="700">策略组工作台</text>
+  <rect x="590" y="552" width="260" height="76" rx="16" fill="#020817" stroke="#334155"/>
+  <rect x="866" y="552" width="260" height="76" rx="16" fill="#020817" stroke="#334155"/>
+  <rect x="1142" y="552" width="306" height="76" rx="16" fill="#020817" stroke="#334155"/>
+  <text x="612" y="580" fill="#7DD3FC" font-size="16" font-family="Arial, sans-serif" font-weight="700">Smart-Transit (3 节点)</text>
+  <text x="888" y="580" fill="#7DD3FC" font-size="16" font-family="Arial, sans-serif" font-weight="700">Smart-Egress (4 节点)</text>
+  <text x="1164" y="580" fill="#7DD3FC" font-size="16" font-family="Arial, sans-serif" font-weight="700">Smart-Chain (12 节点)</text>
+  <text x="612" y="606" fill="#94A3B8" font-size="13" font-family="Arial, sans-serif">中转节点已就位</text>
+  <text x="888" y="606" fill="#94A3B8" font-size="13" font-family="Arial, sans-serif">落地节点已就位</text>
+  <text x="1164" y="606" fill="#94A3B8" font-size="13" font-family="Arial, sans-serif">链式结果自动生成</text>
+
+  <line x1="126" y1="772" x2="1474" y2="772" stroke="#334155" stroke-dasharray="6 6"/>
+  <text x="126" y="804" fill="#94A3B8" font-size="15" font-family="Arial, sans-serif">拖入中转组 / 落地组后，链式结果会自动反映到发布页</text>
+  <rect x="1190" y="786" width="110" height="44" rx="16" fill="#0F172A" stroke="#334155"/>
+  <rect x="1318" y="786" width="128" height="44" rx="16" fill="url(#line)"/>
+  <text x="1245" y="813" text-anchor="middle" fill="#CBD5E1" font-size="16" font-family="Arial, sans-serif" font-weight="700">上一步</text>
+  <text x="1382" y="813" text-anchor="middle" fill="white" font-size="16" font-family="Arial, sans-serif" font-weight="700">下一步</text>
+</svg>

@@ -30,7 +30,7 @@
   </div>
 
   <header>
-    <h1>smartclash-gen v0.12.0</h1>
+    <h1>smartclash-gen v0.12.1</h1>
     <p>单页流程 · 极简编排 · 动画过渡 · YAML 即时交付</p>
   </header>
 
@@ -103,12 +103,30 @@
       </article>
 
       <article class="panel stage-card pane stage-pane" data-main="groups" data-sub="canvas" data-third="drag" hidden>
-        <div class="stage-head">
+        <div class="stage-head stage-head-compose">
           <div>
             <h2>步骤 2：中转 / 落地编排 <span id="doneGenerate" class="helper-text"></span></h2>
             <p class="helper-text">在本页把节点拖到中转组和落地组，系统会实时生成链式结果。</p>
+            <div class="compose-status-row">
+              <div class="status-chip">
+                <span class="status-chip-label">未分配</span>
+                <strong id="composeUnassignedCount">0</strong>
+              </div>
+              <div class="status-chip">
+                <span class="status-chip-label">中转</span>
+                <strong id="composeTransitCount">0</strong>
+              </div>
+              <div class="status-chip">
+                <span class="status-chip-label">落地</span>
+                <strong id="composeEgressCount">0</strong>
+              </div>
+              <div class="status-chip status-chip-accent">
+                <span class="status-chip-label">链式结果</span>
+                <strong id="composeChainCount">0</strong>
+              </div>
+            </div>
           </div>
-          <div class="row compact-row">
+          <div class="row compact-row compose-name-row">
             <input id="transitGroupName" placeholder="中转组名，默认 Smart-Transit" />
             <input id="egressGroupName" placeholder="落地组名，默认 Smart-Egress" />
             <input id="chainGroupName" placeholder="链式组名，默认 Smart-Chain" />
@@ -254,6 +272,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
-  <script src="./app.js?v=0.12.0"></script>
+  <script src="./app.js?v=0.12.1"></script>
 </body>
 </html>

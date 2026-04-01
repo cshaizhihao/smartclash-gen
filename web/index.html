@@ -30,7 +30,7 @@
   </div>
 
   <header>
-    <h1>smartclash-gen v0.10.1</h1>
+    <h1>smartclash-gen v0.10.2</h1>
     <p>单屏向导 · 订阅导入 · 链式代理编排 · YAML 即时交付</p>
   </header>
 
@@ -78,14 +78,17 @@
           <span id="importStatus" class="import-status">未导入</span>
         </div>
         <p class="helper-text">流程：先导入节点，再进入“节点编辑”补充元信息。</p>
-        <div class="row"><button id="goStep2" class="ghost">下一步：生成模块</button></div>
-        <div class="conflict-box">
-          <h3>新手模式：只做这三步</h3>
-          <ul class="warnings">
-            <li>1) 粘贴节点 URL 并点击「批量导入 URL」</li>
-            <li>2) 点击顶部「进入三步流程」跳到生成模块</li>
-            <li>3) 在发布模块点击「发布配置」</li>
-          </ul>
+        <div class="row">
+          <button id="goStep2" class="ghost">下一步：去拖拽编排</button>
+          <button id="jumpToGroupStep" class="ghost">直接进入第 2 步</button>
+        </div>
+        <div class="conflict-box modern-hint">
+          <h3>智能流程建议</h3>
+          <div class="hint-grid">
+            <div><b>① 导入</b><span>支持订阅链接和批量 URL</span></div>
+            <div><b>② 编排</b><span>拖入中转组/落地组自动链式生成</span></div>
+            <div><b>③ 发布</b><span>检查通过后一键导出 YAML</span></div>
+          </div>
         </div>
         <div id="importConflictBox" class="conflict-box hidden">
           <h3>导入冲突清单（可恢复）</h3>
@@ -200,6 +203,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
-  <script src="./app.js?v=0.10.1"></script>
+  <script src="./app.js?v=0.10.2"></script>
 </body>
 </html>

@@ -1,5 +1,5 @@
-const STORAGE_KEY = 'smartclash-web-v101';
-const APP_VERSION = '0.10.1';
+const STORAGE_KEY = 'smartclash-web-v102';
+const APP_VERSION = '0.10.2';
 const UPDATE_CMD = 'bash -c "$(curl -fsSL https://raw.githubusercontent.com/cshaizhihao/smartclash-gen/main/install.sh)" -- --update -d ~/.smartclash-gen';
 const AUTH_DISABLED = true;
 const AUTH_KEY = 'smartclash-web-auth';
@@ -91,6 +91,7 @@ const el = {
   wizStep2: document.getElementById('wizStep2'),
   wizStep3: document.getElementById('wizStep3'),
   goStep2: document.getElementById('goStep2'),
+  jumpToGroupStep: document.getElementById('jumpToGroupStep'),
   goStep3: document.getElementById('goStep3'),
   toggleAdvanced: document.getElementById('toggleAdvanced'),
   smartActionBtn: document.getElementById('smartActionBtn'),
@@ -1124,7 +1125,8 @@ el.fetchSubsBtn?.addEventListener('click', async () => {
 
 el.importUrlsBtn.addEventListener('click', () => {
   const lines = el.nodeUrls.value.split('\n').map((x) => x.trim()).filter(Boolean);
-  if (!lines.length) return setImportStatus('请先粘贴节点 URL', 'error');
+  if (!lines.length) return setImportStatus('请先粘贴节点 URL 或先拉取订阅', 'error');
+  setImportStatus('正在导入节点并分析冲突...', 'idle');
   pushHistory();
 
   const exists = new Set(state.nodes.map((n) => n.name));
@@ -1154,8 +1156,11 @@ el.importUrlsBtn.addEventListener('click', () => {
 
   refreshConflictPanel();
 
-  if (errors.length || dupCount) setImportStatus(`导入 ${okCount}，重复 ${dupCount}，失败 ${errors.length}`, 'error');
-  else setImportStatus(`导入成功 ${okCount}，重复跳过 ${dupCount}`, 'success');
+  if (errors.length || dupCount) {
+    setImportStatus(`导入 ${okCount}，重复 ${dupCount}，失败 ${errors.length}｜可点“自动处理重复”后进入第 2 步`, 'error');
+  } else {
+    setImportStatus(`导入成功 ${okCount} 条｜下一步：点“直接进入第 2 步”开始拖拽编排`, 'success');
+  }
 });
 
 el.addGroup.addEventListener('click', () => {
@@ -1462,7 +1467,15 @@ el.wizStep1?.addEventListener('click', () => jumpTo('nodes', 'import', 'quick'))
 el.wizStep2?.addEventListener('click', () => jumpTo('groups', 'canvas', 'drag'));
 el.wizStep3?.addEventListener('click', () => jumpTo('publish', 'actions', 'output'));
 
-el.goStep2?.addEventListener('click', () => jumpTo('nodes', 'generator', 'region'));
+el.goStep2?.addEventListener('click', () => {
+  jumpTo('groups', 'canvas', 'drag');
+  setPublishStatus('已进入第 2 步：把节点拖到中转组/落地组', 'success');
+});
+
+el.jumpToGroupStep?.addEventListener('click', () => {
+  jumpTo('groups', 'canvas', 'drag');
+  setPublishStatus('已进入第 2 步：把节点拖到中转组/落地组', 'success');
+});
 el.goStep3?.addEventListener('click', () => jumpTo('publish', 'actions', 'output'));
 el.toggleAdvanced?.addEventListener('click', () => {
   el.advancedOps?.classList.toggle('hidden');

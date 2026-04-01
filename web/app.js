@@ -43,6 +43,22 @@ function createDefaultState() {
 
 const state = createDefaultState();
 
+const NAV_SCHEMA = {
+  nodes: {
+    label: '节点模块',
+    subs: {
+      import: { label: '导入', thirds: { quick: '快速导入' } },
+      editor: { label: '编辑', thirds: { meta: '元信息' } },
+      generator: { label: '生成', thirds: { region: '按分区' } },
+    },
+  },
+  groups: { label: '策略组模块', subs: { canvas: { label: '编排', thirds: { drag: '拖拽画布' } } } },
+  rules: { label: '规则模块', subs: { editor: { label: '编辑器', thirds: { line: '行编辑' } } } },
+  publish: { label: '发布模块', subs: { actions: { label: '发布', thirds: { output: '导出与发布' } } } },
+};
+
+const viewState = { main: 'nodes', sub: 'import', third: 'quick' };
+
 const el = {
   authGate: document.getElementById('authGate'),
   authUser: document.getElementById('authUser'),
@@ -52,6 +68,9 @@ const el = {
   authTips: document.getElementById('authTips'),
   appShell: document.getElementById('appShell'),
   logoutBtn: document.getElementById('logoutBtn'),
+  mainTabs: document.getElementById('mainTabs'),
+  subTabs: document.getElementById('subTabs'),
+  thirdTabs: document.getElementById('thirdTabs'),
 
   nodeName: document.getElementById('nodeName'),
   addNode: document.getElementById('addNode'),
@@ -158,6 +177,75 @@ el.logoutBtn.addEventListener('click', () => {
   clearSession();
   showAuth('已退出登录');
 });
+
+function renderTabs(container, items, key, active, onClick) {
+  if (!container) return;
+  container.innerHTML = Object.entries(items)
+    .map(([id, label]) => `<button class="tab ${id === active ? 'active' : ''}" data-${key}="${id}">${label}</button>`)
+    .join('');
+  container.querySelectorAll(`button[data-${key}]`).forEach((btn) => {
+    btn.addEventListener('click', () => onClick(btn.dataset[key]));
+  });
+}
+
+function ensureViewState() {
+  const mainCfg = NAV_SCHEMA[viewState.main] || NAV_SCHEMA.nodes;
+  const subKeys = Object.keys(mainCfg.subs);
+  if (!mainCfg.subs[viewState.sub]) viewState.sub = subKeys[0];
+  const thirdCfg = mainCfg.subs[viewState.sub].thirds;
+  const thirdKeys = Object.keys(thirdCfg);
+  if (!thirdCfg[viewState.third]) viewState.third = thirdKeys[0];
+}
+
+function renderNavigation() {
+  ensureViewState();
+
+  renderTabs(
+    el.mainTabs,
+    Object.fromEntries(Object.entries(NAV_SCHEMA).map(([k, v]) => [k, v.label])),
+    'main',
+    viewState.main,
+    (next) => {
+      viewState.main = next;
+      const firstSub = Object.keys(NAV_SCHEMA[next].subs)[0];
+      viewState.sub = firstSub;
+      viewState.third = Object.keys(NAV_SCHEMA[next].subs[firstSub].thirds)[0];
+      renderNavigation();
+      renderPanes();
+    }
+  );
+
+  const subCfg = NAV_SCHEMA[viewState.main].subs;
+  renderTabs(
+    el.subTabs,
+    Object.fromEntries(Object.entries(subCfg).map(([k, v]) => [k, v.label])),
+    'sub',
+    viewState.sub,
+    (next) => {
+      viewState.sub = next;
+      viewState.third = Object.keys(subCfg[next].thirds)[0];
+      renderNavigation();
+      renderPanes();
+    }
+  );
+
+  const thirdCfg = subCfg[viewState.sub].thirds;
+  renderTabs(el.thirdTabs, thirdCfg, 'third', viewState.third, (next) => {
+    viewState.third = next;
+    renderNavigation();
+    renderPanes();
+  });
+}
+
+function renderPanes() {
+  document.querySelectorAll('.pane').forEach((pane) => {
+    const ok =
+      pane.dataset.main === viewState.main &&
+      pane.dataset.sub === viewState.sub &&
+      pane.dataset.third === viewState.third;
+    pane.classList.toggle('active', ok);
+  });
+}
 
 function mkNodeLi(node) {
   const li = document.createElement('li');
@@ -821,6 +909,8 @@ el.markdown.addEventListener('input', () => (el.markdown.dataset.manualEdit = '1
 
 hydrateState();
 render();
+renderNavigation();
+renderPanes();
 setPublishStatus('尚未发布', 'idle');
 setImportStatus('未导入', 'idle');
 

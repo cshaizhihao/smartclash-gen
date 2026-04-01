@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
+  <rect width="1600" height="900" fill="#0a0f1f"/>
+  <rect x="50" y="50" width="1500" height="800" rx="18" fill="#111a30" stroke="#334155"/>
+  <text x="100" y="120" fill="#7dd3fc" font-size="40" font-family="Inter,Arial">smartclash-gen v0.7.6</text>
+  <text x="100" y="160" fill="#94a3b8" font-size="22" font-family="Inter,Arial">同页多层级交互：一级模块 + 二级工作台 + 三级任务面板</text>
+
+  <rect x="100" y="200" width="1400" height="56" rx="12" fill="#0b1224" stroke="#475569"/>
+  <text x="130" y="236" fill="#e2e8f0" font-size="18" font-family="Inter,Arial">一级：节点模块 | 策略组模块 | 规则模块 | 发布模块</text>
+
+  <rect x="100" y="275" width="1400" height="50" rx="12" fill="#0b1224" stroke="#475569"/>
+  <text x="130" y="307" fill="#cbd5e1" font-size="16" font-family="Inter,Arial">二级：导入 | 编辑 | 生成</text>
+
+  <rect x="100" y="340" width="1400" height="44" rx="12" fill="#0b1224" stroke="#475569"/>
+  <text x="130" y="368" fill="#cbd5e1" font-size="15" font-family="Inter,Arial">三级：快速导入</text>
+
+  <rect x="100" y="410" width="1400" height="380" rx="14" fill="#0b1224" stroke="#475569"/>
+  <text x="130" y="455" fill="#86efac" font-size="22" font-family="Inter,Arial">当前面板：节点导入（二级：导入 / 三级：快速导入）</text>
+  <text x="130" y="495" fill="#93c5fd" font-size="18" font-family="Consolas,monospace">粘贴节点 URL → 批量导入 → 切换“节点编辑”补全元信息 → 切换“模块生成”一键构建 Smart-* 结构</text>
+</svg>

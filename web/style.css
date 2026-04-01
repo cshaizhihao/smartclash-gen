@@ -28,6 +28,28 @@ header p { margin: 6px 0 0; color: var(--sub); }
 
 .layout { display: grid; grid-template-columns: 1.45fr .9fr; gap: 12px; padding: 12px; }
 .left { display: grid; gap: 12px; }
+
+.nav-panel { position: sticky; top: 12px; z-index: 4; }
+.tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+.tab {
+  background: #0b1224;
+  border: 1px solid rgba(100, 116, 139, 0.65);
+  color: #cbd5e1;
+  border-radius: 999px;
+  padding: 7px 12px;
+  font-size: 13px;
+}
+.tab.active {
+  background: linear-gradient(135deg, #1d4ed8, #0ea5e9);
+  color: #f8fafc;
+  border-color: transparent;
+}
+.level-1 .tab { font-weight: 700; }
+.level-2 .tab { font-size: 12px; }
+.level-3 .tab { font-size: 12px; opacity: .9; }
+
+.pane { display: none; }
+.pane.active { display: block; }
 .panel {
   background: var(--panel);
   border: 1px solid var(--line);

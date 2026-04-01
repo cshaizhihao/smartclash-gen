@@ -1,5 +1,5 @@
-const STORAGE_KEY = 'smartclash-web-v091';
-const APP_VERSION = '0.9.1';
+const STORAGE_KEY = 'smartclash-web-v092';
+const APP_VERSION = '0.9.2';
 const UPDATE_CMD = 'bash -c "$(curl -fsSL https://raw.githubusercontent.com/cshaizhihao/smartclash-gen/main/install.sh)" -- --update -d ~/.smartclash-gen';
 const AUTH_DISABLED = true;
 const AUTH_KEY = 'smartclash-web-auth';
@@ -671,6 +671,22 @@ function applyRegionModulesFromNodes() {
     keep.push(g);
   });
 
+  const transitGroupName = (el.transitGroupName?.value || state.transitGroupName || 'Smart-Transit').trim() || 'Smart-Transit';
+  const egressGroupName = (el.egressGroupName?.value || state.egressGroupName || 'Smart-Egress').trim() || 'Smart-Egress';
+  const chainGroupName = (el.chainGroupName?.value || state.chainGroupName || 'Smart-Chain').trim() || 'Smart-Chain';
+
+  const transit = byName.get(transitGroupName) || { id: makeId(), name: transitGroupName, type: 'select', members: [] };
+  transit.type = 'select';
+  keep.push(transit);
+
+  const egress = byName.get(egressGroupName) || { id: makeId(), name: egressGroupName, type: 'select', members: [] };
+  egress.type = 'select';
+  keep.push(egress);
+
+  const chain = byName.get(chainGroupName) || { id: makeId(), name: chainGroupName, type: 'select', members: [] };
+  chain.type = 'select';
+  keep.push(chain);
+
   const direct = byName.get('DIRECT') || { id: makeId(), name: 'DIRECT', type: 'select', members: [] };
   direct.type = 'select';
   keep.push(direct);
@@ -761,31 +777,23 @@ function buildProxyGroup(group, names) {
   return base;
 }
 
-function classifyChainNodes(proxyNames) {
-  const transit = [];
-  const egress = [];
-  const transitRe = /(relay|transit|中转|入口|entry)/i;
-  const egressRe = /(egress|exit|landing|落地|出口)/i;
-
-  state.nodes.forEach((node) => {
-    if (!proxyNames.includes(node.name)) return;
-    if (transitRe.test(node.name)) transit.push(node.name);
-    if (egressRe.test(node.name)) egress.push(node.name);
-  });
-
-  return { transit, egress };
+function getGroupProxyNames(groupName) {
+  const group = state.groups.find((g) => g.name === groupName);
+  if (!group) return [];
+  return group.members
+    .map((id) => state.nodes.find((node) => node.id === id)?.name)
+    .filter(Boolean);
 }
 
-function injectChainGroups(proxyGroups, proxyNames) {
+function injectChainGroups(proxyGroups) {
   const transitGroupName = (el.transitGroupName?.value || state.transitGroupName || 'Smart-Transit').trim() || 'Smart-Transit';
   const egressGroupName = (el.egressGroupName?.value || state.egressGroupName || 'Smart-Egress').trim() || 'Smart-Egress';
   const chainGroupName = (el.chainGroupName?.value || state.chainGroupName || 'Smart-Chain').trim() || 'Smart-Chain';
 
-  const { transit, egress } = classifyChainNodes(proxyNames);
-  if (!transit.length || !egress.length) return;
+  const transit = getGroupProxyNames(transitGroupName);
+  const egress = getGroupProxyNames(egressGroupName);
 
-  proxyGroups.push({ name: transitGroupName, type: 'select', proxies: transit });
-  proxyGroups.push({ name: egressGroupName, type: 'select', proxies: egress });
+  if (!transit.length || !egress.length) return;
 
   const chains = [];
   let combo = 0;
@@ -798,7 +806,11 @@ function injectChainGroups(proxyGroups, proxyNames) {
     }
   }
 
-  if (chains.length) proxyGroups.push({ name: chainGroupName, type: 'select', proxies: chains });
+  if (chains.length) {
+    const chainIdx = proxyGroups.findIndex((g) => g.name === chainGroupName);
+    if (chainIdx >= 0) proxyGroups[chainIdx] = { name: chainGroupName, type: 'select', proxies: chains };
+    else proxyGroups.push({ name: chainGroupName, type: 'select', proxies: chains });
+  }
 }
 
 function buildYamlObject() {
@@ -806,7 +818,7 @@ function buildYamlObject() {
   const proxyNames = proxies.map((proxy) => proxy.name);
   const proxyGroups = state.groups.map((group) => buildProxyGroup(group, proxyNames));
 
-  injectChainGroups(proxyGroups, proxyNames);
+  injectChainGroups(proxyGroups);
 
   if (!proxyGroups.some((group) => group.name === 'DIRECT')) {
     proxyGroups.push({ name: 'DIRECT', type: 'select', proxies: ['DIRECT'] });
@@ -923,6 +935,14 @@ function validateState() {
   const lines2 = el.rules.value.split('\n').map((x) => x.trim()).filter(Boolean);
   if (!lines2.some((r) => r.startsWith('MATCH,'))) {
     risks.push('高风险：缺少 MATCH 兜底规则，可能出现未命中流量异常');
+  }
+
+  const transitGroupName = (el.transitGroupName?.value || state.transitGroupName || 'Smart-Transit').trim() || 'Smart-Transit';
+  const egressGroupName = (el.egressGroupName?.value || state.egressGroupName || 'Smart-Egress').trim() || 'Smart-Egress';
+  const transitCount = getGroupProxyNames(transitGroupName).length;
+  const egressCount = getGroupProxyNames(egressGroupName).length;
+  if (!transitCount || !egressCount) {
+    suggestions.push(`链式代理待激活：请将节点拖入「${transitGroupName}」和「${egressGroupName}」`);
   }
 
   return { warnings, blockers, suggestions, risks };

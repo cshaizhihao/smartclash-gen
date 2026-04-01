@@ -159,21 +159,21 @@ header p { margin: 6px 0 0; color: var(--sub); }
   flex-direction: column;
 }
 .stage-pane[data-main="groups"] {
-  height: min(820px, calc(100vh - 170px));
-  min-height: 700px;
-  max-height: calc(100vh - 170px);
-  overflow: hidden;
+  height: auto;
+  min-height: 0;
+  max-height: none;
+  overflow: visible;
 }
 .stage-pane[data-main="groups"].stage-card {
-  height: min(820px, calc(100vh - 170px));
-  min-height: 700px;
-  max-height: calc(100vh - 170px);
+  height: auto;
+  min-height: 0;
+  max-height: none;
 }
 .stage-pane[data-main="groups"] > .stage-body,
 .stage-pane[data-main="groups"] .stage-body-compose-shell {
-  flex: 1 1 auto;
+  flex: 0 0 auto;
   min-height: 0;
-  overflow: hidden;
+  overflow: visible;
 }
 .stage-head {
   display: flex;
@@ -196,8 +196,8 @@ header p { margin: 6px 0 0; color: var(--sub); }
 .stage-body-import { display: grid; grid-template-columns: 1fr 1.2fr; gap: 14px; align-items: start; }
 .stage-body-compose-shell {
   min-height: 0;
-  flex: 1 1 auto;
-  overflow: hidden;
+  flex: 0 0 auto;
+  overflow: visible;
 }
 .stage-body-compose { display: grid; grid-template-columns: .92fr 1.28fr; gap: 14px; align-items: start; }
 .stage-body-publish { display: grid; grid-template-columns: .9fr 1.1fr; gap: 14px; align-items: start; }
@@ -327,8 +327,9 @@ header p { margin: 6px 0 0; color: var(--sub); }
   display: grid;
   grid-template-columns: minmax(0, 1.32fr) minmax(340px, .78fr);
   gap: 14px;
-  height: 100%;
-  min-height: 0;
+  height: clamp(480px, 62vh, 640px);
+  min-height: 480px;
+  max-height: 640px;
   overflow: hidden;
 }
 .compose-main-column,
@@ -343,7 +344,7 @@ header p { margin: 6px 0 0; color: var(--sub); }
   grid-template-rows: minmax(0, 1fr);
 }
 .compose-side-column {
-  grid-template-rows: minmax(0, 1fr) auto;
+  grid-template-rows: minmax(280px, 1fr) auto;
 }
 .compose-workbench-panel,
 .node-pool-panel {
@@ -473,19 +474,19 @@ button.ghost {
   background: rgba(8, 15, 29, 0.58);
 }
 .node-pool {
-  min-height: 0;
+  min-height: 180px;
   max-height: 100%;
   flex: 1 1 auto;
   overflow-y: auto;
   overscroll-behavior: contain;
 }
 .group-pool {
-  min-height: 72px;
-  max-height: 160px;
+  min-height: 96px;
+  max-height: 132px;
   overflow-y: auto;
 }
 .group-meta-zone {
-  margin-bottom: 12px;
+  margin-bottom: 10px;
   flex: 0 0 auto;
 }
 .item {
@@ -495,6 +496,32 @@ button.ghost {
   border: 1px solid rgba(71,85,105,.6);
   border-radius: 10px;
   cursor: grab;
+}
+
+.group-pool::-webkit-scrollbar,
+.group-canvas::-webkit-scrollbar,
+.node-pool::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+.group-pool::-webkit-scrollbar-track,
+.group-canvas::-webkit-scrollbar-track,
+.node-pool::-webkit-scrollbar-track {
+  background: rgba(8,15,29,.78);
+  border-radius: 999px;
+}
+.group-pool::-webkit-scrollbar-thumb,
+.group-canvas::-webkit-scrollbar-thumb,
+.node-pool::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(125,211,252,.92), rgba(14,165,233,.85));
+  border-radius: 999px;
+  border: 2px solid rgba(8,15,29,.78);
+}
+.group-pool,
+.group-canvas,
+.node-pool {
+  scrollbar-color: #38bdf8 rgba(8,15,29,.78);
+  scrollbar-width: auto;
 }
 .item.group-ref {
   border-style: solid;
@@ -506,10 +533,10 @@ button.ghost {
   gap: 10px;
   align-content: start;
   overflow-y: auto;
-  min-height: 0;
+  min-height: 220px;
   max-height: 100%;
   flex: 1 1 auto;
-  padding-right: 4px;
+  padding-right: 6px;
   overscroll-behavior: contain;
 }
 .group {

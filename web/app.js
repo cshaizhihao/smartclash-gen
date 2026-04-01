@@ -1,5 +1,5 @@
-const STORAGE_KEY = 'smartclash-web-v1322';
-const APP_VERSION = '0.13.22';
+const STORAGE_KEY = 'smartclash-web-v1323';
+const APP_VERSION = '0.13.23';
 const UPDATE_CMD = 'bash -c "$(curl -fsSL https://raw.githubusercontent.com/cshaizhihao/smartclash-gen/main/install.sh)" -- --update -d ~/.smartclash-gen';
 const AUTH_DISABLED = true;
 const AUTH_KEY = 'smartclash-web-auth';
@@ -169,6 +169,7 @@ const el = {
   publishBtn: document.getElementById('publishBtn'),
   generateSubBtn: document.getElementById('generateSubBtn'),
   copySubBtn: document.getElementById('copySubBtn'),
+  openSubBtn: document.getElementById('openSubBtn'),
   autoFixBtn: document.getElementById('autoFixBtn'),
   presetAIBtn: document.getElementById('presetAIBtn'),
   presetMediaBtn: document.getElementById('presetMediaBtn'),
@@ -1735,9 +1736,20 @@ el.copySubBtn?.addEventListener('click', async () => {
     const url = el.subLinkOutput?.value || await generateSubscriptionLink();
     if (!url) return;
     const ok = await copyTextSmart(url, el.subLinkOutput);
-    setPublishStatus(ok ? '订阅链接已复制，可直接粘贴到 Clash' : '订阅链接已生成，请手动长按复制', ok ? 'success' : 'idle');
+    setPublishStatus(ok ? '订阅链接已复制，可直接粘贴到 Clash' : '订阅链接已生成，请直接点“打开订阅链接”或长按复制', ok ? 'success' : 'idle');
   } catch (error) {
     setPublishStatus(`复制订阅链接失败：${error.message}`, 'error');
+  }
+});
+
+el.openSubBtn?.addEventListener('click', async () => {
+  try {
+    const url = el.subLinkOutput?.value || await generateSubscriptionLink();
+    if (!url) return;
+    window.open(url, '_blank', 'noopener,noreferrer');
+    setPublishStatus('订阅链接已打开，可直接复制或交给 Clash 使用', 'success');
+  } catch (error) {
+    setPublishStatus(`打开订阅链接失败：${error.message}`, 'error');
   }
 });
 

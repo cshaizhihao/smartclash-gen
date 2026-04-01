@@ -1,5 +1,5 @@
-const STORAGE_KEY = 'smartclash-web-v1324';
-const APP_VERSION = '0.13.24';
+const STORAGE_KEY = 'smartclash-web-v1325';
+const APP_VERSION = '0.13.25';
 const UPDATE_CMD = 'bash -c "$(curl -fsSL https://raw.githubusercontent.com/cshaizhihao/smartclash-gen/main/install.sh)" -- --update -d ~/.smartclash-gen';
 const AUTH_DISABLED = true;
 const AUTH_KEY = 'smartclash-web-auth';
@@ -177,6 +177,8 @@ const el = {
   presetResetBtn: document.getElementById('presetResetBtn'),
   subLinkOutput: document.getElementById('subLinkOutput'),
   subLinkAnchor: document.getElementById('subLinkAnchor'),
+  subLinkCard: document.getElementById('subLinkCard'),
+  subLinkCardAnchor: document.getElementById('subLinkCardAnchor'),
   resetBtn: document.getElementById('resetBtn'),
   publishStatus: document.getElementById('publishStatus'),
   markdown: document.getElementById('markdown'),
@@ -1690,6 +1692,11 @@ async function generateSubscriptionLink() {
   if (el.subLinkAnchor) {
     el.subLinkAnchor.href = data.url;
     el.subLinkAnchor.classList.remove('hidden');
+  }
+  if (el.subLinkCard && el.subLinkCardAnchor) {
+    el.subLinkCard.classList.remove('hidden');
+    el.subLinkCardAnchor.href = data.url;
+    el.subLinkCardAnchor.textContent = data.url;
   }
   setPublishStatus(`订阅链接已生成，可直接给 Clash 使用`, 'success');
   return data.url;

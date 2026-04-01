@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>smartclash-gen 可视化编排器</title>
-  <link rel="stylesheet" href="./style.css?v=0.13.24" />
+  <link rel="stylesheet" href="./style.css?v=0.13.25" />
 </head>
 <body>
   <div class="ambient-grid" aria-hidden="true"></div>
@@ -37,7 +37,7 @@
       <header>
         <div class="header-bar">
           <div>
-            <h1>Clash smart 分组编辑器 V0.13.24</h1>
+            <h1>Clash smart 分组编辑器 V0.13.25</h1>
             <p>极简编排 · YAML 即时交付</p>
           </div>
           <div class="header-links">
@@ -335,6 +335,10 @@
               <div class="sub-link-box">
                 <input id="subLinkOutput" readonly placeholder="点“生成订阅链接”后，这里会出现 Clash 可直接使用的订阅地址" />
                 <a id="subLinkAnchor" class="sub-link-anchor hidden" href="#" target="_blank" rel="noreferrer">打开当前订阅链接</a>
+                <div id="subLinkCard" class="sub-link-card hidden">
+                  <b>当前订阅地址</b>
+                  <a id="subLinkCardAnchor" href="#" target="_blank" rel="noreferrer"></a>
+                </div>
                 <p class="helper-text">如果当前环境复制能力有限，可直接点“打开订阅链接”或长按上方地址手动复制。</p>
               </div>
               <ul id="warnings" class="warnings"></ul>
@@ -355,7 +359,7 @@
                 <h3>YAML / Markdown 预览</h3>
                 <p class="helper-text">当前导出内容会实时映射到这里。</p>
               </div>
-              <span id="updateStatus" class="helper-text">当前版本：v0.13.24</span>
+              <span id="updateStatus" class="helper-text">当前版本：v0.13.25</span>
             </div>
             <textarea id="markdown" class="code-preview" rows="24"></textarea>
           </section>
@@ -388,6 +392,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
-  <script src="./app.js?v=0.13.24"></script>
+  <script src="./app.js?v=0.13.25"></script>
 </body>
 </html>

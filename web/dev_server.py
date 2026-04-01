@@ -271,11 +271,18 @@ class Handler(SimpleHTTPRequestHandler):
                 except Exception as e:
                     errors.append(f'{url}: {e}')
 
+            placeholder_hits = 0
+            for line in merged:
+                lowered = line.lower()
+                if ('不支持您的代理软件' in line or '请换用支持的代理软件' in line or '官网地址' in line or 'unsupported' in lowered):
+                    placeholder_hits += 1
+
             self._json(200, {
                 'ok': True,
                 'count': len(merged),
                 'lines': merged,
                 'errors': errors[-10:],
+                'placeholderOnly': bool(merged) and placeholder_hits == len(merged),
             })
             return
 

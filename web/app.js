@@ -1,5 +1,5 @@
-const STORAGE_KEY = 'smartclash-web-v1318';
-const APP_VERSION = '0.13.18';
+const STORAGE_KEY = 'smartclash-web-v1319';
+const APP_VERSION = '0.13.19';
 const UPDATE_CMD = 'bash -c "$(curl -fsSL https://raw.githubusercontent.com/cshaizhihao/smartclash-gen/main/install.sh)" -- --update -d ~/.smartclash-gen';
 const AUTH_DISABLED = true;
 const AUTH_KEY = 'smartclash-web-auth';
@@ -1436,6 +1436,10 @@ el.fetchSubsBtn?.addEventListener('click', async () => {
     const merged = [...new Set([...old, ...lines])];
     el.nodeUrls.value = merged.join('\n');
     persistState();
+    if (data.placeholderOnly) {
+      setSubFetchStatus(`订阅已返回，但当前拿到的是机场给出的占位提示节点，不是真实可用节点`, 'error');
+      return;
+    }
     setSubFetchStatus(`拉取完成：${lines.length} 条（已填充到节点 URL 区）`, 'success');
   } catch {
     setSubFetchStatus('拉取失败，请确认使用 dev_server.py 启动网页', 'error');

@@ -1,5 +1,5 @@
-const STORAGE_KEY = 'smartclash-web-v1309';
-const APP_VERSION = '0.13.9';
+const STORAGE_KEY = 'smartclash-web-v1310';
+const APP_VERSION = '0.13.10';
 const UPDATE_CMD = 'bash -c "$(curl -fsSL https://raw.githubusercontent.com/cshaizhihao/smartclash-gen/main/install.sh)" -- --update -d ~/.smartclash-gen';
 const AUTH_DISABLED = true;
 const AUTH_KEY = 'smartclash-web-auth';
@@ -807,7 +807,6 @@ function deleteNodeEverywhere(nodeId) {
 
 function quickGroupNodes() {
   pushHistory('一键分组');
-  applyRegionModulesFromNodes();
   const transitGroup = ensureComposeGroup(state.transitGroupName || '中转组', 'select');
   const egressGroup = ensureComposeGroup(state.egressGroupName || '落地组', 'select');
   const chainGroup = ensureComposeGroup(state.chainGroupName || '链式组', 'select');
@@ -916,7 +915,25 @@ function render() {
     el.groups.appendChild(box);
     new Sortable(ul, { group: { name: 'nodes-and-groups', pull: true, put: true }, animation: 150, onSort: syncFromDom });
     if (el.groupPool && !['Smart-AUTO', transitGroupName, egressGroupName, chainGroupName].includes(g.name)) {
-      el.groupPool.appendChild(makeGroupRefLi(g));
+      const refLi = makeGroupRefLi(g);
+      refLi.insertAdjacentHTML('beforeend', '<button class="member-remove-btn group-ref-delete-btn" type="button" title="删除该组">×</button>');
+      refLi.querySelector('.group-ref-delete-btn')?.addEventListener('click', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        pushHistory('删除组');
+        const fallbackGroup = state.groups.find((item) => item.id !== g.id && item.name !== 'Smart-AUTO') || state.groups.find((item) => item.name === 'Smart-AUTO');
+        state.groups.forEach((group) => {
+          group.members = (group.members || []).filter((member) => String(member) !== `group:${g.id}`);
+        });
+        state.groups.splice(state.groups.findIndex((item) => item.id === g.id), 1);
+        if (state.transitGroupName === g.name) state.transitGroupName = fallbackGroup?.name || 'Smart-Transit';
+        if (state.egressGroupName === g.name) state.egressGroupName = fallbackGroup?.name || 'Smart-Egress';
+        if (state.chainGroupName === g.name) state.chainGroupName = fallbackGroup?.name || 'Smart-Chain';
+        render();
+        persistState();
+        setPublishStatus(`已删除组：${g.name}`, 'success');
+      });
+      el.groupPool.appendChild(refLi);
     }
   });
 

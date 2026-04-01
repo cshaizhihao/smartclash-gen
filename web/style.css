@@ -320,10 +320,10 @@ header p { margin: 6px 0 0; color: var(--sub); }
 .route-card {
   border: 1px solid rgba(56,189,248,.28);
   background: linear-gradient(180deg, rgba(14,165,233,.14), rgba(8,15,29,.5));
-  border-radius: 16px;
-  padding: 10px;
+  border-radius: 14px;
+  padding: 8px;
   display: grid;
-  gap: 4px;
+  gap: 3px;
 }
 .route-card-label {
   color: #7dd3fc;
@@ -351,39 +351,39 @@ header p { margin: 6px 0 0; color: var(--sub); }
 .route-config-panel {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
+  gap: 6px;
 }
 .route-config-item {
   display: grid;
-  gap: 4px;
+  gap: 3px;
   color: #cbd5e1;
-  font-size: 12px;
+  font-size: 11px;
 }
 .route-config-item select {
-  padding-top: 8px;
-  padding-bottom: 8px;
+  padding-top: 7px;
+  padding-bottom: 7px;
 }
 .route-live-summary {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
+  gap: 6px;
 }
 .route-live-item {
   border: 1px solid rgba(71,85,105,.42);
-  border-radius: 12px;
-  padding: 8px 10px;
+  border-radius: 10px;
+  padding: 7px 8px;
   background: rgba(8,15,29,.42);
   display: grid;
-  gap: 3px;
+  gap: 2px;
 }
 .route-live-item span {
-  font-size: 11px;
+  font-size: 10px;
   color: #94a3b8;
 }
 .route-live-item strong {
-  font-size: 12px;
+  font-size: 11px;
   color: #e2e8f0;
-  line-height: 1.35;
+  line-height: 1.3;
   word-break: break-word;
 }
 .route-live-accent {
@@ -437,6 +437,15 @@ header p { margin: 6px 0 0; color: var(--sub); }
 }
 .compose-workbench-head {
   align-items: flex-start;
+}
+.compose-workbench-head h3,
+.node-pool-panel h3 {
+  margin-bottom: 4px;
+}
+.compose-workbench-head .helper-text,
+.node-pool-panel .helper-text {
+  margin-bottom: 0;
+  font-size: 12px;
 }
 .node-editor-panel {
   padding: 10px;
@@ -594,7 +603,7 @@ button.ghost {
   background: rgba(8, 15, 29, 0.58);
 }
 .node-pool {
-  min-height: 240px;
+  min-height: 220px;
   max-height: 100%;
   flex: 1 1 auto;
   overflow-y: auto;
@@ -604,12 +613,12 @@ button.ghost {
 .node-pool .item {
   white-space: normal;
   word-break: break-word;
-  line-height: 1.4;
-  font-size: 13px;
+  line-height: 1.3;
+  font-size: 12px;
 }
 .group-pool {
-  min-height: 112px;
-  max-height: 168px;
+  min-height: 84px;
+  max-height: 112px;
   overflow-y: auto;
   overflow-x: hidden;
 }
@@ -626,8 +635,8 @@ button.ghost {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 8px;
+  gap: 8px;
+  margin-bottom: 4px;
 }
 .pool-head-inline h4 {
   margin: 0;
@@ -637,14 +646,15 @@ button.ghost {
   margin: 0;
 }
 .item {
-  padding: 10px 42px 10px 12px;
-  margin: 8px 0;
+  padding: 8px 38px 8px 10px;
+  margin: 6px 0;
   background: linear-gradient(180deg, rgba(30,41,59,.96), rgba(15,23,42,.96));
   border: 1px solid rgba(71,85,105,.6);
   border-radius: 10px;
   cursor: grab;
   box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
   position: relative;
+  font-size: 12px;
 }
 .member-remove-btn {
   position: absolute;
@@ -761,8 +771,8 @@ button.ghost {
   font-size: 12px;
 }
 .group .list {
-  min-height: 64px;
-  padding: 8px;
+  min-height: 52px;
+  padding: 6px;
 }
 .warnings { margin: 0; padding-left: 18px; color: #fda4af; }
 .warnings .ok { color: #86efac; list-style: none; margin-left: -18px; }
@@ -866,10 +876,10 @@ button.ghost {
     overflow: visible;
   }
   .compose-workbench-frame {
-    grid-template-columns: minmax(0, 1.26fr) minmax(220px, .74fr);
-    height: clamp(260px, 34vh, 320px);
-    min-height: 260px;
-    max-height: 320px;
+    grid-template-columns: minmax(0, 1.3fr) minmax(210px, .7fr);
+    height: clamp(248px, 32vh, 300px);
+    min-height: 248px;
+    max-height: 300px;
     overflow: hidden;
   }
   .compose-main-column,

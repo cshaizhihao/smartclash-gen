@@ -80,6 +80,10 @@ const el = {
   stepPrev: document.getElementById('stepPrev'),
   stepNext: document.getElementById('stepNext'),
   quickFlowBtn: document.getElementById('quickFlowBtn'),
+  goStep2: document.getElementById('goStep2'),
+  goStep3: document.getElementById('goStep3'),
+  toggleAdvanced: document.getElementById('toggleAdvanced'),
+  advancedOps: document.getElementById('advancedOps'),
   undoBtn: document.getElementById('undoBtn'),
   redoBtn: document.getElementById('redoBtn'),
 
@@ -127,6 +131,9 @@ const el = {
   qcRules: document.getElementById('qcRules'),
   qcNodes: document.getElementById('qcNodes'),
   qcPort: document.getElementById('qcPort'),
+  doneImport: document.getElementById('doneImport'),
+  doneGenerate: document.getElementById('doneGenerate'),
+  donePublish: document.getElementById('donePublish'),
   exportDiffBtn: document.getElementById('exportDiffBtn'),
 };
 
@@ -835,6 +842,10 @@ function renderQuickChecks(result) {
   if (el.qcNodes) el.qcNodes.textContent = smart?.members?.length ? `Smart-AUTO 已分配 ${smart.members.length} 节点` : 'Smart-AUTO 暂无节点';
   const p = Number(el.mixedPort.value || 0);
   if (el.qcPort) el.qcPort.textContent = Number.isInteger(p) && p >= 1 && p <= 65535 ? `端口 ${p} 有效` : '端口无效';
+
+  if (el.doneImport) el.doneImport.textContent = state.nodes.some((n) => n.url) ? '✅ 已完成' : '⏳ 未完成';
+  if (el.doneGenerate) el.doneGenerate.textContent = smart?.members?.length ? '✅ 已完成' : '⏳ 未完成';
+  if (el.donePublish) el.donePublish.textContent = result.blockers.length ? '⏳ 待处理' : '✅ 可发布';
 }
 
 function renderWarnings(result) {
@@ -1209,6 +1220,12 @@ el.stepNext?.addEventListener('click', () => {
 el.quickFlowBtn?.addEventListener('click', () => {
   jumpTo('nodes', 'import', 'quick');
   setPublishStatus('已进入三步流程：1导入节点 → 2生成模块 → 3发布', 'success');
+});
+
+el.goStep2?.addEventListener('click', () => jumpTo('nodes', 'generator', 'region'));
+el.goStep3?.addEventListener('click', () => jumpTo('publish', 'actions', 'output'));
+el.toggleAdvanced?.addEventListener('click', () => {
+  el.advancedOps?.classList.toggle('hidden');
 });
 
 el.stepNext?.addEventListener('dblclick', () => {

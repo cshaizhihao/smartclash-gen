@@ -29,7 +29,7 @@
   </div>
 
   <header>
-    <h1>smartclash-gen v0.8.3</h1>
+    <h1>smartclash-gen v0.8.4</h1>
     <p>模块化编辑 · 拖拽编排 · Markdown/YAML 交付 · 隐私登录保护</p>
   </header>
 
@@ -57,7 +57,7 @@
       </article>
 
       <article class="panel pane" data-main="nodes" data-sub="import" data-third="quick">
-        <h2>节点导入（二级：导入 / 三级：快速导入）</h2>
+        <h2>节点导入（二级：导入 / 三级：快速导入）<span id="doneImport" class="helper-text"></span></h2>
         <div class="row">
           <input id="nodeName" placeholder="节点名称，如 HK-01" />
           <button id="addNode">添加节点</button>
@@ -71,6 +71,7 @@
           <span id="importStatus" class="import-status">未导入</span>
         </div>
         <p class="helper-text">流程：先导入节点，再进入“节点编辑”补充元信息。</p>
+        <div class="row"><button id="goStep2" class="ghost">下一步：生成模块</button></div>
         <div class="conflict-box">
           <h3>新手模式：只做这三步</h3>
           <ul class="warnings">
@@ -112,11 +113,12 @@
       </article>
 
       <article class="panel pane" data-main="nodes" data-sub="generator" data-third="region">
-        <h2>模块生成（二级：生成 / 三级：按分区）</h2>
+        <h2>模块生成（二级：生成 / 三级：按分区）<span id="doneGenerate" class="helper-text"></span></h2>
         <div class="row">
           <button id="applyRegionModules" class="ghost">按分区生成模块</button>
         </div>
         <p class="helper-text">会自动重建 Smart-AUTO 与 Smart-HK/SG/JP/US/OTHER 模块结构。</p>
+        <div class="row"><button id="goStep3" class="ghost">下一步：去发布</button></div>
       </article>
 
       <article class="panel pane" data-main="groups" data-sub="canvas" data-third="drag">
@@ -142,12 +144,15 @@
       </article>
 
       <article class="panel pane" data-main="publish" data-sub="actions" data-third="output">
-        <h2>发布与导出（二级：发布）</h2>
+        <h2>发布与导出（二级：发布）<span id="donePublish" class="helper-text"></span></h2>
         <div class="row controls">
           <input id="mixedPort" type="number" min="1" max="65535" placeholder="mixed-port，默认 7892" />
           <button id="saveBtn">保存并生成 Markdown</button>
           <button id="downloadYamlBtn">下载 YAML</button>
           <button id="publishBtn">发布配置</button>
+          <button id="toggleAdvanced" class="ghost">高级操作</button>
+        </div>
+        <div id="advancedOps" class="row hidden">
           <button id="autoFixBtn" class="ghost">自动修复引用</button>
         </div>
         <div class="publish-quickcheck">

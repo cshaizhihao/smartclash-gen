@@ -71,6 +71,9 @@ const el = {
   mainTabs: document.getElementById('mainTabs'),
   subTabs: document.getElementById('subTabs'),
   thirdTabs: document.getElementById('thirdTabs'),
+  breadcrumbText: document.getElementById('breadcrumbText'),
+  stepProgressText: document.getElementById('stepProgressText'),
+  stepProgressFill: document.getElementById('stepProgressFill'),
 
   nodeName: document.getElementById('nodeName'),
   addNode: document.getElementById('addNode'),
@@ -78,6 +81,8 @@ const el = {
   importUrlsBtn: document.getElementById('importUrlsBtn'),
   clearUrlsBtn: document.getElementById('clearUrlsBtn'),
   importStatus: document.getElementById('importStatus'),
+  importConflictBox: document.getElementById('importConflictBox'),
+  importConflicts: document.getElementById('importConflicts'),
 
   groupName: document.getElementById('groupName'),
   groupType: document.getElementById('groupType'),
@@ -103,6 +108,7 @@ const el = {
   publishStatus: document.getElementById('publishStatus'),
   markdown: document.getElementById('markdown'),
   warnings: document.getElementById('warnings'),
+  publishChecklist: document.getElementById('publishChecklist'),
 };
 
 function simpleHash(input) {
@@ -237,6 +243,18 @@ function renderNavigation() {
   });
 }
 
+function updatePathline() {
+  const mainCfg = NAV_SCHEMA[viewState.main];
+  const subCfg = mainCfg.subs[viewState.sub];
+  const thirdLabel = subCfg.thirds[viewState.third];
+  if (el.breadcrumbText) el.breadcrumbText.textContent = `路径：${mainCfg.label} / ${subCfg.label} / ${thirdLabel}`;
+  const order = ['nodes', 'groups', 'rules', 'publish'];
+  const idx = Math.max(0, order.indexOf(viewState.main));
+  const step = idx + 1;
+  if (el.stepProgressText) el.stepProgressText.textContent = `Step ${step} / ${order.length}`;
+  if (el.stepProgressFill) el.stepProgressFill.style.width = `${(step / order.length) * 100}%`;
+}
+
 function renderPanes() {
   document.querySelectorAll('.pane').forEach((pane) => {
     const ok =
@@ -245,6 +263,7 @@ function renderPanes() {
       pane.dataset.third === viewState.third;
     pane.classList.toggle('active', ok);
   });
+  updatePathline();
 }
 
 function mkNodeLi(node) {
@@ -708,6 +727,16 @@ function renderWarnings(result) {
   result.warnings.forEach((x) => items.push(`<li>⚠️ ${x}</li>`));
   result.suggestions.forEach((x) => items.push(`<li>💡 ${x}</li>`));
   el.warnings.innerHTML = items.length ? items.join('') : '<li class="ok">✅ 状态校验通过，可保存可发布</li>';
+
+  if (el.publishChecklist) {
+    const checks = [
+      result.blockers.length ? `⛔ 阻塞项 ${result.blockers.length} 条（需先修复）` : '✅ 无阻塞项，可发布',
+      result.warnings.length ? `⚠️ 警告 ${result.warnings.length} 条（建议处理）` : '✅ 无警告项',
+      '📦 已确认导出格式：YAML + Markdown',
+      '🧪 已完成规则与引用一致性检查',
+    ];
+    el.publishChecklist.innerHTML = checks.map((x) => `<li>${x}</li>`).join('');
+  }
 }
 
 function refreshMarkdownPreview() {
@@ -737,12 +766,17 @@ el.importUrlsBtn.addEventListener('click', () => {
   let okCount = 0;
   let dupCount = 0;
   const errors = [];
+  const dupNames = [];
 
   lines.forEach((line, i) => {
     const parsed = parseNodeUrl(line, i);
     if (!parsed) return;
     if (!parsed.ok) return errors.push(parsed.error);
-    if (exists.has(parsed.name)) return dupCount++;
+    if (exists.has(parsed.name)) {
+      dupCount++;
+      dupNames.push(parsed.name);
+      return;
+    }
     exists.add(parsed.name);
     state.nodes.push({ id: makeId(), name: parsed.name, url: parsed.url, region: inferRegion(parsed.name) });
     okCount++;
@@ -750,7 +784,17 @@ el.importUrlsBtn.addEventListener('click', () => {
 
   render();
   persistState();
-  if (errors.length) setImportStatus(`导入 ${okCount}，重复 ${dupCount}，失败 ${errors.length}`, 'error');
+
+  if (el.importConflictBox && el.importConflicts) {
+    const conflictItems = [
+      ...dupNames.map((name) => `🔁 重名节点：${name}`),
+      ...errors.map((e) => `⛔ ${e}`),
+    ];
+    el.importConflictBox.classList.toggle('hidden', conflictItems.length === 0);
+    el.importConflicts.innerHTML = conflictItems.map((x) => `<li>${x}</li>`).join('');
+  }
+
+  if (errors.length || dupCount) setImportStatus(`导入 ${okCount}，重复 ${dupCount}，失败 ${errors.length}`, 'error');
   else setImportStatus(`导入成功 ${okCount}，重复跳过 ${dupCount}`, 'success');
 });
 
@@ -796,6 +840,10 @@ el.clearUrlsBtn.addEventListener('click', () => {
   el.nodeUrls.value = '';
   render();
   persistState();
+  if (el.importConflictBox && el.importConflicts) {
+    el.importConflictBox.classList.add('hidden');
+    el.importConflicts.innerHTML = '';
+  }
   setImportStatus('已清空已导入 URL', 'idle');
   setPublishStatus('已清空节点 URL，请重新导入后再发布', 'idle');
 });

@@ -30,6 +30,9 @@ header p { margin: 6px 0 0; color: var(--sub); }
 .left { display: grid; gap: 12px; }
 
 .nav-panel { position: sticky; top: 12px; z-index: 4; }
+.pathline { display: flex; justify-content: space-between; gap: 8px; color: var(--sub); font-size: 12px; margin-bottom: 8px; }
+.progress-track { height: 8px; background: #0b1224; border: 1px solid rgba(71,85,105,.6); border-radius: 999px; margin-bottom: 10px; overflow: hidden; }
+.progress-track i { display: block; height: 100%; width: 25%; background: linear-gradient(90deg, #2563eb, #0ea5e9); }
 .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
 .tab {
   background: #0b1224;
@@ -117,6 +120,8 @@ button.ghost {
 .warnings { margin: 0; padding-left: 18px; color: #fda4af; }
 .warnings .ok { color: #86efac; list-style: none; margin-left: -18px; }
 .publish-status, .import-status, .auth-tips, .helper-text { font-size: 13px; color: var(--sub); }
+.conflict-box { margin-top: 10px; border: 1px dashed #475569; border-radius: 10px; padding: 8px; background: rgba(15,23,42,.5); }
+.hidden { display: none !important; }
 .publish-status[data-type="success"], .import-status[data-type="success"] { color: #86efac; }
 .publish-status[data-type="error"], .import-status[data-type="error"] { color: #fda4af; }
 .helper-text { margin: 0 0 10px; }

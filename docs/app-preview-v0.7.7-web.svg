@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
+  <rect width="1600" height="900" fill="#0a1022"/>
+  <rect x="50" y="50" width="1500" height="800" rx="20" fill="#121b33" stroke="#334155"/>
+  <text x="100" y="120" fill="#7dd3fc" font-size="40" font-family="Inter,Arial">smartclash-gen v0.7.7</text>
+  <text x="100" y="162" fill="#94a3b8" font-size="22" font-family="Inter,Arial">面包屑 + 进度条 + 冲突子流程 + 发布前清单</text>
+
+  <rect x="100" y="200" width="1400" height="68" rx="12" fill="#0b1224" stroke="#475569"/>
+  <text x="130" y="238" fill="#cbd5e1" font-size="18" font-family="Inter,Arial">路径：节点模块 / 导入 / 快速导入</text>
+  <text x="1270" y="238" fill="#93c5fd" font-size="18" font-family="Inter,Arial">Step 1 / 4</text>
+
+  <rect x="100" y="290" width="930" height="500" rx="12" fill="#0b1224" stroke="#475569"/>
+  <text x="130" y="334" fill="#86efac" font-size="22" font-family="Inter,Arial">导入冲突清单（可恢复）</text>
+  <text x="130" y="374" fill="#fbbf24" font-size="18" font-family="Inter,Arial">🔁 重名节点：HK-01</text>
+  <text x="130" y="408" fill="#f87171" font-size="18" font-family="Inter,Arial">⛔ 第 3 行协议不支持</text>
+
+  <rect x="1060" y="290" width="440" height="500" rx="12" fill="#0b1224" stroke="#475569"/>
+  <text x="1090" y="334" fill="#cbd5e1" font-size="22" font-family="Inter,Arial">发布前清单确认</text>
+  <text x="1090" y="374" fill="#f87171" font-size="17" font-family="Inter,Arial">⛔ 阻塞项 1 条（需先修复）</text>
+  <text x="1090" y="406" fill="#fbbf24" font-size="17" font-family="Inter,Arial">⚠️ 警告 2 条（建议处理）</text>
+  <text x="1090" y="438" fill="#86efac" font-size="17" font-family="Inter,Arial">📦 已确认导出格式：YAML + Markdown</text>
+</svg>

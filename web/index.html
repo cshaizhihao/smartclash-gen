@@ -29,13 +29,18 @@
   </div>
 
   <header>
-    <h1>smartclash-gen v0.7.6</h1>
+    <h1>smartclash-gen v0.7.7</h1>
     <p>模块化编辑 · 拖拽编排 · Markdown/YAML 交付 · 隐私登录保护</p>
   </header>
 
   <main class="layout" id="appShell">
     <section class="left">
       <article class="panel nav-panel">
+        <div class="pathline">
+          <span id="breadcrumbText">路径：节点模块 / 导入 / 快速导入</span>
+          <span id="stepProgressText">Step 1 / 4</span>
+        </div>
+        <div class="progress-track"><i id="stepProgressFill"></i></div>
         <div id="mainTabs" class="tabs level-1">
           <button class="tab active" data-main="nodes">节点模块</button>
           <button class="tab" data-main="groups">策略组模块</button>
@@ -59,6 +64,10 @@
           <span id="importStatus" class="import-status">未导入</span>
         </div>
         <p class="helper-text">流程：先导入节点，再进入“节点编辑”补充元信息。</p>
+        <div id="importConflictBox" class="conflict-box hidden">
+          <h3>导入冲突清单（可恢复）</h3>
+          <ul id="importConflicts" class="warnings"></ul>
+        </div>
       </article>
 
       <article class="panel pane" data-main="nodes" data-sub="editor" data-third="meta">
@@ -126,6 +135,8 @@
           <button id="resetBtn" class="ghost">重置示例数据</button>
         </div>
         <p id="publishStatus" class="publish-status">尚未发布</p>
+        <h3>发布前清单确认</h3>
+        <ul id="publishChecklist" class="warnings"></ul>
       </article>
     </section>
 

@@ -807,9 +807,13 @@ function deleteNodeEverywhere(nodeId) {
 
 function quickGroupNodes() {
   pushHistory('一键分组');
-  const transitGroup = ensureComposeGroup(state.transitGroupName || '中转组', 'select');
-  const egressGroup = ensureComposeGroup(state.egressGroupName || '落地组', 'select');
-  const chainGroup = ensureComposeGroup(state.chainGroupName || '链式组', 'select');
+  const transitGroup = state.groups.find((g) => g.name === (state.transitGroupName || '中转组'));
+  const egressGroup = state.groups.find((g) => g.name === (state.egressGroupName || '落地组'));
+  const chainGroup = state.groups.find((g) => g.name === (state.chainGroupName || '链式组'));
+  if (!transitGroup || !egressGroup || !chainGroup) {
+    setPublishStatus('一键分组前，请先选择已存在的中转组、落地组和链式组', 'error');
+    return;
+  }
   const regionPriority = ['HK', 'SG', 'JP', 'US', 'OTHER', 'AUTO'];
   const ordered = state.nodes.slice().sort((a, b) => regionPriority.indexOf(a.region || 'AUTO') - regionPriority.indexOf(b.region || 'AUTO'));
   const transitIds = [];

@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 import base64
+import gzip
 import json
 import os
 import subprocess
+import zlib
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import quote
@@ -120,9 +122,14 @@ class Handler(SimpleHTTPRequestHandler):
         except Exception:
             pass
 
-        yaml_like_markers = ('proxies:', 'proxy-groups:', 'rules:', 'rule-providers:')
+        yaml_like_markers = ('proxies:', 'proxy-groups:', 'rules:', 'rule-providers:', 'port:', 'socks-port:', 'mixed-port:')
 
         for candidate in candidates:
+            lines_only = [line.strip() for line in candidate.splitlines() if line.strip()]
+            direct = [x for x in lines_only if x.startswith(('vless://', 'vmess://', 'trojan://', 'ss://'))]
+            if direct and len(direct) == len(lines_only):
+                return direct
+
             is_yaml_like = any(marker in candidate for marker in yaml_like_markers)
             if yaml is not None:
                 for loader_name in ('safe_load', 'full_load', 'unsafe_load'):
@@ -147,7 +154,6 @@ class Handler(SimpleHTTPRequestHandler):
             if is_yaml_like:
                 continue
 
-            direct = [x.strip() for x in candidate.splitlines() if x.strip().startswith(('vless://', 'vmess://', 'trojan://', 'ss://'))]
             if direct:
                 return direct
 
@@ -183,11 +189,24 @@ class Handler(SimpleHTTPRequestHandler):
                 if not url.startswith(('http://', 'https://')):
                     continue
                 try:
-                    req = Request(url, headers={'User-Agent': 'smartclash-gen/1.0'})
+                    req = Request(url, headers={
+                        'User-Agent': 'Mozilla/5.0 (smartclash-gen)',
+                        'Accept': '*/*',
+                        'Accept-Encoding': 'gzip, deflate',
+                        'Cache-Control': 'no-cache',
+                    })
                     with urlopen(req, timeout=12) as r:
-                        raw = r.read().decode('utf-8', errors='ignore')
+                        body = r.read()
+                        encoding = (r.headers.get('Content-Encoding') or '').lower()
+                        if encoding == 'gzip':
+                            body = gzip.decompress(body)
+                        elif encoding == 'deflate':
+                            body = zlib.decompress(body)
+                        raw = body.decode('utf-8', errors='ignore')
                     lines = self._extract_proxy_urls(raw)
                     merged.extend(lines)
+                    if not lines:
+                        errors.append(f'{url}: 返回内容中没有识别到可导入节点')
                 except Exception as e:
                     errors.append(f'{url}: {e}')
 

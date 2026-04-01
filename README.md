@@ -1,6 +1,6 @@
 # smartclash-gen
 
-> 版本：**v0.9.0**
+> 版本：**v0.9.1**
 
 一个面向 **OpenClash + mihomo(type: smart)** 的配置生成器：
 
@@ -15,7 +15,7 @@
 
 ## 安装后应用示意图
 
-![应用示意图](docs/app-preview-v0.9.0-web.svg)
+![应用示意图](docs/app-preview-v0.9.1-web.svg)
 
 ---
 
@@ -143,6 +143,17 @@ python3 generate.py \
 ---
 
 ## 版本更新说明
+
+### v0.9.1
+- 新增“中转组 / 落地组 / 链式组”自定义命名输入
+- 自动识别节点名中的关键词并分组：
+  - 中转关键词：`relay/transit/中转/入口/entry`
+  - 落地关键词：`egress/exit/landing/落地/出口`
+- 当中转与落地节点同时存在时，自动生成链式代理：
+  - `<链式组名>-1..N`（`type: relay`，按“中转→落地”链路）
+  - `<链式组名>`（`type: select`，聚合所有链路）
+- 暂时关闭登录门禁，打开页面可直接验收
+- README 版本号与截图引用同步到 v0.9.1
 
 ### v0.9.0
 - 修复 `web/app.js` 的 ID 生成逻辑：在支持 `crypto.randomUUID` 的浏览器中不再递归调用导致潜在栈溢出

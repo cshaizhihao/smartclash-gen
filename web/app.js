@@ -1,6 +1,7 @@
-const STORAGE_KEY = 'smartclash-web-v090';
-const APP_VERSION = '0.9.0';
+const STORAGE_KEY = 'smartclash-web-v091';
+const APP_VERSION = '0.9.1';
 const UPDATE_CMD = 'bash -c "$(curl -fsSL https://raw.githubusercontent.com/cshaizhihao/smartclash-gen/main/install.sh)" -- --update -d ~/.smartclash-gen';
+const AUTH_DISABLED = true;
 const AUTH_KEY = 'smartclash-web-auth';
 const AUTH_SESSION_KEY = 'smartclash-web-auth-session';
 
@@ -40,6 +41,9 @@ function createDefaultState() {
     ],
     rules: ['DOMAIN-SUFFIX,google.com,Smart-AUTO', 'MATCH,Smart-AUTO'],
     mixedPort: 7892,
+    transitGroupName: 'Smart-Transit',
+    egressGroupName: 'Smart-Egress',
+    chainGroupName: 'Smart-Chain',
   };
 }
 
@@ -120,6 +124,9 @@ const el = {
 
   rules: document.getElementById('rules'),
   mixedPort: document.getElementById('mixedPort'),
+  transitGroupName: document.getElementById('transitGroupName'),
+  egressGroupName: document.getElementById('egressGroupName'),
+  chainGroupName: document.getElementById('chainGroupName'),
   saveBtn: document.getElementById('saveBtn'),
   copyBtn: document.getElementById('copyBtn'),
   downloadBtn: document.getElementById('downloadBtn'),
@@ -551,6 +558,9 @@ function getSerializableState() {
     groups: structuredClone(state.groups),
     rules: el.rules.value.split('\n'),
     mixedPort: Number(el.mixedPort.value || state.mixedPort || 7892),
+    transitGroupName: (el.transitGroupName?.value || state.transitGroupName || 'Smart-Transit').trim() || 'Smart-Transit',
+    egressGroupName: (el.egressGroupName?.value || state.egressGroupName || 'Smart-Egress').trim() || 'Smart-Egress',
+    chainGroupName: (el.chainGroupName?.value || state.chainGroupName || 'Smart-Chain').trim() || 'Smart-Chain',
     nodeUrls: el.nodeUrls.value || '',
   };
 }
@@ -572,6 +582,9 @@ function applySnapshot(snap) {
     groups: snap.groups || [],
     rules: snap.rules || [],
     mixedPort: snap.mixedPort || 7892,
+    transitGroupName: snap.transitGroupName || 'Smart-Transit',
+    egressGroupName: snap.egressGroupName || 'Smart-Egress',
+    chainGroupName: snap.chainGroupName || 'Smart-Chain',
   });
   el.nodeUrls.value = snap.nodeUrls || '';
   render();
@@ -613,6 +626,9 @@ function replaceState(nextState) {
   state.groups.splice(0, state.groups.length, ...(nextState.groups || []));
   state.rules.splice(0, state.rules.length, ...(nextState.rules || []));
   state.mixedPort = Number(nextState.mixedPort || 7892);
+  state.transitGroupName = nextState.transitGroupName || 'Smart-Transit';
+  state.egressGroupName = nextState.egressGroupName || 'Smart-Egress';
+  state.chainGroupName = nextState.chainGroupName || 'Smart-Chain';
 }
 
 function syncNodeEditorOptions() {
@@ -672,6 +688,9 @@ function hydrateState() {
       groups: Array.isArray(parsed.groups) ? parsed.groups : createDefaultState().groups,
       rules: Array.isArray(parsed.rules) ? parsed.rules : createDefaultState().rules,
       mixedPort: parsed.mixedPort || 7892,
+      transitGroupName: parsed.transitGroupName || 'Smart-Transit',
+      egressGroupName: parsed.egressGroupName || 'Smart-Egress',
+      chainGroupName: parsed.chainGroupName || 'Smart-Chain',
     });
     if (typeof parsed.nodeUrls === 'string') el.nodeUrls.value = parsed.nodeUrls;
   } catch {
@@ -706,6 +725,9 @@ function render() {
 
   el.rules.value = state.rules.join('\n');
   el.mixedPort.value = state.mixedPort;
+  if (el.transitGroupName) el.transitGroupName.value = state.transitGroupName || 'Smart-Transit';
+  if (el.egressGroupName) el.egressGroupName.value = state.egressGroupName || 'Smart-Egress';
+  if (el.chainGroupName) el.chainGroupName.value = state.chainGroupName || 'Smart-Chain';
   syncNodeEditorOptions();
   refreshMarkdownPreview();
 }
@@ -739,10 +761,52 @@ function buildProxyGroup(group, names) {
   return base;
 }
 
+function classifyChainNodes(proxyNames) {
+  const transit = [];
+  const egress = [];
+  const transitRe = /(relay|transit|中转|入口|entry)/i;
+  const egressRe = /(egress|exit|landing|落地|出口)/i;
+
+  state.nodes.forEach((node) => {
+    if (!proxyNames.includes(node.name)) return;
+    if (transitRe.test(node.name)) transit.push(node.name);
+    if (egressRe.test(node.name)) egress.push(node.name);
+  });
+
+  return { transit, egress };
+}
+
+function injectChainGroups(proxyGroups, proxyNames) {
+  const transitGroupName = (el.transitGroupName?.value || state.transitGroupName || 'Smart-Transit').trim() || 'Smart-Transit';
+  const egressGroupName = (el.egressGroupName?.value || state.egressGroupName || 'Smart-Egress').trim() || 'Smart-Egress';
+  const chainGroupName = (el.chainGroupName?.value || state.chainGroupName || 'Smart-Chain').trim() || 'Smart-Chain';
+
+  const { transit, egress } = classifyChainNodes(proxyNames);
+  if (!transit.length || !egress.length) return;
+
+  proxyGroups.push({ name: transitGroupName, type: 'select', proxies: transit });
+  proxyGroups.push({ name: egressGroupName, type: 'select', proxies: egress });
+
+  const chains = [];
+  let combo = 0;
+  for (const t of transit.slice(0, 8)) {
+    for (const e of egress.slice(0, 8)) {
+      combo += 1;
+      const name = `${chainGroupName}-${combo}`;
+      proxyGroups.push({ name, type: 'relay', proxies: [t, e] });
+      chains.push(name);
+    }
+  }
+
+  if (chains.length) proxyGroups.push({ name: chainGroupName, type: 'select', proxies: chains });
+}
+
 function buildYamlObject() {
   const proxies = state.nodes.map((node, index) => buildProxyFromNode(node, index));
   const proxyNames = proxies.map((proxy) => proxy.name);
   const proxyGroups = state.groups.map((group) => buildProxyGroup(group, proxyNames));
+
+  injectChainGroups(proxyGroups, proxyNames);
 
   if (!proxyGroups.some((group) => group.name === 'DIRECT')) {
     proxyGroups.push({ name: 'DIRECT', type: 'select', proxies: ['DIRECT'] });
@@ -800,6 +864,9 @@ function validateState() {
   const risks = [];
   const knownNodeIds = new Set(state.nodes.map((n) => n.id));
   const knownGroupNames = new Set(state.groups.map((g) => g.name));
+  knownGroupNames.add((el.transitGroupName?.value || state.transitGroupName || 'Smart-Transit').trim() || 'Smart-Transit');
+  knownGroupNames.add((el.egressGroupName?.value || state.egressGroupName || 'Smart-Egress').trim() || 'Smart-Egress');
+  knownGroupNames.add((el.chainGroupName?.value || state.chainGroupName || 'Smart-Chain').trim() || 'Smart-Chain');
 
   state.groups.forEach((g) => {
     if (g.type === 'smart' && g.members.length === 0) {
@@ -1228,6 +1295,24 @@ el.mixedPort.addEventListener('input', () => {
   persistState();
 });
 
+el.transitGroupName?.addEventListener('input', () => {
+  state.transitGroupName = (el.transitGroupName.value || 'Smart-Transit').trim() || 'Smart-Transit';
+  refreshMarkdownPreview();
+  persistState();
+});
+
+el.egressGroupName?.addEventListener('input', () => {
+  state.egressGroupName = (el.egressGroupName.value || 'Smart-Egress').trim() || 'Smart-Egress';
+  refreshMarkdownPreview();
+  persistState();
+});
+
+el.chainGroupName?.addEventListener('input', () => {
+  state.chainGroupName = (el.chainGroupName.value || 'Smart-Chain').trim() || 'Smart-Chain';
+  refreshMarkdownPreview();
+  persistState();
+});
+
 el.autoFixBtn?.addEventListener('click', () => {
   pushHistory();
   let fixed = 0;
@@ -1405,5 +1490,13 @@ setPublishStatus('尚未发布', 'idle');
 setImportStatus('未导入', 'idle');
 if (el.updateStatus) el.updateStatus.textContent = `当前版本：v${APP_VERSION}`;
 
-if (isAuthed()) showApp();
-else showAuth('请先登录，首次使用会自动初始化账户');
+if (AUTH_DISABLED) {
+  showApp();
+  if (el.logoutBtn) {
+    el.logoutBtn.style.display = 'none';
+  }
+} else if (isAuthed()) {
+  showApp();
+} else {
+  showAuth('请先登录，首次使用会自动初始化账户');
+}

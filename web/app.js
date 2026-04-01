@@ -1,5 +1,5 @@
-const STORAGE_KEY = 'smartclash-web-v100';
-const APP_VERSION = '0.10.0';
+const STORAGE_KEY = 'smartclash-web-v101';
+const APP_VERSION = '0.10.1';
 const UPDATE_CMD = 'bash -c "$(curl -fsSL https://raw.githubusercontent.com/cshaizhihao/smartclash-gen/main/install.sh)" -- --update -d ~/.smartclash-gen';
 const AUTH_DISABLED = true;
 const AUTH_KEY = 'smartclash-web-auth';
@@ -87,6 +87,9 @@ const el = {
   stepPrev: document.getElementById('stepPrev'),
   stepNext: document.getElementById('stepNext'),
   quickFlowBtn: document.getElementById('quickFlowBtn'),
+  wizStep1: document.getElementById('wizStep1'),
+  wizStep2: document.getElementById('wizStep2'),
+  wizStep3: document.getElementById('wizStep3'),
   goStep2: document.getElementById('goStep2'),
   goStep3: document.getElementById('goStep3'),
   toggleAdvanced: document.getElementById('toggleAdvanced'),
@@ -304,16 +307,27 @@ function renderNavigation() {
   });
 }
 
+function getWizardStep() {
+  if (viewState.main === 'nodes') return 1;
+  if (viewState.main === 'groups' || viewState.main === 'rules') return 2;
+  return 3;
+}
+
+function updateWizardButtons(step) {
+  const pairs = [el.wizStep1, el.wizStep2, el.wizStep3];
+  pairs.forEach((btn, i) => btn?.classList.toggle('active', i + 1 === step));
+}
+
 function updatePathline() {
   const mainCfg = NAV_SCHEMA[viewState.main];
   const subCfg = mainCfg.subs[viewState.sub];
   const thirdLabel = subCfg.thirds[viewState.third];
   if (el.breadcrumbText) el.breadcrumbText.textContent = `路径：${mainCfg.label} / ${subCfg.label} / ${thirdLabel}`;
-  const order = ['nodes', 'groups', 'rules', 'publish'];
-  const idx = Math.max(0, order.indexOf(viewState.main));
-  const step = idx + 1;
-  if (el.stepProgressText) el.stepProgressText.textContent = `Step ${step} / ${order.length}`;
-  if (el.stepProgressFill) el.stepProgressFill.style.width = `${(step / order.length) * 100}%`;
+
+  const step = getWizardStep();
+  if (el.stepProgressText) el.stepProgressText.textContent = `Step ${step} / 3`;
+  if (el.stepProgressFill) el.stepProgressFill.style.width = `${(step / 3) * 100}%`;
+  updateWizardButtons(step);
 }
 
 function getNavTriples() {
@@ -1441,8 +1455,12 @@ el.stepNext?.addEventListener('click', () => {
 
 el.quickFlowBtn?.addEventListener('click', () => {
   jumpTo('nodes', 'import', 'quick');
-  setPublishStatus('已进入三步流程：1导入节点 → 2生成模块 → 3发布', 'success');
+  setPublishStatus('已回到第 1 步：导入订阅/节点', 'success');
 });
+
+el.wizStep1?.addEventListener('click', () => jumpTo('nodes', 'import', 'quick'));
+el.wizStep2?.addEventListener('click', () => jumpTo('groups', 'canvas', 'drag'));
+el.wizStep3?.addEventListener('click', () => jumpTo('publish', 'actions', 'output'));
 
 el.goStep2?.addEventListener('click', () => jumpTo('nodes', 'generator', 'region'));
 el.goStep3?.addEventListener('click', () => jumpTo('publish', 'actions', 'output'));

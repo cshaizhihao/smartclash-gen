@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>smartclash-gen 可视化编排器</title>
-  <link rel="stylesheet" href="./style.css?v=0.13.13" />
+  <link rel="stylesheet" href="./style.css?v=0.13.14" />
 </head>
 <body>
   <div class="ambient-grid" aria-hidden="true"></div>
@@ -35,7 +35,7 @@
   <div class="app-window-shell">
     <div class="app-window">
       <header>
-        <h1>smartclash-gen v0.13.13</h1>
+        <h1>smartclash-gen v0.13.14</h1>
         <p>单页流程 · 极简编排 · 动画过渡 · YAML 即时交付</p>
       </header>
 
@@ -294,6 +294,8 @@
               <button id="saveBtn" class="ghost">保存并生成 Markdown</button>
               <button id="downloadYamlBtn" class="ghost">下载 YAML</button>
               <button id="publishBtn" class="ghost">发布配置</button>
+              <button id="generateSubBtn" class="ghost">生成订阅链接</button>
+              <button id="copySubBtn" class="ghost">复制订阅链接</button>
               <button id="autoFixBtn" class="ghost">自动修复引用</button>
             </div>
           </div>
@@ -312,7 +314,16 @@
                 <h3>规则编辑（已从 Step 2 拆出）</h3>
                 <span class="helper-text">现在只在发布前检查与微调</span>
               </div>
+              <div class="rule-presets-row row compact-row">
+                <button id="presetAIBtn" class="ghost">AI 常用</button>
+                <button id="presetMediaBtn" class="ghost">流媒体常用</button>
+                <button id="presetDomesticBtn" class="ghost">国内直连</button>
+                <button id="presetResetBtn" class="ghost">恢复默认规则</button>
+              </div>
               <textarea id="rules" rows="12" placeholder="DOMAIN-SUFFIX,google.com,Smart-AUTO&#10;MATCH,Smart-AUTO"></textarea>
+              <div class="sub-link-box">
+                <input id="subLinkOutput" readonly placeholder="点“生成订阅链接”后，这里会出现 Clash 可直接使用的订阅地址" />
+              </div>
               <ul id="warnings" class="warnings"></ul>
             </div>
             <div class="publish-list-block">
@@ -331,7 +342,7 @@
                 <h3>YAML / Markdown 预览</h3>
                 <p class="helper-text">当前导出内容会实时映射到这里。</p>
               </div>
-              <span id="updateStatus" class="helper-text">当前版本：v0.13.13</span>
+              <span id="updateStatus" class="helper-text">当前版本：v0.13.14</span>
             </div>
             <textarea id="markdown" class="code-preview" rows="24"></textarea>
           </section>
@@ -364,6 +375,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
-  <script src="./app.js?v=0.13.13"></script>
+  <script src="./app.js?v=0.13.14"></script>
 </body>
 </html>

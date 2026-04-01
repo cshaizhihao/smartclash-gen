@@ -572,6 +572,8 @@ h3 { margin: 0 0 8px; font-size: 13px; color: var(--sub); }
 .row { display: flex; gap: 6px; margin-bottom: 6px; flex-wrap: wrap; align-items: center; }
 .compact-row { flex-wrap: nowrap; }
 .stack-row { display: grid; gap: 6px; }
+.rule-presets-row { margin-bottom: 8px; }
+.sub-link-box { margin: 8px 0 0; }
 input, select, textarea, button {
   border-radius: 12px;
   border: 1px solid rgba(71, 85, 105, 0.8);

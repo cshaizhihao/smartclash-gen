@@ -1,9 +1,32 @@
-const STORAGE_KEY = 'smartclash-web-v1313';
-const APP_VERSION = '0.13.13';
+const STORAGE_KEY = 'smartclash-web-v1314';
+const APP_VERSION = '0.13.14';
 const UPDATE_CMD = 'bash -c "$(curl -fsSL https://raw.githubusercontent.com/cshaizhihao/smartclash-gen/main/install.sh)" -- --update -d ~/.smartclash-gen';
 const AUTH_DISABLED = true;
 const AUTH_KEY = 'smartclash-web-auth';
 const AUTH_SESSION_KEY = 'smartclash-web-auth-session';
+const DEFAULT_RULE_LINES = ['DOMAIN-SUFFIX,google.com,Smart-AUTO', 'MATCH,Smart-AUTO'];
+const RULE_PRESETS = {
+  ai: [
+    'RULE-SET,openai,Smart-AUTO',
+    'RULE-SET,category-ai-!cn,Smart-AUTO',
+    'DOMAIN-SUFFIX,anthropic.com,Smart-AUTO',
+    'DOMAIN-SUFFIX,claude.ai,Smart-AUTO',
+    'MATCH,Smart-AUTO',
+  ],
+  media: [
+    'RULE-SET,Netflix,Smart-AUTO',
+    'RULE-SET,Telegram,Smart-AUTO',
+    'DOMAIN-SUFFIX,youtube.com,Smart-AUTO',
+    'DOMAIN-SUFFIX,spotify.com,Smart-AUTO',
+    'MATCH,Smart-AUTO',
+  ],
+  domestic: [
+    'RULE-SET,LocalAreaNetwork,DIRECT',
+    'RULE-SET,ChinaDomain,DIRECT',
+    'RULE-SET,ChinaCompanyIp,DIRECT',
+    'MATCH,Smart-AUTO',
+  ],
+};
 
 function makeId() {
   if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();
@@ -34,7 +57,7 @@ function createDefaultState() {
     groups: [
       { id: makeId(), name: 'Smart-AUTO', type: 'smart', members: [] },
     ],
-    rules: ['DOMAIN-SUFFIX,google.com,Smart-AUTO', 'MATCH,Smart-AUTO'],
+    rules: [...DEFAULT_RULE_LINES],
     mixedPort: 7892,
     transitGroupName: 'Smart-Transit',
     egressGroupName: 'Smart-Egress',
@@ -144,7 +167,14 @@ const el = {
   downloadBtn: document.getElementById('downloadBtn'),
   downloadYamlBtn: document.getElementById('downloadYamlBtn'),
   publishBtn: document.getElementById('publishBtn'),
+  generateSubBtn: document.getElementById('generateSubBtn'),
+  copySubBtn: document.getElementById('copySubBtn'),
   autoFixBtn: document.getElementById('autoFixBtn'),
+  presetAIBtn: document.getElementById('presetAIBtn'),
+  presetMediaBtn: document.getElementById('presetMediaBtn'),
+  presetDomesticBtn: document.getElementById('presetDomesticBtn'),
+  presetResetBtn: document.getElementById('presetResetBtn'),
+  subLinkOutput: document.getElementById('subLinkOutput'),
   resetBtn: document.getElementById('resetBtn'),
   publishStatus: document.getElementById('publishStatus'),
   markdown: document.getElementById('markdown'),
@@ -1598,6 +1628,27 @@ el.saveBtn.addEventListener('click', () => {
   setPublishStatus('已保存最新 Markdown，等待发布', 'idle');
 });
 
+async function generateSubscriptionLink() {
+  const result = validateState();
+  renderWarnings(result);
+  if (result.blockers.length) {
+    const summary = result.blockers.slice(0, 2).join('；');
+    setPublishStatus(`现在还不能生成订阅：有 ${result.blockers.length} 个必须先修的问题。${summary}${result.blockers.length > 2 ? '…' : ''}`, 'error');
+    return null;
+  }
+  const yaml = jsyaml.dump(buildYamlObject(), { noRefs: true });
+  const resp = await fetch('/api/subscription/publish', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ yaml }),
+  });
+  const data = await resp.json();
+  if (!resp.ok || !data.ok || !data.url) throw new Error(data.error || '生成失败');
+  if (el.subLinkOutput) el.subLinkOutput.value = data.url;
+  setPublishStatus(`订阅链接已生成，可直接给 Clash 使用`, 'success');
+  return data.url;
+}
+
 el.publishBtn.addEventListener('click', () => {
   const result = validateState();
   renderWarnings(result);
@@ -1607,6 +1658,25 @@ el.publishBtn.addEventListener('click', () => {
   }
   persistState();
   setPublishStatus(result.warnings.length ? `可以发布，另外还有 ${result.warnings.length} 条提醒可按需处理` : '发布检查通过：现在可以直接导出或发布', 'success');
+});
+
+el.generateSubBtn?.addEventListener('click', async () => {
+  try {
+    await generateSubscriptionLink();
+  } catch (error) {
+    setPublishStatus(`生成订阅链接失败：${error.message}`, 'error');
+  }
+});
+
+el.copySubBtn?.addEventListener('click', async () => {
+  try {
+    const url = el.subLinkOutput?.value || await generateSubscriptionLink();
+    if (!url) return;
+    await navigator.clipboard.writeText(url);
+    setPublishStatus('订阅链接已复制，可直接粘贴到 Clash', 'success');
+  } catch (error) {
+    setPublishStatus(`复制订阅链接失败：${error.message}`, 'error');
+  }
 });
 
 el.copyBtn?.addEventListener('click', async () => {
@@ -1647,6 +1717,20 @@ el.exportDiffBtn?.addEventListener('click', () => {
   a.click();
   URL.revokeObjectURL(url);
 });
+
+function applyRulePreset(lines, label) {
+  pushHistory(`规则预设：${label}`);
+  el.rules.value = lines.join('\n');
+  state.rules = [...lines];
+  refreshMarkdownPreview();
+  persistState();
+  setPublishStatus(`已套用规则预设：${label}`, 'success');
+}
+
+el.presetAIBtn?.addEventListener('click', () => applyRulePreset(RULE_PRESETS.ai, 'AI 常用'));
+el.presetMediaBtn?.addEventListener('click', () => applyRulePreset(RULE_PRESETS.media, '流媒体常用'));
+el.presetDomesticBtn?.addEventListener('click', () => applyRulePreset(RULE_PRESETS.domestic, '国内直连'));
+el.presetResetBtn?.addEventListener('click', () => applyRulePreset(DEFAULT_RULE_LINES, '恢复默认规则'));
 
 el.rules.addEventListener('input', () => {
   state.rules = el.rules.value.split('\n');

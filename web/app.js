@@ -1,5 +1,5 @@
-const STORAGE_KEY = 'smartclash-web-v121';
-const APP_VERSION = '0.12.1';
+const STORAGE_KEY = 'smartclash-web-v122';
+const APP_VERSION = '0.12.2';
 const UPDATE_CMD = 'bash -c "$(curl -fsSL https://raw.githubusercontent.com/cshaizhihao/smartclash-gen/main/install.sh)" -- --update -d ~/.smartclash-gen';
 const AUTH_DISABLED = true;
 const AUTH_KEY = 'smartclash-web-auth';
@@ -80,6 +80,7 @@ const el = {
   breadcrumbText: document.getElementById('breadcrumbText'),
   stepProgressText: document.getElementById('stepProgressText'),
   stepProgressFill: document.getElementById('stepProgressFill'),
+  flowStage: document.getElementById('flowStage'),
   stepPrev: document.getElementById('stepPrev'),
   stepNext: document.getElementById('stepNext'),
   stepNextCompose: document.getElementById('stepNextCompose'),
@@ -347,9 +348,14 @@ function getNavTriples() {
 }
 
 function jumpTo(main, sub, third) {
+  const prevStep = getWizardStep();
   viewState.main = main;
   viewState.sub = sub;
   viewState.third = third;
+  const nextStep = getWizardStep();
+  if (el.flowStage) {
+    el.flowStage.dataset.motion = nextStep < prevStep ? 'backward' : 'forward';
+  }
   renderNavigation();
   renderPanes();
 }
@@ -360,7 +366,7 @@ function renderPanes() {
     const step = main === 'nodes' ? 1 : main === 'publish' ? 3 : 2;
     const show = step === getWizardStep();
     pane.classList.toggle('active', show);
-    pane.hidden = !show;
+    pane.setAttribute('aria-hidden', show ? 'false' : 'true');
   });
   updatePathline();
 }

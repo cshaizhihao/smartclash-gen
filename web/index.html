@@ -7,6 +7,9 @@
   <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
+  <div class="ambient-grid" aria-hidden="true"></div>
+  <div class="ambient-orb orb-left" aria-hidden="true"></div>
+  <div class="ambient-orb orb-right" aria-hidden="true"></div>
   <div id="authGate" class="auth-gate hidden">
     <div class="auth-card">
       <h2>🔐 smartclash-gen 访问验证</h2>
@@ -29,12 +32,14 @@
     </div>
   </div>
 
-  <header>
-    <h1>smartclash-gen v0.12.1</h1>
-    <p>单页流程 · 极简编排 · 动画过渡 · YAML 即时交付</p>
-  </header>
+  <div class="app-window-shell">
+    <div class="app-window">
+      <header>
+        <h1>smartclash-gen v0.12.2</h1>
+        <p>单页流程 · 极简编排 · 动画过渡 · YAML 即时交付</p>
+      </header>
 
-  <main class="flow-shell" id="appShell">
+      <main class="flow-shell" id="appShell">
     <section class="flow-topbar">
       <div class="flow-title">
         <h2>配置生成流程</h2>
@@ -51,7 +56,7 @@
       </div>
     </section>
 
-    <section class="flow-stage">
+    <section class="flow-stage" id="flowStage">
       <article class="panel stage-card pane stage-pane active" data-main="nodes" data-sub="import" data-third="quick">
         <div class="stage-head">
           <div>
@@ -268,10 +273,12 @@
     <button id="goStep2" class="hidden">go step2</button>
     <button id="goStep3" class="hidden">go step3</button>
     <button id="jumpToGroupStep" class="hidden">jump</button>
-  </main>
+      </main>
+    </div>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
-  <script src="./app.js?v=0.12.1"></script>
+  <script src="./app.js?v=0.12.2"></script>
 </body>
 </html>

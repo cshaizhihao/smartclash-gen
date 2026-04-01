@@ -1,0 +1,55 @@
+<svg width="1600" height="900" viewBox="0 0 1600 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1600" height="900" fill="#030712"/>
+  <rect width="1600" height="900" fill="url(#g)" opacity=".95"/>
+  <defs>
+    <radialGradient id="g" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(800 160) rotate(90) scale(760 1160)">
+      <stop stop-color="#0F172A"/>
+      <stop offset="1" stop-color="#020617"/>
+    </radialGradient>
+    <linearGradient id="line" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#2563EB"/>
+      <stop offset="1" stop-color="#38BDF8"/>
+    </linearGradient>
+  </defs>
+  <circle cx="220" cy="170" r="220" fill="#0EA5E9" opacity=".12"/>
+  <circle cx="1380" cy="720" r="240" fill="#8B5CF6" opacity=".10"/>
+  <rect x="180" y="72" width="1240" height="756" rx="34" fill="#0B1220" fill-opacity="0.62" stroke="#FFFFFF" stroke-opacity="0.12"/>
+  <text x="226" y="124" fill="#E2E8F0" font-size="30" font-family="Arial" font-weight="700">smartclash-gen v0.12.2</text>
+  <text x="226" y="150" fill="#94A3B8" font-size="15" font-family="Arial">居中应用窗口 · 毛玻璃外壳 · 步骤切换过渡加强</text>
+  <rect x="214" y="188" width="1172" height="92" rx="24" fill="#0F172A" fill-opacity="0.58" stroke="#FFFFFF" stroke-opacity="0.08"/>
+  <rect x="610" y="214" width="220" height="40" rx="14" fill="#0F172A" stroke="#334155"/>
+  <rect x="846" y="214" width="220" height="40" rx="14" fill="url(#line)"/>
+  <rect x="1082" y="214" width="220" height="40" rx="14" fill="#0F172A" stroke="#334155"/>
+  <text x="720" y="239" text-anchor="middle" fill="#CBD5E1" font-size="16" font-family="Arial" font-weight="700">① 导入</text>
+  <text x="956" y="239" text-anchor="middle" fill="white" font-size="16" font-family="Arial" font-weight="700">② 编排</text>
+  <text x="1192" y="239" text-anchor="middle" fill="#CBD5E1" font-size="16" font-family="Arial" font-weight="700">③ 发布</text>
+  <rect x="610" y="264" width="692" height="8" rx="4" fill="#111827"/>
+  <rect x="610" y="264" width="460" height="8" rx="4" fill="url(#line)"/>
+  <rect x="214" y="308" width="1172" height="454" rx="28" fill="#0F172A" fill-opacity="0.48" stroke="#FFFFFF" stroke-opacity="0.08"/>
+  <text x="248" y="360" fill="#E2E8F0" font-size="28" font-family="Arial" font-weight="700">步骤 2：中转 / 落地编排</text>
+  <text x="248" y="388" fill="#94A3B8" font-size="16" font-family="Arial">窗口化承载，视觉不再贴边；步骤切换改为更清晰的滑入 + 淡入。</text>
+  <rect x="248" y="420" width="112" height="70" rx="18" fill="#111827" fill-opacity="0.7" stroke="#334155"/>
+  <rect x="374" y="420" width="112" height="70" rx="18" fill="#111827" fill-opacity="0.7" stroke="#334155"/>
+  <rect x="500" y="420" width="112" height="70" rx="18" fill="#111827" fill-opacity="0.7" stroke="#334155"/>
+  <rect x="626" y="420" width="140" height="70" rx="18" fill="#082F49" fill-opacity="0.7" stroke="#38BDF8"/>
+  <text x="270" y="447" fill="#94A3B8" font-size="13" font-family="Arial">未分配</text><text x="294" y="475" fill="#F8FAFC" font-size="27" font-family="Arial" font-weight="700">12</text>
+  <text x="400" y="447" fill="#94A3B8" font-size="13" font-family="Arial">中转</text><text x="420" y="475" fill="#F8FAFC" font-size="27" font-family="Arial" font-weight="700">3</text>
+  <text x="528" y="447" fill="#94A3B8" font-size="13" font-family="Arial">落地</text><text x="548" y="475" fill="#F8FAFC" font-size="27" font-family="Arial" font-weight="700">4</text>
+  <text x="650" y="447" fill="#94A3B8" font-size="13" font-family="Arial">链式结果</text><text x="678" y="475" fill="#F8FAFC" font-size="27" font-family="Arial" font-weight="700">12</text>
+  <rect x="248" y="522" width="332" height="180" rx="22" fill="#0B1224" fill-opacity="0.72" stroke="#334155"/>
+  <rect x="606" y="522" width="748" height="180" rx="22" fill="#0B1224" fill-opacity="0.72" stroke="#334155"/>
+  <text x="274" y="556" fill="#CBD5E1" font-size="18" font-family="Arial" font-weight="700">未分配节点池</text>
+  <text x="632" y="556" fill="#CBD5E1" font-size="18" font-family="Arial" font-weight="700">策略组工作台</text>
+  <rect x="274" y="578" width="280" height="26" rx="10" fill="#111827"/>
+  <rect x="274" y="620" width="280" height="26" rx="10" fill="#111827"/>
+  <rect x="274" y="662" width="220" height="26" rx="10" fill="#111827"/>
+  <rect x="632" y="578" width="206" height="70" rx="16" fill="#111827" stroke="#334155"/>
+  <rect x="854" y="578" width="206" height="70" rx="16" fill="#111827" stroke="#334155"/>
+  <rect x="1076" y="578" width="250" height="70" rx="16" fill="#111827" stroke="#334155"/>
+  <text x="650" y="605" fill="#7DD3FC" font-size="15" font-family="Arial" font-weight="700">Smart-Transit (3 节点)</text>
+  <text x="872" y="605" fill="#7DD3FC" font-size="15" font-family="Arial" font-weight="700">Smart-Egress (4 节点)</text>
+  <text x="1094" y="605" fill="#7DD3FC" font-size="15" font-family="Arial" font-weight="700">Smart-Chain (12 节点)</text>
+  <line x1="248" y1="726" x2="1354" y2="726" stroke="#475569" stroke-dasharray="6 6"/>
+  <rect x="1170" y="744" width="160" height="44" rx="16" fill="url(#line)"/>
+  <text x="1250" y="771" text-anchor="middle" fill="white" font-size="16" font-family="Arial" font-weight="700">下一步</text>
+</svg>

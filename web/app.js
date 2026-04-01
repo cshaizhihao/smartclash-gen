@@ -1,5 +1,5 @@
-const STORAGE_KEY = 'smartclash-web-v088';
-const APP_VERSION = '0.8.8';
+const STORAGE_KEY = 'smartclash-web-v089';
+const APP_VERSION = '0.8.9';
 const UPDATE_CMD = 'bash -c "$(curl -fsSL https://raw.githubusercontent.com/cshaizhihao/smartclash-gen/main/install.sh)" -- --update -d ~/.smartclash-gen';
 const AUTH_KEY = 'smartclash-web-auth';
 const AUTH_SESSION_KEY = 'smartclash-web-auth-session';
@@ -139,7 +139,7 @@ const el = {
   doneGenerate: document.getElementById('doneGenerate'),
   donePublish: document.getElementById('donePublish'),
   checkUpdateBtn: document.getElementById('checkUpdateBtn'),
-  webUpdateBtn: document.getElementById('webUpdateBtn'),
+  smartUpdateBtn: document.getElementById('smartUpdateBtn'),
   copyUpdateCmdBtn: document.getElementById('copyUpdateCmdBtn'),
   updateStatus: document.getElementById('updateStatus'),
   exportDiffBtn: document.getElementById('exportDiffBtn'),
@@ -1304,21 +1304,30 @@ el.toggleAdvanced?.addEventListener('click', () => {
   el.advancedOps?.classList.toggle('hidden');
 });
 
-el.checkUpdateBtn?.addEventListener('click', checkUpdate);
-el.webUpdateBtn?.addEventListener('click', async () => {
-  if (!el.updateStatus) return;
+async function runWebUpdate() {
+  if (!el.updateStatus) return { ok: false };
   el.updateStatus.textContent = '正在更新，请稍候...';
   try {
     const resp = await fetch('/api/update', { method: 'POST' });
     const data = await resp.json();
     if (data.ok) {
       el.updateStatus.textContent = `更新完成，当前版本：v${data.local}，建议刷新页面`;
-    } else {
-      el.updateStatus.textContent = `更新失败：${data.stderr || data.error || '未知错误'}`;
+      return { ok: true, local: data.local };
     }
+    el.updateStatus.textContent = `更新失败：${data.stderr || data.error || '未知错误'}`;
+    return { ok: false };
   } catch {
     el.updateStatus.textContent = '网页更新不可用（请用 dev_server.py 启动服务）';
+    return { ok: false };
   }
+}
+
+el.checkUpdateBtn?.addEventListener('click', checkUpdate);
+el.smartUpdateBtn?.addEventListener('click', async () => {
+  await checkUpdate();
+  const text = el.updateStatus?.textContent || '';
+  if (text.includes('已是最新版本')) return;
+  await runWebUpdate();
 });
 el.copyUpdateCmdBtn?.addEventListener('click', async () => {
   try {

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-VERSION="0.8.8"
+VERSION="0.8.9"
 PORT=7892
 TARGET_DIR="$HOME/.smartclash-gen"
 BASE_URL="https://raw.githubusercontent.com/cshaizhihao/smartclash-gen/main"

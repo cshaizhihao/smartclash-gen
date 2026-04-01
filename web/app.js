@@ -59,6 +59,8 @@ const NAV_SCHEMA = {
 
 const viewState = { main: 'nodes', sub: 'import', third: 'quick' };
 const importConflictState = { dupEntries: [], errors: [] };
+const historyState = { undo: [], redo: [] };
+let savedBaseline = null;
 
 const el = {
   authGate: document.getElementById('authGate'),
@@ -77,6 +79,8 @@ const el = {
   stepProgressFill: document.getElementById('stepProgressFill'),
   stepPrev: document.getElementById('stepPrev'),
   stepNext: document.getElementById('stepNext'),
+  undoBtn: document.getElementById('undoBtn'),
+  redoBtn: document.getElementById('redoBtn'),
 
   nodeName: document.getElementById('nodeName'),
   addNode: document.getElementById('addNode'),
@@ -87,6 +91,7 @@ const el = {
   importConflictBox: document.getElementById('importConflictBox'),
   importConflicts: document.getElementById('importConflicts'),
   resolveAllDup: document.getElementById('resolveAllDup'),
+  resolveOneDup: document.getElementById('resolveOneDup'),
   ignoreConflicts: document.getElementById('ignoreConflicts'),
 
   groupName: document.getElementById('groupName'),
@@ -114,6 +119,7 @@ const el = {
   markdown: document.getElementById('markdown'),
   warnings: document.getElementById('warnings'),
   publishChecklist: document.getElementById('publishChecklist'),
+  diffSummary: document.getElementById('diffSummary'),
 };
 
 function simpleHash(input) {
@@ -488,17 +494,52 @@ function syncFromDom() {
   persistState();
 }
 
+function getSerializableState() {
+  return {
+    nodes: structuredClone(state.nodes),
+    groups: structuredClone(state.groups),
+    rules: el.rules.value.split('\n'),
+    mixedPort: Number(el.mixedPort.value || state.mixedPort || 7892),
+    nodeUrls: el.nodeUrls.value || '',
+  };
+}
+
+function pushHistory() {
+  historyState.undo.push(getSerializableState());
+  if (historyState.undo.length > 50) historyState.undo.shift();
+  historyState.redo = [];
+}
+
+function applySnapshot(snap) {
+  replaceState({
+    nodes: snap.nodes || [],
+    groups: snap.groups || [],
+    rules: snap.rules || [],
+    mixedPort: snap.mixedPort || 7892,
+  });
+  el.nodeUrls.value = snap.nodeUrls || '';
+  render();
+  persistState();
+}
+
+function renderDiffSummary() {
+  if (!el.diffSummary) return;
+  if (!savedBaseline) {
+    el.diffSummary.innerHTML = '<li class="ok">✅ 当前版本尚无基线，保存后将开始追踪差异</li>';
+    return;
+  }
+  const curr = getSerializableState();
+  const diffs = [];
+  if (curr.nodes.length !== savedBaseline.nodes.length) diffs.push(`节点数量：${savedBaseline.nodes.length} → ${curr.nodes.length}`);
+  if (curr.groups.length !== savedBaseline.groups.length) diffs.push(`策略组数量：${savedBaseline.groups.length} → ${curr.groups.length}`);
+  if (curr.rules.join('\n') !== savedBaseline.rules.join('\n')) diffs.push('规则内容已变更');
+  if (curr.mixedPort !== savedBaseline.mixedPort) diffs.push(`mixed-port：${savedBaseline.mixedPort} → ${curr.mixedPort}`);
+  el.diffSummary.innerHTML = diffs.length ? diffs.map((x) => `<li>🧾 ${x}</li>`).join('') : '<li class="ok">✅ 与上次保存相比无差异</li>';
+}
+
 function persistState() {
-  localStorage.setItem(
-    STORAGE_KEY,
-    JSON.stringify({
-      nodes: state.nodes,
-      groups: state.groups,
-      rules: el.rules.value.split('\n'),
-      mixedPort: Number(el.mixedPort.value || state.mixedPort || 7892),
-      nodeUrls: el.nodeUrls.value || '',
-    })
-  );
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(getSerializableState()));
+  renderDiffSummary();
 }
 
 function replaceState(nextState) {
@@ -790,6 +831,7 @@ function setPublishStatus(text, type = 'idle') {
 el.addNode.addEventListener('click', () => {
   const name = el.nodeName.value.trim();
   if (!name) return;
+  pushHistory();
   state.nodes.push({ id: makeId(), name, url: '', region: inferRegion(name) });
   el.nodeName.value = '';
   render();
@@ -799,6 +841,7 @@ el.addNode.addEventListener('click', () => {
 el.importUrlsBtn.addEventListener('click', () => {
   const lines = el.nodeUrls.value.split('\n').map((x) => x.trim()).filter(Boolean);
   if (!lines.length) return setImportStatus('请先粘贴节点 URL', 'error');
+  pushHistory();
 
   const exists = new Set(state.nodes.map((n) => n.name));
   let okCount = 0;
@@ -841,6 +884,7 @@ el.importUrlsBtn.addEventListener('click', () => {
 el.addGroup.addEventListener('click', () => {
   const name = el.groupName.value.trim();
   if (!name) return;
+  pushHistory();
   state.groups.push({ id: makeId(), name, type: el.groupType.value, members: [] });
   el.groupName.value = '';
   render();
@@ -858,6 +902,7 @@ el.nodeEditorSelect?.addEventListener('change', () => {
 el.saveNodeMeta?.addEventListener('click', () => {
   const selected = state.nodes.find((n) => n.id === el.nodeEditorSelect.value);
   if (!selected) return;
+  pushHistory();
   selected.name = el.nodeEditorName.value.trim() || selected.name;
   selected.url = el.nodeEditorUrl.value.trim();
   selected.region = el.nodeEditorRegion.value || inferRegion(selected.name);
@@ -867,6 +912,7 @@ el.saveNodeMeta?.addEventListener('click', () => {
 });
 
 el.applyRegionModules?.addEventListener('click', () => {
+  pushHistory();
   applyRegionModulesFromNodes();
   render();
   persistState();
@@ -874,6 +920,7 @@ el.applyRegionModules?.addEventListener('click', () => {
 });
 
 el.clearUrlsBtn.addEventListener('click', () => {
+  pushHistory();
   state.nodes.forEach((node) => {
     node.url = '';
   });
@@ -892,6 +939,7 @@ el.clearUrlsBtn.addEventListener('click', () => {
 
 el.resolveAllDup?.addEventListener('click', () => {
   if (!importConflictState.dupEntries.length) return setImportStatus('没有待处理的重复节点', 'idle');
+  pushHistory();
   const exists = new Set(state.nodes.map((n) => n.name));
   let imported = 0;
   importConflictState.dupEntries.forEach((item) => {
@@ -914,6 +962,29 @@ el.resolveAllDup?.addEventListener('click', () => {
   setImportStatus(`重复节点已重命名导入 ${imported} 条`, 'success');
 });
 
+el.resolveOneDup?.addEventListener('click', () => {
+  if (!importConflictState.dupEntries.length) return setImportStatus('没有待处理的重复节点', 'idle');
+  pushHistory();
+  const item = importConflictState.dupEntries.shift();
+  const exists = new Set(state.nodes.map((n) => n.name));
+  let idx = 2;
+  let name = `${item.name}-dup${idx}`;
+  while (exists.has(name)) {
+    idx += 1;
+    name = `${item.name}-dup${idx}`;
+  }
+  state.nodes.push({ id: makeId(), name, url: item.url, region: inferRegion(name) });
+  render();
+  persistState();
+  const conflictItems = [
+    ...importConflictState.dupEntries.map((d) => `🔁 重名节点：${d.name}`),
+    ...importConflictState.errors.map((e) => `⛔ ${e}`),
+  ];
+  if (el.importConflicts) el.importConflicts.innerHTML = conflictItems.map((x) => `<li>${x}</li>`).join('');
+  if (el.importConflictBox) el.importConflictBox.classList.toggle('hidden', conflictItems.length === 0);
+  setImportStatus(`已处理 1 条重复节点，剩余 ${importConflictState.dupEntries.length} 条`, 'success');
+});
+
 el.ignoreConflicts?.addEventListener('click', () => {
   importConflictState.dupEntries = [];
   importConflictState.errors = [];
@@ -930,6 +1001,7 @@ el.saveBtn.addEventListener('click', () => {
   el.markdown.dataset.manualEdit = '';
   el.markdown.value = buildMarkdown();
   state.mixedPort = Number(el.mixedPort.value || 7892);
+  savedBaseline = getSerializableState();
   persistState();
   setPublishStatus('已保存最新 Markdown，等待发布', 'idle');
 });
@@ -985,6 +1057,7 @@ el.mixedPort.addEventListener('input', () => {
 });
 
 el.autoFixBtn?.addEventListener('click', () => {
+  pushHistory();
   let fixed = 0;
   const validIds = new Set(state.nodes.map((n) => n.id));
 
@@ -1017,6 +1090,7 @@ el.autoFixBtn?.addEventListener('click', () => {
 });
 
 el.resetBtn.addEventListener('click', () => {
+  pushHistory();
   replaceState(createDefaultState());
   el.nodeName.value = '';
   el.groupName.value = '';
@@ -1047,7 +1121,26 @@ el.stepNext?.addEventListener('click', () => {
   jumpTo(next.main, next.sub, next.third);
 });
 
+el.undoBtn?.addEventListener('click', () => {
+  if (!historyState.undo.length) return setPublishStatus('没有可撤销的操作', 'idle');
+  const current = getSerializableState();
+  historyState.redo.push(current);
+  const prev = historyState.undo.pop();
+  applySnapshot(prev);
+  setPublishStatus('已撤销一步', 'success');
+});
+
+el.redoBtn?.addEventListener('click', () => {
+  if (!historyState.redo.length) return setPublishStatus('没有可重做的操作', 'idle');
+  const current = getSerializableState();
+  historyState.undo.push(current);
+  const next = historyState.redo.pop();
+  applySnapshot(next);
+  setPublishStatus('已重做一步', 'success');
+});
+
 hydrateState();
+savedBaseline = getSerializableState();
 render();
 renderNavigation();
 renderPanes();

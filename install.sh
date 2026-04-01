@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-VERSION="0.8.7"
+VERSION="0.8.8"
 PORT=7892
 TARGET_DIR="$HOME/.smartclash-gen"
 BASE_URL="https://raw.githubusercontent.com/cshaizhihao/smartclash-gen/main"
@@ -74,7 +74,13 @@ fi
 curl -fsSL -o generate.py "${BASE_URL}/generate.py"
 curl -fsSL -o requirements.txt "${BASE_URL}/requirements.txt"
 curl -fsSL -o VERSION "${BASE_URL}/VERSION" || echo "$VERSION" > VERSION
-chmod +x generate.py
+
+mkdir -p web
+curl -fsSL -o web/index.html "${BASE_URL}/web/index.html"
+curl -fsSL -o web/style.css "${BASE_URL}/web/style.css"
+curl -fsSL -o web/app.js "${BASE_URL}/web/app.js"
+curl -fsSL -o web/dev_server.py "${BASE_URL}/web/dev_server.py"
+chmod +x generate.py web/dev_server.py
 python3 -m pip install --user --quiet -r requirements.txt
 
 if [[ "$MODE" == "update" ]]; then
@@ -84,5 +90,7 @@ else
   echo "smartclash-gen v${VERSION} installed to: $TARGET_DIR"
   echo "Suggested command:"
   echo "  python3 generate.py --urls urls.txt --rules rules.txt --port $PORT --output openclash.yaml"
+  echo "Web workbench (supports in-page update):"
+  echo "  cd $TARGET_DIR/web && python3 dev_server.py"
   echo "You can override the port later with --port <1-65535>."
 fi

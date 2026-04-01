@@ -1,6 +1,6 @@
 # smartclash-gen
 
-> 版本：**v0.8.7**
+> 版本：**v0.8.8**
 
 一个面向 **OpenClash + mihomo(type: smart)** 的配置生成器：
 
@@ -15,7 +15,7 @@
 
 ## 安装后应用示意图
 
-![应用示意图](docs/app-preview-v0.8.7-web.svg)
+![应用示意图](docs/app-preview-v0.8.8-web.svg)
 
 ---
 
@@ -26,6 +26,15 @@
 ```bash
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/cshaizhihao/smartclash-gen/main/install.sh)" -- -p 10801
 ```
+
+### 启动 Web 工作台（支持网页一键更新）
+
+```bash
+cd smartclash-gen/web
+python3 dev_server.py
+```
+
+> 使用 `dev_server.py` 启动时，页面内的“网页一键更新”按钮可直接生效。
 
 ---
 
@@ -130,6 +139,12 @@ python3 generate.py \
 ---
 
 ## 版本更新说明
+
+### v0.8.8
+- 新增网页“一键更新”能力：在更新助手中可直接触发更新，无需手动复制终端命令
+- 新增 `web/dev_server.py`：提供 `/api/version` 与 `/api/update` 接口（支撑网页内检查/更新）
+- 保留“复制更新命令”作为兜底方案
+- README 版本号与截图引用同步到 v0.8.8
 
 ### v0.8.7
 - 新增“更新助手”：支持一键检查远端版本、复制更新命令

@@ -1,4 +1,4 @@
-const STORAGE_KEY = 'smartclash-web-v071';
+const STORAGE_KEY = 'smartclash-web-v073';
 const AUTH_KEY = 'smartclash-web-auth';
 const AUTH_SESSION_KEY = 'smartclash-web-auth-session';
 
@@ -441,8 +441,27 @@ function buildYamlObject() {
     proxyGroups.push({ name: 'DIRECT', type: 'select', proxies: ['DIRECT'] });
   }
 
-  const rules = el.rules.value.split('\n').map((x) => x.trim()).filter(Boolean);
-  if (!rules.some((r) => r.startsWith('MATCH,'))) rules.push('MATCH,Smart-AUTO');
+  const userRules = el.rules.value.split('\n').map((x) => x.trim()).filter(Boolean);
+  if (!userRules.some((r) => r.startsWith('MATCH,'))) userRules.push('MATCH,Smart-AUTO');
+
+  const builtinRules = [
+    'RULE-SET,BanAD,DIRECT',
+    'RULE-SET,LocalAreaNetwork,DIRECT',
+    'RULE-SET,Telegram,Smart-AUTO',
+    'RULE-SET,Netflix,Smart-AUTO',
+    'RULE-SET,openai,Smart-AUTO',
+    'RULE-SET,category-ai-!cn,Smart-AUTO',
+    'MATCH,Smart-AUTO',
+  ];
+
+  const mergedRules = [];
+  const seen = new Set();
+  [...userRules, ...builtinRules].forEach((rule) => {
+    if (!seen.has(rule)) {
+      seen.add(rule);
+      mergedRules.push(rule);
+    }
+  });
 
   return {
     'mixed-port': Number(el.mixedPort.value || state.mixedPort || 7892),
@@ -458,15 +477,7 @@ function buildYamlObject() {
     'rule-providers': DEFAULT_RULE_PROVIDERS,
     dns: { enable: true, 'enhanced-mode': 'redir-host' },
     'proxy-groups': proxyGroups,
-    rules: rules.concat([
-      'RULE-SET,BanAD,DIRECT',
-      'RULE-SET,LocalAreaNetwork,DIRECT',
-      'RULE-SET,Telegram,Smart-AUTO',
-      'RULE-SET,Netflix,Smart-AUTO',
-      'RULE-SET,openai,Smart-AUTO',
-      'RULE-SET,category-ai-!cn,Smart-AUTO',
-      'MATCH,Smart-AUTO',
-    ]),
+    rules: mergedRules,
   };
 }
 

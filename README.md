@@ -1,6 +1,6 @@
 # smartclash-gen
 
-> 版本：**v0.7.2**
+> 版本：**v0.7.3**
 
 一个面向 **OpenClash + mihomo(type: smart)** 的配置生成器：
 
@@ -15,7 +15,7 @@
 
 ## 安装后应用示意图
 
-![应用示意图](docs/app-preview-v0.7.2-web.svg)
+![应用示意图](docs/app-preview-v0.7.3-web.svg)
 
 ---
 
@@ -130,6 +130,11 @@ python3 generate.py \
 ---
 
 ## 版本更新说明
+
+### v0.7.3
+- Web 端页面标题版本号同步到 `v0.7.3`，避免页面显示版本与 README 版本不一致
+- YAML 规则合并逻辑升级：用户规则 + 内置规则会自动去重，避免重复 `MATCH,Smart-AUTO` 或重复内置 RULE-SET
+- README 版本号与截图引用同步到 v0.7.3
 
 ### v0.7.2
 - Web 端新增“清空已导入 URL / 重置示例数据”操作，降低演示状态与真实节点状态混用风险

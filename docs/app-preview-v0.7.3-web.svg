@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-label="smartclash-gen v0.7.3 preview">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0b1220"/>
+      <stop offset="100%" stop-color="#121a2b"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <rect x="70" y="70" width="1460" height="760" rx="22" fill="#11192a" stroke="#2b3a55"/>
+  <text x="120" y="145" fill="#8cb3ff" font-size="40" font-family="Inter,Segoe UI,Arial">smartclash-gen v0.7.3</text>
+  <text x="120" y="190" fill="#8aa0c7" font-size="24" font-family="Inter,Segoe UI,Arial">规则去重 + 版本显示对齐</text>
+  <rect x="120" y="230" width="900" height="540" rx="14" fill="#0f1728" stroke="#314767"/>
+  <rect x="1050" y="230" width="430" height="540" rx="14" fill="#0f1728" stroke="#314767"/>
+  <text x="145" y="275" fill="#7dd3fc" font-size="22" font-family="Consolas,Monaco,monospace">RULE-SET,Telegram,Smart-AUTO</text>
+  <text x="145" y="315" fill="#7dd3fc" font-size="22" font-family="Consolas,Monaco,monospace">RULE-SET,Netflix,Smart-AUTO</text>
+  <text x="145" y="355" fill="#7dd3fc" font-size="22" font-family="Consolas,Monaco,monospace">RULE-SET,openai,Smart-AUTO</text>
+  <text x="145" y="395" fill="#7dd3fc" font-size="22" font-family="Consolas,Monaco,monospace">MATCH,Smart-AUTO  (deduped)</text>
+  <text x="1080" y="275" fill="#a5b4fc" font-size="20" font-family="Inter,Segoe UI,Arial">Preview Panel</text>
+  <text x="1080" y="315" fill="#93c5fd" font-size="18" font-family="Consolas,Monaco,monospace"># v0.7.3</text>
+  <text x="1080" y="350" fill="#93c5fd" font-size="18" font-family="Consolas,Monaco,monospace">No duplicate tail rules</text>
+</svg>

@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>smartclash-gen 可视化编排器</title>
-  <link rel="stylesheet" href="./style.css?v=0.13.7" />
+  <link rel="stylesheet" href="./style.css?v=0.13.8" />
 </head>
 <body>
   <div class="ambient-grid" aria-hidden="true"></div>
@@ -35,7 +35,7 @@
   <div class="app-window-shell">
     <div class="app-window">
       <header>
-        <h1>smartclash-gen v0.13.7</h1>
+        <h1>smartclash-gen v0.13.8</h1>
         <p>单页流程 · 极简编排 · 动画过渡 · YAML 即时交付</p>
       </header>
 
@@ -138,9 +138,9 @@
           </div>
           <div class="compose-route-hint compose-route-hint-vertical">
             <div class="route-card">
-              <span class="route-card-label">链路模板</span>
-              <strong>中转 → 落地 → 输出</strong>
-              <small>组名现在可自定义；链式组会按你选的中转组 / 落地组自动生成。</small>
+              <span class="route-card-label">链路逻辑</span>
+              <strong>中转组 → 落地组 → 链式结果</strong>
+              <small>组名可自定义；链式组会按你选的中转组 / 落地组自动生成。</small>
             </div>
             <div class="route-config-panel">
               <label class="route-config-item">中转组
@@ -159,7 +159,8 @@
               <div class="route-live-item route-live-accent"><span>链式状态</span><strong id="routeLiveStatus">待配置</strong></div>
             </div>
             <div class="route-config-actions row compact-row">
-              <button id="createComposePreset" class="ghost">快速创建中转/落地/链式组</button>
+              <button id="quickGroupBtn" class="ghost">一键分组</button>
+              <button id="createComposePreset" class="ghost">创建中转/落地/链式组</button>
               <button id="applyRegionModules" class="ghost route-action-btn">自动补齐默认组结构</button>
             </div>
           </div>
@@ -201,8 +202,8 @@
               <div class="mini-panel node-pool-panel">
                 <div class="section-head">
                   <div>
-                    <h3>右侧复用节点池</h3>
-                    <p class="helper-text">节点可重复拖拽</p>
+                    <h3>右侧节点池</h3>
+                    <p class="helper-text">节点可重复拖拽，也可直接删除</p>
                   </div>
                   <div class="row compact-row">
                     <input id="nodeName" placeholder="手动新增节点名" />
@@ -363,6 +364,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
-  <script src="./app.js?v=0.13.7"></script>
+  <script src="./app.js?v=0.13.8"></script>
 </body>
 </html>

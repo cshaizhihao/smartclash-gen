@@ -1,5 +1,5 @@
-const STORAGE_KEY = 'smartclash-web-v1307';
-const APP_VERSION = '0.13.7';
+const STORAGE_KEY = 'smartclash-web-v1308';
+const APP_VERSION = '0.13.8';
 const UPDATE_CMD = 'bash -c "$(curl -fsSL https://raw.githubusercontent.com/cshaizhihao/smartclash-gen/main/install.sh)" -- --update -d ~/.smartclash-gen';
 const AUTH_DISABLED = true;
 const AUTH_KEY = 'smartclash-web-auth';
@@ -119,6 +119,7 @@ const el = {
   groupType: document.getElementById('groupType'),
   addGroup: document.getElementById('addGroup'),
   createComposePreset: document.getElementById('createComposePreset'),
+  quickGroupBtn: document.getElementById('quickGroupBtn'),
   openNodeEditor: document.getElementById('openNodeEditor'),
   closeNodeEditor: document.getElementById('closeNodeEditor'),
   nodeEditorModal: document.getElementById('nodeEditorModal'),
@@ -793,6 +794,41 @@ function removeMemberFromGroup(groupId, memberKey) {
   if (idx >= 0) group.members.splice(idx, 1);
 }
 
+function deleteNodeEverywhere(nodeId) {
+  state.nodes = state.nodes.filter((n) => n.id !== nodeId);
+  state.groups.forEach((g) => {
+    g.members = (g.members || []).filter((member) => {
+      const key = String(member || '');
+      const memberNodeId = key.startsWith('node:') ? key.slice(5) : key;
+      return memberNodeId !== nodeId;
+    });
+  });
+}
+
+function quickGroupNodes() {
+  pushHistory('一键分组');
+  applyRegionModulesFromNodes();
+  const transitGroup = ensureComposeGroup(state.transitGroupName || '中转组', 'select');
+  const egressGroup = ensureComposeGroup(state.egressGroupName || '落地组', 'select');
+  const chainGroup = ensureComposeGroup(state.chainGroupName || '链式组', 'select');
+  const regionPriority = ['HK', 'SG', 'JP', 'US', 'OTHER', 'AUTO'];
+  const ordered = state.nodes.slice().sort((a, b) => regionPriority.indexOf(a.region || 'AUTO') - regionPriority.indexOf(b.region || 'AUTO'));
+  const transitIds = [];
+  const egressIds = [];
+  ordered.forEach((node, index) => {
+    const key = `node:${node.id}`;
+    if (index % 2 === 0) transitIds.push(key);
+    else egressIds.push(key);
+  });
+  if (!egressIds.length && transitIds.length > 1) egressIds.push(transitIds.pop());
+  transitGroup.members = transitIds;
+  egressGroup.members = egressIds;
+  chainGroup.members = [];
+  render();
+  persistState();
+  setPublishStatus(`已一键分组：中转 ${transitIds.length} 个，落地 ${egressIds.length} 个`, 'success');
+}
+
 function render() {
   const transitGroupName = state.transitGroupName || 'Smart-Transit';
   const egressGroupName = state.egressGroupName || 'Smart-Egress';
@@ -808,7 +844,20 @@ function render() {
   el.nodePool.innerHTML = '';
   if (el.groupPool) el.groupPool.innerHTML = '';
   const availableNodes = state.nodes.slice();
-  availableNodes.forEach((n) => el.nodePool.appendChild(mkNodeLi(n)));
+  availableNodes.forEach((n) => {
+    const li = mkNodeLi(n);
+    li.insertAdjacentHTML('beforeend', '<button class="member-remove-btn node-delete-btn" type="button" title="删除节点">×</button>');
+    li.querySelector('.node-delete-btn')?.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      pushHistory('删除节点');
+      deleteNodeEverywhere(n.id);
+      render();
+      persistState();
+      setImportStatus(`已删除节点：${n.name}`, 'success');
+    });
+    el.nodePool.appendChild(li);
+  });
 
   const preferredOrder = [transitGroupName, egressGroupName, chainGroupName, 'Smart-AUTO'];
   const orderedGroups = [
@@ -1397,10 +1446,7 @@ el.deleteNodeBtn?.addEventListener('click', () => {
   const node = state.nodes.find((n) => n.id === id);
   if (!id || !node) return setImportStatus('没有可删除的节点', 'error');
   pushHistory();
-  state.nodes = state.nodes.filter((n) => n.id !== id);
-  state.groups.forEach((g) => {
-    g.members = g.members.filter((mid) => mid !== id);
-  });
+  deleteNodeEverywhere(id);
   render();
   persistState();
   if (!state.nodes.length) setNodeEditorOpen(false);
@@ -1612,15 +1658,15 @@ el.chainGroupName?.addEventListener('change', () => {
 el.createComposePreset?.addEventListener('click', () => {
   pushHistory('创建链路组');
   let idx = 1;
-  let transit = `Transit-${idx}`;
-  let egress = `Egress-${idx}`;
-  let chain = `Chain-${idx}`;
+  let transit = `中转组-${idx}`;
+  let egress = `落地组-${idx}`;
+  let chain = `链式组-${idx}`;
   const names = new Set(state.groups.map((g) => g.name));
   while (names.has(transit) || names.has(egress) || names.has(chain)) {
     idx += 1;
-    transit = `Transit-${idx}`;
-    egress = `Egress-${idx}`;
-    chain = `Chain-${idx}`;
+    transit = `中转组-${idx}`;
+    egress = `落地组-${idx}`;
+    chain = `链式组-${idx}`;
   }
   ensureComposeGroup(transit, 'select');
   ensureComposeGroup(egress, 'select');
@@ -1630,8 +1676,10 @@ el.createComposePreset?.addEventListener('click', () => {
   state.chainGroupName = chain;
   render();
   persistState();
-  setPublishStatus(`已创建可自定义链路组：${transit} / ${egress} / ${chain}`, 'success');
+  setPublishStatus(`已创建链路组：${transit} / ${egress} / ${chain}`, 'success');
 });
+
+el.quickGroupBtn?.addEventListener('click', quickGroupNodes);
 
 el.autoFixBtn?.addEventListener('click', () => {
   pushHistory();

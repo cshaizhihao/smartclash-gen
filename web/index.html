@@ -29,14 +29,14 @@
   </div>
 
   <header>
-    <h1>smartclash-gen v0.7.4</h1>
+    <h1>smartclash-gen v0.7.5</h1>
     <p>模块化编辑 · 拖拽编排 · Markdown/YAML 交付 · 隐私登录保护</p>
   </header>
 
   <main class="layout" id="appShell">
     <section class="left">
       <article class="panel">
-        <h2>节点模块区</h2>
+        <h2>节点输入模块（导入 / 编辑 / 分区）</h2>
         <div class="row">
           <input id="nodeName" placeholder="节点名称，如 HK-01" />
           <button id="addNode">添加节点</button>
@@ -47,7 +47,26 @@
           <button id="clearUrlsBtn" class="ghost">清空已导入 URL</button>
           <span id="importStatus" class="import-status">未导入</span>
         </div>
-        <p class="helper-text">已导入的真实节点 URL 仅保存在当前浏览器，用于生成实际可下载的 YAML/Markdown。</p>
+
+        <div class="row">
+          <select id="nodeEditorSelect"></select>
+          <input id="nodeEditorName" placeholder="节点展示名" />
+          <select id="nodeEditorRegion">
+            <option value="AUTO">AUTO</option>
+            <option value="HK">HK</option>
+            <option value="SG">SG</option>
+            <option value="JP">JP</option>
+            <option value="US">US</option>
+            <option value="OTHER">OTHER</option>
+          </select>
+        </div>
+        <div class="row">
+          <input id="nodeEditorUrl" placeholder="可直接编辑节点 URL" />
+          <button id="saveNodeMeta" class="ghost">保存节点信息</button>
+          <button id="applyRegionModules" class="ghost">按分区生成模块</button>
+        </div>
+
+        <p class="helper-text">模块化特征：节点先录入元信息（名称/分区/URL），再一键按分区生成策略组结构。</p>
         <ul id="nodePool" class="list"></ul>
       </article>
 

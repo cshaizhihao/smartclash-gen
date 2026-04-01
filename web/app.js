@@ -1,4 +1,4 @@
-const STORAGE_KEY = 'smartclash-web-v073';
+const STORAGE_KEY = 'smartclash-web-v075';
 const AUTH_KEY = 'smartclash-web-auth';
 const AUTH_SESSION_KEY = 'smartclash-web-auth-session';
 
@@ -23,9 +23,9 @@ const DEFAULT_RULE_PROVIDERS = {
 function createDefaultState() {
   return {
     nodes: [
-      { id: crypto.randomUUID(), name: 'HK-01', url: '' },
-      { id: crypto.randomUUID(), name: 'SG-01', url: '' },
-      { id: crypto.randomUUID(), name: 'JP-01', url: '' },
+      { id: crypto.randomUUID(), name: 'HK-01', url: '', region: 'HK' },
+      { id: crypto.randomUUID(), name: 'SG-01', url: '', region: 'SG' },
+      { id: crypto.randomUUID(), name: 'JP-01', url: '', region: 'JP' },
     ],
     groups: [
       { id: crypto.randomUUID(), name: 'Smart-AUTO', type: 'smart', members: [] },
@@ -59,6 +59,12 @@ const el = {
   groupType: document.getElementById('groupType'),
   addGroup: document.getElementById('addGroup'),
   nodePool: document.getElementById('nodePool'),
+  nodeEditorSelect: document.getElementById('nodeEditorSelect'),
+  nodeEditorName: document.getElementById('nodeEditorName'),
+  nodeEditorRegion: document.getElementById('nodeEditorRegion'),
+  nodeEditorUrl: document.getElementById('nodeEditorUrl'),
+  saveNodeMeta: document.getElementById('saveNodeMeta'),
+  applyRegionModules: document.getElementById('applyRegionModules'),
   groups: document.getElementById('groups'),
 
   rules: document.getElementById('rules'),
@@ -152,8 +158,16 @@ function mkNodeLi(node) {
   const li = document.createElement('li');
   li.className = 'item';
   li.dataset.id = node.id;
-  li.textContent = node.name;
+  li.textContent = `[${node.region || 'AUTO'}] ${node.name}`;
   return li;
+}
+
+function inferRegion(name = '') {
+  if (/HK|Hong\s?Kong|香港/i.test(name)) return 'HK';
+  if (/SG|Singapore|新加坡/i.test(name)) return 'SG';
+  if (/JP|Japan|日本/i.test(name)) return 'JP';
+  if (/US|America|美国/i.test(name)) return 'US';
+  return 'AUTO';
 }
 
 function setImportStatus(text, type = 'idle') {
@@ -351,10 +365,57 @@ function persistState() {
 }
 
 function replaceState(nextState) {
-  state.nodes.splice(0, state.nodes.length, ...(nextState.nodes || []));
+  state.nodes.splice(0, state.nodes.length, ...((nextState.nodes || []).map((n) => ({ ...n, region: n.region || inferRegion(n.name) }))));
   state.groups.splice(0, state.groups.length, ...(nextState.groups || []));
   state.rules.splice(0, state.rules.length, ...(nextState.rules || []));
   state.mixedPort = Number(nextState.mixedPort || 7892);
+}
+
+function syncNodeEditorOptions() {
+  if (!el.nodeEditorSelect) return;
+  const current = el.nodeEditorSelect.value;
+  el.nodeEditorSelect.innerHTML = state.nodes
+    .map((node) => `<option value="${node.id}">[${node.region || 'AUTO'}] ${node.name}</option>`)
+    .join('');
+  if (!state.nodes.length) {
+    el.nodeEditorName.value = '';
+    el.nodeEditorUrl.value = '';
+    el.nodeEditorRegion.value = 'AUTO';
+    return;
+  }
+  el.nodeEditorSelect.value = state.nodes.some((n) => n.id === current) ? current : state.nodes[0].id;
+  const selected = state.nodes.find((n) => n.id === el.nodeEditorSelect.value);
+  if (selected) {
+    el.nodeEditorName.value = selected.name || '';
+    el.nodeEditorUrl.value = selected.url || '';
+    el.nodeEditorRegion.value = selected.region || 'AUTO';
+  }
+}
+
+function applyRegionModulesFromNodes() {
+  const keep = [];
+  const byName = new Map();
+  state.groups.forEach((g) => byName.set(g.name, g));
+
+  const smartAuto = byName.get('Smart-AUTO') || { id: crypto.randomUUID(), name: 'Smart-AUTO', type: 'smart', members: [] };
+  smartAuto.type = 'smart';
+  smartAuto.members = state.nodes.map((n) => n.id);
+  keep.push(smartAuto);
+
+  const regions = ['HK', 'SG', 'JP', 'US', 'OTHER'];
+  regions.forEach((region) => {
+    const name = `Smart-${region}`;
+    const g = byName.get(name) || { id: crypto.randomUUID(), name, type: 'select', members: [] };
+    g.type = 'select';
+    g.members = state.nodes.filter((n) => (n.region || 'AUTO') === region).map((n) => n.id);
+    keep.push(g);
+  });
+
+  const direct = byName.get('DIRECT') || { id: crypto.randomUUID(), name: 'DIRECT', type: 'select', members: [] };
+  direct.type = 'select';
+  keep.push(direct);
+
+  state.groups.splice(0, state.groups.length, ...keep);
 }
 
 function hydrateState() {
@@ -401,6 +462,7 @@ function render() {
 
   el.rules.value = state.rules.join('\n');
   el.mixedPort.value = state.mixedPort;
+  syncNodeEditorOptions();
   refreshMarkdownPreview();
 }
 
@@ -568,7 +630,7 @@ function setPublishStatus(text, type = 'idle') {
 el.addNode.addEventListener('click', () => {
   const name = el.nodeName.value.trim();
   if (!name) return;
-  state.nodes.push({ id: crypto.randomUUID(), name, url: '' });
+  state.nodes.push({ id: crypto.randomUUID(), name, url: '', region: inferRegion(name) });
   el.nodeName.value = '';
   render();
   persistState();
@@ -589,7 +651,7 @@ el.importUrlsBtn.addEventListener('click', () => {
     if (!parsed.ok) return errors.push(parsed.error);
     if (exists.has(parsed.name)) return dupCount++;
     exists.add(parsed.name);
-    state.nodes.push({ id: crypto.randomUUID(), name: parsed.name, url: parsed.url });
+    state.nodes.push({ id: crypto.randomUUID(), name: parsed.name, url: parsed.url, region: inferRegion(parsed.name) });
     okCount++;
   });
 
@@ -606,6 +668,32 @@ el.addGroup.addEventListener('click', () => {
   el.groupName.value = '';
   render();
   persistState();
+});
+
+el.nodeEditorSelect?.addEventListener('change', () => {
+  const selected = state.nodes.find((n) => n.id === el.nodeEditorSelect.value);
+  if (!selected) return;
+  el.nodeEditorName.value = selected.name || '';
+  el.nodeEditorUrl.value = selected.url || '';
+  el.nodeEditorRegion.value = selected.region || 'AUTO';
+});
+
+el.saveNodeMeta?.addEventListener('click', () => {
+  const selected = state.nodes.find((n) => n.id === el.nodeEditorSelect.value);
+  if (!selected) return;
+  selected.name = el.nodeEditorName.value.trim() || selected.name;
+  selected.url = el.nodeEditorUrl.value.trim();
+  selected.region = el.nodeEditorRegion.value || inferRegion(selected.name);
+  render();
+  persistState();
+  setImportStatus(`已更新节点：${selected.name}`, 'success');
+});
+
+el.applyRegionModules?.addEventListener('click', () => {
+  applyRegionModulesFromNodes();
+  render();
+  persistState();
+  setPublishStatus('已按节点分区重建策略组模块（Smart-HK/SG/JP/US/OTHER）', 'success');
 });
 
 el.clearUrlsBtn.addEventListener('click', () => {

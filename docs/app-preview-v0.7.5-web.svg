@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-label="smartclash-gen v0.7.5 preview">
+  <rect width="1600" height="900" fill="#0b1020"/>
+  <rect x="56" y="56" width="1488" height="788" rx="22" fill="#121a2f" stroke="#334155"/>
+  <text x="110" y="128" fill="#7dd3fc" font-size="42" font-family="Inter,Arial">smartclash-gen v0.7.5</text>
+  <text x="110" y="172" fill="#94a3b8" font-size="24" font-family="Inter,Arial">节点输入模块化：导入 → 编辑 → 按分区生成模块</text>
+
+  <rect x="110" y="220" width="680" height="560" rx="14" fill="#0b1224" stroke="#475569"/>
+  <text x="140" y="262" fill="#cbd5e1" font-size="22" font-family="Inter,Arial">节点输入模块</text>
+  <text x="140" y="304" fill="#93c5fd" font-size="20" font-family="Consolas,monospace">[HK] HK-01</text>
+  <text x="140" y="338" fill="#93c5fd" font-size="20" font-family="Consolas,monospace">[SG] SG-01</text>
+  <text x="140" y="372" fill="#93c5fd" font-size="20" font-family="Consolas,monospace">[JP] JP-01</text>
+  <rect x="140" y="420" width="220" height="46" rx="10" fill="#0f172a" stroke="#64748b"/>
+  <text x="158" y="450" fill="#cbd5e1" font-size="18" font-family="Inter,Arial">保存节点信息</text>
+  <rect x="380" y="420" width="260" height="46" rx="10" fill="#0f172a" stroke="#64748b"/>
+  <text x="398" y="450" fill="#cbd5e1" font-size="18" font-family="Inter,Arial">按分区生成模块</text>
+
+  <rect x="830" y="220" width="680" height="560" rx="14" fill="#0b1224" stroke="#475569"/>
+  <text x="860" y="262" fill="#cbd5e1" font-size="22" font-family="Inter,Arial">策略组模块结果</text>
+  <text x="860" y="304" fill="#86efac" font-size="20" font-family="Consolas,monospace">Smart-AUTO</text>
+  <text x="860" y="338" fill="#86efac" font-size="20" font-family="Consolas,monospace">Smart-HK</text>
+  <text x="860" y="372" fill="#86efac" font-size="20" font-family="Consolas,monospace">Smart-SG</text>
+  <text x="860" y="406" fill="#86efac" font-size="20" font-family="Consolas,monospace">Smart-JP</text>
+  <text x="860" y="440" fill="#86efac" font-size="20" font-family="Consolas,monospace">Smart-US / Smart-OTHER</text>
+</svg>

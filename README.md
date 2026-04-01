@@ -1,6 +1,6 @@
 # smartclash-gen
 
-> 版本：**v0.7.4**
+> 版本：**v0.7.5**
 
 一个面向 **OpenClash + mihomo(type: smart)** 的配置生成器：
 
@@ -15,7 +15,7 @@
 
 ## 安装后应用示意图
 
-![应用示意图](docs/app-preview-v0.7.4-web.svg)
+![应用示意图](docs/app-preview-v0.7.5-web.svg)
 
 ---
 
@@ -130,6 +130,13 @@ python3 generate.py \
 ---
 
 ## 版本更新说明
+
+### v0.7.5
+- 节点输入升级为真正模块化流程：`批量导入 URL` + `节点编辑器` + `按分区生成模块`
+- 新增节点元信息（Region）编辑：支持 `HK/SG/JP/US/OTHER/AUTO`，并在节点池中直观展示 `[Region] 名称`
+- 新增“按分区生成模块”按钮：基于节点 Region 自动重建 `Smart-HK/Smart-SG/Smart-JP/Smart-US/Smart-OTHER` 与 `Smart-AUTO`
+- 文案与交互提示优化：突出“输入节点信息 → 生成模块结构”的产品路径
+- README 版本号与截图引用同步到 v0.7.5
 
 ### v0.7.4
 - 发布校验结果结构化展示：明确区分“阻塞项 / 警告 / 建议”，减少排障歧义

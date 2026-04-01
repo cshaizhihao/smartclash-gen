@@ -153,6 +153,9 @@ header p { margin: 6px 0 0; color: var(--sub); }
   backdrop-filter: blur(22px) saturate(130%);
   -webkit-backdrop-filter: blur(22px) saturate(130%);
 }
+.stage-pane[data-main="groups"].panel {
+  padding: 16px;
+}
 .stage-card {
   min-height: 0;
   display: flex;
@@ -191,10 +194,10 @@ header p { margin: 6px 0 0; color: var(--sub); }
 }
 .stage-head-compose {
   align-items: start;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
   display: grid;
-  grid-template-columns: minmax(0, 1.24fr) minmax(280px, .84fr);
-  gap: 10px;
+  grid-template-columns: minmax(0, 1.28fr) minmax(260px, .8fr);
+  gap: 8px;
 }
 .stage-head-publish {
   align-items: stretch;
@@ -230,8 +233,8 @@ header p { margin: 6px 0 0; color: var(--sub); }
 .compose-guide-strip {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
-  margin: 14px 0 12px;
+  gap: 8px;
+  margin: 8px 0 6px;
 }
 .stage-head-compose > div,
 .compose-route-hint {
@@ -312,7 +315,7 @@ header p { margin: 6px 0 0; color: var(--sub); }
   display: grid;
   justify-items: stretch;
   align-content: start;
-  gap: 8px;
+  gap: 6px;
 }
 .route-card {
   border: 1px solid rgba(56,189,248,.28);
@@ -347,19 +350,26 @@ header p { margin: 6px 0 0; color: var(--sub); }
 }
 .route-config-panel {
   display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
 }
 .route-config-item {
   display: grid;
-  gap: 6px;
+  gap: 4px;
   color: #cbd5e1;
-  font-size: 13px;
+  font-size: 12px;
+}
+.route-config-item select {
+  padding-top: 8px;
+  padding-bottom: 8px;
 }
 .route-config-actions {
   margin-bottom: 0;
 }
 .route-config-actions > button {
   flex: 1 1 0;
+  padding-top: 9px;
+  padding-bottom: 9px;
 }
 .compose-column {
   display: grid;
@@ -369,11 +379,11 @@ header p { margin: 6px 0 0; color: var(--sub); }
 }
 .compose-workbench-frame {
   display: grid;
-  grid-template-columns: minmax(0, 1.48fr) minmax(300px, .74fr);
+  grid-template-columns: minmax(0, 1.54fr) minmax(280px, .68fr);
   gap: 10px;
-  height: clamp(340px, 43vh, 460px);
-  min-height: 340px;
-  max-height: 460px;
+  height: clamp(330px, 42vh, 430px);
+  min-height: 330px;
+  max-height: 430px;
   overflow: hidden;
 }
 .compose-main-column,
@@ -381,7 +391,7 @@ header p { margin: 6px 0 0; color: var(--sub); }
   min-width: 0;
   min-height: 0;
   display: grid;
-  gap: 10px;
+  gap: 8px;
   height: 100%;
 }
 .compose-main-column {
@@ -403,6 +413,8 @@ header p { margin: 6px 0 0; color: var(--sub); }
 }
 .node-editor-panel {
   padding: 10px;
+  max-height: 156px;
+  overflow: auto;
 }
 .node-editor-panel h3 {
   margin-bottom: 8px;
@@ -790,6 +802,9 @@ button.ghost {
   .compose-guide-strip {
     grid-template-columns: 1fr;
   }
+  .route-config-panel {
+    grid-template-columns: 1fr;
+  }
   .compose-workbench-head,
   .node-pool-panel .section-head {
     flex-direction: column;
@@ -823,10 +838,10 @@ button.ghost {
     overflow: visible;
   }
   .compose-workbench-frame {
-    grid-template-columns: minmax(0, 1.18fr) minmax(280px, .82fr);
-    height: clamp(320px, 40vh, 420px);
-    min-height: 320px;
-    max-height: 420px;
+    grid-template-columns: minmax(0, 1.2fr) minmax(250px, .8fr);
+    height: clamp(300px, 38vh, 380px);
+    min-height: 300px;
+    max-height: 380px;
     overflow: hidden;
   }
   .compose-main-column,

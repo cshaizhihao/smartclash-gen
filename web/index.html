@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>smartclash-gen 可视化编排器</title>
-  <link rel="stylesheet" href="./style.css?v=0.13.16" />
+  <link rel="stylesheet" href="./style.css?v=0.13.17" />
 </head>
 <body>
   <div class="ambient-grid" aria-hidden="true"></div>
@@ -37,7 +37,7 @@
       <header>
         <div class="header-bar">
           <div>
-            <h1>Clash smart 分组编辑器 V0.13.16</h1>
+            <h1>Clash smart 分组编辑器 V0.13.17</h1>
             <p>极简编排 · YAML 即时交付</p>
           </div>
           <div class="header-links">
@@ -71,7 +71,7 @@
         <div class="stage-head">
           <div>
             <h2>步骤 1：导入订阅 / 节点 <span id="doneImport" class="helper-text"></span></h2>
-            <p class="helper-text">把机场订阅或节点 URL 丢进来，系统会自动帮你进入下一步。</p>
+            <p class="helper-text">先把机场订阅或节点链接导入进来，系统会自动识别节点并进入下一步编排。</p>
           </div>
         </div>
 
@@ -121,7 +121,7 @@
         <div class="stage-head stage-head-compose">
           <div>
             <h2>步骤 2：中转 / 落地编排 <span id="doneGenerate" class="helper-text"></span></h2>
-            <p class="helper-text">这一步只做编排，不再塞规则编辑。先决定“谁做中转、谁做落地”，链式结果会自动生成。</p>
+            <p class="helper-text">这一步只负责分组和链路编排：把节点分到中转组、落地组或其他分组里，系统会自动生成链式结果。</p>
             <div class="compose-guide-strip compose-guide-strip-strong compose-guide-strip-compact">
               <div class="guide-step"><b>1</b><span><strong>右侧挑节点</strong>，支持重复分配</span></div>
               <div class="guide-step"><b>2</b><span><strong>左侧放组里</strong>，先中转后落地</span></div>
@@ -352,7 +352,7 @@
                 <h3>YAML / Markdown 预览</h3>
                 <p class="helper-text">当前导出内容会实时映射到这里。</p>
               </div>
-              <span id="updateStatus" class="helper-text">当前版本：v0.13.16</span>
+              <span id="updateStatus" class="helper-text">当前版本：v0.13.17</span>
             </div>
             <textarea id="markdown" class="code-preview" rows="24"></textarea>
           </section>
@@ -385,6 +385,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
-  <script src="./app.js?v=0.13.16"></script>
+  <script src="./app.js?v=0.13.17"></script>
 </body>
 </html>

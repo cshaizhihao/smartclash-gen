@@ -120,22 +120,32 @@ class Handler(SimpleHTTPRequestHandler):
         except Exception:
             pass
 
+        yaml_like_markers = ('proxies:', 'proxy-groups:', 'rules:', 'rule-providers:')
+
         for candidate in candidates:
+            is_yaml_like = any(marker in candidate for marker in yaml_like_markers)
             if yaml is not None:
-                try:
-                    obj = yaml.safe_load(candidate)
-                    proxies = obj.get('proxies') if isinstance(obj, dict) else None
-                    if isinstance(proxies, list):
-                        lines = []
-                        for i, proxy in enumerate(proxies):
-                            if isinstance(proxy, dict):
-                                line = self._proxy_to_url(proxy, i)
-                                if line:
-                                    lines.append(line)
-                        if lines:
-                            return lines
-                except Exception:
-                    pass
+                for loader_name in ('safe_load', 'full_load', 'unsafe_load'):
+                    loader = getattr(yaml, loader_name, None)
+                    if not loader:
+                        continue
+                    try:
+                        obj = loader(candidate)
+                        proxies = obj.get('proxies') if isinstance(obj, dict) else None
+                        if isinstance(proxies, list):
+                            lines = []
+                            for i, proxy in enumerate(proxies):
+                                if isinstance(proxy, dict):
+                                    line = self._proxy_to_url(proxy, i)
+                                    if line:
+                                        lines.append(line)
+                            if lines:
+                                return lines
+                    except Exception:
+                        continue
+
+            if is_yaml_like:
+                continue
 
             direct = [x.strip() for x in candidate.splitlines() if x.strip().startswith(('vless://', 'vmess://', 'trojan://', 'ss://'))]
             if direct:

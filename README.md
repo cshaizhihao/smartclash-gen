@@ -1,6 +1,6 @@
 # smartclash-gen
 
-> 版本：**v0.13.16**
+> 版本：**v0.13.17**
 
 一个面向 **OpenClash + mihomo(type: smart)** 的配置生成器：
 
@@ -143,6 +143,11 @@ python3 generate.py \
 ---
 
 ## 版本更新说明
+
+### v0.13.17
+- 订阅解析继续收根因：当返回内容明显是 Clash YAML 时，不再盲目回退到普通文本扫描，避免再次把 YAML 字段误塞进节点 URL 区
+- YAML 解析增加多种 Loader 尝试，提高复杂机场订阅的兼容性
+- Step 1 / Step 2 顶部说明文案改成更贴合当前功能的中文说明
 
 ### v0.13.16
 - 修复机场订阅拉取根因：优先按 Clash YAML 解析 `proxies`，避免把 YAML 里的普通字段行误判成节点 URL

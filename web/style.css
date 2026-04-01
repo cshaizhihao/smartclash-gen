@@ -54,6 +54,10 @@ input, select, textarea, button {
 }
 input, select, textarea { width: 100%; }
 textarea { resize: vertical; min-height: 100px; }
+textarea.code-preview {
+  font-family: "JetBrains Mono", "Fira Code", monospace;
+  line-height: 1.55;
+}
 
 button {
   cursor: pointer;
@@ -63,6 +67,10 @@ button {
 }
 button:hover { filter: brightness(1.08); }
 button.danger { background: linear-gradient(135deg, #be123c, #fb7185); }
+button.ghost {
+  background: #0b1224;
+  border: 1px solid rgba(71, 85, 105, 0.8);
+}
 
 .list {
   min-height: 92px;

@@ -44,6 +44,7 @@
         <textarea id="nodeUrls" rows="4" placeholder="粘贴节点 URL（每行一条，支持 vless/vmess/trojan/ss）"></textarea>
         <div class="row">
           <button id="importUrlsBtn">批量导入 URL</button>
+          <button id="clearUrlsBtn" class="ghost">清空已导入 URL</button>
           <span id="importStatus" class="import-status">未导入</span>
         </div>
         <p class="helper-text">已导入的真实节点 URL 仅保存在当前浏览器，用于生成实际可下载的 YAML/Markdown。</p>
@@ -79,6 +80,7 @@
           <button id="downloadBtn">下载 Markdown</button>
           <button id="downloadYamlBtn">下载 YAML</button>
           <button id="publishBtn">发布配置</button>
+          <button id="resetBtn" class="ghost">重置示例数据</button>
         </div>
         <p id="publishStatus" class="publish-status">尚未发布</p>
       </article>
@@ -89,7 +91,7 @@
         <h2>Markdown 输出预览区（可直接编辑）</h2>
         <button id="logoutBtn" class="danger">退出登录</button>
       </div>
-      <textarea id="markdown" rows="28"></textarea>
+      <textarea id="markdown" class="code-preview" rows="28"></textarea>
     </aside>
   </main>
 

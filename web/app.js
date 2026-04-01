@@ -20,19 +20,23 @@ const DEFAULT_RULE_PROVIDERS = {
   openai: { type: 'http', format: 'mrs', behavior: 'domain', url: 'https://gh-proxy.com/https://github.com/MetaCubeX/meta-rules-dat/raw/refs/heads/meta/geo/geosite/openai.mrs', path: './ruleset/openai.mrs', interval: 86400 },
 };
 
-const state = {
-  nodes: [
-    { id: crypto.randomUUID(), name: 'HK-01', url: '' },
-    { id: crypto.randomUUID(), name: 'SG-01', url: '' },
-    { id: crypto.randomUUID(), name: 'JP-01', url: '' },
-  ],
-  groups: [
-    { id: crypto.randomUUID(), name: 'Smart-AUTO', type: 'smart', members: [] },
-    { id: crypto.randomUUID(), name: 'Smart-HK', type: 'select', members: [] },
-  ],
-  rules: ['DOMAIN-SUFFIX,google.com,Smart-AUTO', 'MATCH,Smart-AUTO'],
-  mixedPort: 7892,
-};
+function createDefaultState() {
+  return {
+    nodes: [
+      { id: crypto.randomUUID(), name: 'HK-01', url: '' },
+      { id: crypto.randomUUID(), name: 'SG-01', url: '' },
+      { id: crypto.randomUUID(), name: 'JP-01', url: '' },
+    ],
+    groups: [
+      { id: crypto.randomUUID(), name: 'Smart-AUTO', type: 'smart', members: [] },
+      { id: crypto.randomUUID(), name: 'Smart-HK', type: 'select', members: [] },
+    ],
+    rules: ['DOMAIN-SUFFIX,google.com,Smart-AUTO', 'MATCH,Smart-AUTO'],
+    mixedPort: 7892,
+  };
+}
+
+const state = createDefaultState();
 
 const el = {
   authGate: document.getElementById('authGate'),
@@ -48,6 +52,7 @@ const el = {
   addNode: document.getElementById('addNode'),
   nodeUrls: document.getElementById('nodeUrls'),
   importUrlsBtn: document.getElementById('importUrlsBtn'),
+  clearUrlsBtn: document.getElementById('clearUrlsBtn'),
   importStatus: document.getElementById('importStatus'),
 
   groupName: document.getElementById('groupName'),
@@ -63,6 +68,7 @@ const el = {
   downloadBtn: document.getElementById('downloadBtn'),
   downloadYamlBtn: document.getElementById('downloadYamlBtn'),
   publishBtn: document.getElementById('publishBtn'),
+  resetBtn: document.getElementById('resetBtn'),
   publishStatus: document.getElementById('publishStatus'),
   markdown: document.getElementById('markdown'),
   warnings: document.getElementById('warnings'),
@@ -343,15 +349,24 @@ function persistState() {
   );
 }
 
+function replaceState(nextState) {
+  state.nodes.splice(0, state.nodes.length, ...(nextState.nodes || []));
+  state.groups.splice(0, state.groups.length, ...(nextState.groups || []));
+  state.rules.splice(0, state.rules.length, ...(nextState.rules || []));
+  state.mixedPort = Number(nextState.mixedPort || 7892);
+}
+
 function hydrateState() {
   const raw = localStorage.getItem(STORAGE_KEY);
   if (!raw) return;
   try {
     const parsed = JSON.parse(raw);
-    if (Array.isArray(parsed.nodes)) state.nodes = parsed.nodes;
-    if (Array.isArray(parsed.groups)) state.groups = parsed.groups;
-    if (Array.isArray(parsed.rules)) state.rules = parsed.rules;
-    if (parsed.mixedPort) state.mixedPort = Number(parsed.mixedPort);
+    replaceState({
+      nodes: Array.isArray(parsed.nodes) ? parsed.nodes : createDefaultState().nodes,
+      groups: Array.isArray(parsed.groups) ? parsed.groups : createDefaultState().groups,
+      rules: Array.isArray(parsed.rules) ? parsed.rules : createDefaultState().rules,
+      mixedPort: parsed.mixedPort || 7892,
+    });
     if (typeof parsed.nodeUrls === 'string') el.nodeUrls.value = parsed.nodeUrls;
   } catch {
     // ignore
@@ -570,6 +585,17 @@ el.addGroup.addEventListener('click', () => {
   persistState();
 });
 
+el.clearUrlsBtn.addEventListener('click', () => {
+  state.nodes.forEach((node) => {
+    node.url = '';
+  });
+  el.nodeUrls.value = '';
+  render();
+  persistState();
+  setImportStatus('已清空已导入 URL', 'idle');
+  setPublishStatus('已清空节点 URL，请重新导入后再发布', 'idle');
+});
+
 el.saveBtn.addEventListener('click', () => {
   const result = validateState();
   renderWarnings(result);
@@ -628,6 +654,18 @@ el.mixedPort.addEventListener('input', () => {
   state.mixedPort = Number(el.mixedPort.value || 7892);
   refreshMarkdownPreview();
   persistState();
+});
+
+el.resetBtn.addEventListener('click', () => {
+  replaceState(createDefaultState());
+  el.nodeName.value = '';
+  el.groupName.value = '';
+  el.nodeUrls.value = '';
+  el.markdown.dataset.manualEdit = '';
+  render();
+  persistState();
+  setImportStatus('已重置为示例数据', 'idle');
+  setPublishStatus('已重置，等待重新导入或编辑', 'idle');
 });
 
 el.nodeUrls.addEventListener('input', persistState);

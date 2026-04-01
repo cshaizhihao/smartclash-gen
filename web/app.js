@@ -68,6 +68,7 @@ const el = {
   downloadBtn: document.getElementById('downloadBtn'),
   downloadYamlBtn: document.getElementById('downloadYamlBtn'),
   publishBtn: document.getElementById('publishBtn'),
+  autoFixBtn: document.getElementById('autoFixBtn'),
   resetBtn: document.getElementById('resetBtn'),
   publishStatus: document.getElementById('publishStatus'),
   markdown: document.getElementById('markdown'),
@@ -489,6 +490,7 @@ function buildMarkdown() {
 function validateState() {
   const warnings = [];
   const blockers = [];
+  const suggestions = [];
   const knownNodeIds = new Set(state.nodes.map((n) => n.id));
   const knownGroupNames = new Set(state.groups.map((g) => g.name));
 
@@ -496,6 +498,7 @@ function validateState() {
     if (g.type === 'smart' && g.members.length === 0) {
       warnings.push(`Smart 组「${g.name}」当前为空成员`);
       blockers.push(`Smart 组「${g.name}」为空，禁止发布`);
+      suggestions.push(`可将至少 1 个节点拖入 Smart 组「${g.name}」`);
     }
     g.members.forEach((id) => {
       if (!knownNodeIds.has(id)) {
@@ -510,11 +513,15 @@ function validateState() {
     const segs = line.split(',').map((s) => s.trim()).filter(Boolean);
     if (segs.length < 2) {
       blockers.push(`规则第 ${i + 1} 行格式错误，禁止发布`);
+      suggestions.push(`规则第 ${i + 1} 行至少需要“类型,值[,策略组]”`);
       return;
     }
     if (segs.length >= 3) {
       const target = segs[2];
-      if (target !== 'DIRECT' && !knownGroupNames.has(target)) blockers.push(`规则第 ${i + 1} 行引用不存在策略组，禁止发布`);
+      if (target !== 'DIRECT' && !knownGroupNames.has(target)) {
+        blockers.push(`规则第 ${i + 1} 行引用不存在策略组，禁止发布`);
+        suggestions.push(`将规则第 ${i + 1} 行目标策略组改为已存在组，或改为 Smart-AUTO`);
+      }
     }
   });
 
@@ -527,19 +534,24 @@ function validateState() {
       buildProxyFromNode(node, index);
     } catch (error) {
       blockers.push(`节点「${node.name}」解析失败：${error.message}`);
+      suggestions.push(`修正节点「${node.name}」URL 协议/参数后再发布`);
     }
   });
 
   const p = Number(el.mixedPort.value || 0);
-  if (!Number.isInteger(p) || p < 1 || p > 65535) blockers.push('mixed-port 必须是 1-65535 之间的整数，禁止发布');
+  if (!Number.isInteger(p) || p < 1 || p > 65535) {
+    blockers.push('mixed-port 必须是 1-65535 之间的整数，禁止发布');
+    suggestions.push('将 mixed-port 设置为 1-65535 的整数（建议 7892）');
+  }
 
-  return { warnings, blockers };
+  return { warnings, blockers, suggestions };
 }
 
 function renderWarnings(result) {
   const items = [];
   result.blockers.forEach((x) => items.push(`<li>⛔ ${x}</li>`));
   result.warnings.forEach((x) => items.push(`<li>⚠️ ${x}</li>`));
+  result.suggestions.forEach((x) => items.push(`<li>💡 ${x}</li>`));
   el.warnings.innerHTML = items.length ? items.join('') : '<li class="ok">✅ 状态校验通过，可保存可发布</li>';
 }
 
@@ -622,10 +634,10 @@ el.publishBtn.addEventListener('click', () => {
   renderWarnings(result);
   if (result.blockers.length) {
     const summary = result.blockers.slice(0, 2).join('；');
-    return setPublishStatus(`发布失败：${summary}${result.blockers.length > 2 ? '…' : ''}`, 'error');
+    return setPublishStatus(`发布失败（阻塞 ${result.blockers.length} / 警告 ${result.warnings.length}）：${summary}${result.blockers.length > 2 ? '…' : ''}`, 'error');
   }
   persistState();
-  setPublishStatus('发布成功：配置已通过校验（模拟发布）', 'success');
+  setPublishStatus(`发布成功：无阻塞项（警告 ${result.warnings.length}）`, 'success');
 });
 
 el.copyBtn.addEventListener('click', async () => {
@@ -665,6 +677,38 @@ el.mixedPort.addEventListener('input', () => {
   state.mixedPort = Number(el.mixedPort.value || 7892);
   refreshMarkdownPreview();
   persistState();
+});
+
+el.autoFixBtn?.addEventListener('click', () => {
+  let fixed = 0;
+  const validIds = new Set(state.nodes.map((n) => n.id));
+
+  state.groups.forEach((g) => {
+    const before = g.members.length;
+    g.members = g.members.filter((id) => validIds.has(id));
+    fixed += before - g.members.length;
+  });
+
+  const groupNames = new Set(state.groups.map((g) => g.name));
+  const lines = el.rules.value.split('\n').map((x) => x.trim()).filter(Boolean);
+  const fixedRules = lines.map((line) => {
+    const segs = line.split(',').map((s) => s.trim());
+    if (segs.length >= 3) {
+      const target = segs[2];
+      if (target !== 'DIRECT' && !groupNames.has(target)) {
+        segs[2] = 'Smart-AUTO';
+        fixed += 1;
+      }
+      return segs.join(',');
+    }
+    return line;
+  });
+
+  el.rules.value = fixedRules.join('\n');
+  state.rules = fixedRules;
+  render();
+  persistState();
+  setPublishStatus(fixed ? `自动修复完成：共修复 ${fixed} 处引用` : '自动修复完成：未发现可修复问题', fixed ? 'success' : 'idle');
 });
 
 el.resetBtn.addEventListener('click', () => {

@@ -1,5 +1,5 @@
-const STORAGE_KEY = 'smartclash-web-v1306';
-const APP_VERSION = '0.13.6';
+const STORAGE_KEY = 'smartclash-web-v1307';
+const APP_VERSION = '0.13.7';
 const UPDATE_CMD = 'bash -c "$(curl -fsSL https://raw.githubusercontent.com/cshaizhihao/smartclash-gen/main/install.sh)" -- --update -d ~/.smartclash-gen';
 const AUTH_DISABLED = true;
 const AUTH_KEY = 'smartclash-web-auth';
@@ -119,6 +119,9 @@ const el = {
   groupType: document.getElementById('groupType'),
   addGroup: document.getElementById('addGroup'),
   createComposePreset: document.getElementById('createComposePreset'),
+  openNodeEditor: document.getElementById('openNodeEditor'),
+  closeNodeEditor: document.getElementById('closeNodeEditor'),
+  nodeEditorModal: document.getElementById('nodeEditorModal'),
   nodePool: document.getElementById('nodePool'),
   nodeEditorSelect: document.getElementById('nodeEditorSelect'),
   nodeEditorName: document.getElementById('nodeEditorName'),
@@ -204,6 +207,12 @@ function isAuthed() {
 function showApp() {
   el.authGate.classList.add('hidden');
   el.appShell.classList.remove('blurred');
+}
+
+function setNodeEditorOpen(open) {
+  if (!el.nodeEditorModal) return;
+  el.nodeEditorModal.classList.toggle('hidden', !open);
+  el.nodeEditorModal.setAttribute('aria-hidden', open ? 'false' : 'true');
 }
 
 function showAuth(message) {
@@ -1364,6 +1373,13 @@ el.nodeEditorSelect?.addEventListener('change', () => {
   el.nodeEditorRegion.value = selected.region || 'AUTO';
 });
 
+el.openNodeEditor?.addEventListener('click', () => {
+  syncNodeEditorOptions();
+  setNodeEditorOpen(true);
+});
+
+el.closeNodeEditor?.addEventListener('click', () => setNodeEditorOpen(false));
+
 el.saveNodeMeta?.addEventListener('click', () => {
   const selected = state.nodes.find((n) => n.id === el.nodeEditorSelect.value);
   if (!selected) return;
@@ -1387,6 +1403,7 @@ el.deleteNodeBtn?.addEventListener('click', () => {
   });
   render();
   persistState();
+  if (!state.nodes.length) setNodeEditorOpen(false);
   setImportStatus(`已删除节点：${node.name}`, 'success');
 });
 

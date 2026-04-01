@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>smartclash-gen 可视化编排器</title>
-  <link rel="stylesheet" href="./style.css?v=0.13.6" />
+  <link rel="stylesheet" href="./style.css?v=0.13.7" />
 </head>
 <body>
   <div class="ambient-grid" aria-hidden="true"></div>
@@ -35,7 +35,7 @@
   <div class="app-window-shell">
     <div class="app-window">
       <header>
-        <h1>smartclash-gen v0.13.6</h1>
+        <h1>smartclash-gen v0.13.7</h1>
         <p>单页流程 · 极简编排 · 动画过渡 · YAML 即时交付</p>
       </header>
 
@@ -207,34 +207,40 @@
                   <div class="row compact-row">
                     <input id="nodeName" placeholder="手动新增节点名" />
                     <button id="addNode">添加</button>
+                    <button id="openNodeEditor" class="ghost">编辑节点</button>
                   </div>
                 </div>
                 <ul id="nodePool" class="list node-pool"></ul>
               </div>
 
-              <div class="mini-panel node-editor-panel">
+            </aside>
+          </div>
+          <div id="nodeEditorModal" class="node-editor-modal hidden" aria-hidden="true">
+            <div class="mini-panel node-editor-panel node-editor-panel-modal">
+              <div class="section-head">
                 <h3>节点编辑</h3>
-                <div class="row stack-row">
-                  <select id="nodeEditorSelect"></select>
-                  <div class="row compact-row">
-                    <input id="nodeEditorName" placeholder="节点展示名" />
-                    <select id="nodeEditorRegion">
-                      <option value="AUTO">AUTO</option>
-                      <option value="HK">HK</option>
-                      <option value="SG">SG</option>
-                      <option value="JP">JP</option>
-                      <option value="US">US</option>
-                      <option value="OTHER">OTHER</option>
-                    </select>
-                  </div>
-                  <input id="nodeEditorUrl" placeholder="可直接编辑节点 URL" />
-                  <div class="row compact-row">
-                    <button id="saveNodeMeta" class="ghost">保存节点信息</button>
-                    <button id="deleteNodeBtn" class="danger">删除当前节点</button>
-                  </div>
+                <button id="closeNodeEditor" class="ghost">关闭</button>
+              </div>
+              <div class="row stack-row">
+                <select id="nodeEditorSelect"></select>
+                <div class="row compact-row">
+                  <input id="nodeEditorName" placeholder="节点展示名" />
+                  <select id="nodeEditorRegion">
+                    <option value="AUTO">AUTO</option>
+                    <option value="HK">HK</option>
+                    <option value="SG">SG</option>
+                    <option value="JP">JP</option>
+                    <option value="US">US</option>
+                    <option value="OTHER">OTHER</option>
+                  </select>
+                </div>
+                <input id="nodeEditorUrl" placeholder="可直接编辑节点 URL" />
+                <div class="row compact-row">
+                  <button id="saveNodeMeta" class="ghost">保存节点信息</button>
+                  <button id="deleteNodeBtn" class="danger">删除当前节点</button>
                 </div>
               </div>
-            </aside>
+            </div>
           </div>
         </div>
 
@@ -357,6 +363,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
-  <script src="./app.js?v=0.13.6"></script>
+  <script src="./app.js?v=0.13.7"></script>
 </body>
 </html>

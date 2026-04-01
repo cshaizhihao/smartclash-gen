@@ -219,17 +219,17 @@ header p { margin: 6px 0 0; color: var(--sub); }
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 12px;
-  margin-top: 8px;
-  padding-top: 8px;
-  border-top: 1px dashed rgba(148,163,184,.18);
+  gap: 10px;
+  margin-top: 4px;
+  padding-top: 6px;
+  border-top: 1px dashed rgba(148,163,184,.14);
   flex-wrap: wrap;
   flex: 0 0 auto;
 }
 .flow-footer > .row {
   margin-bottom: 0;
 }
-.hint-inline { color: var(--sub); font-size: 13px; }
+.hint-inline { color: var(--sub); font-size: 12px; }
 .compose-guide-strip {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -440,12 +440,12 @@ header p { margin: 6px 0 0; color: var(--sub); }
 }
 .compose-workbench-head h3,
 .node-pool-panel h3 {
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
 .compose-workbench-head .helper-text,
 .node-pool-panel .helper-text {
   margin-bottom: 0;
-  font-size: 12px;
+  font-size: 11px;
 }
 .node-editor-panel {
   padding: 10px;
@@ -603,7 +603,7 @@ button.ghost {
   background: rgba(8, 15, 29, 0.58);
 }
 .node-pool {
-  min-height: 220px;
+  min-height: 210px;
   max-height: 100%;
   flex: 1 1 auto;
   overflow-y: auto;
@@ -617,8 +617,8 @@ button.ghost {
   font-size: 12px;
 }
 .group-pool {
-  min-height: 84px;
-  max-height: 112px;
+  min-height: 72px;
+  max-height: 92px;
   overflow-y: auto;
   overflow-x: hidden;
 }
@@ -628,15 +628,15 @@ button.ghost {
   line-height: 1.4;
 }
 .group-meta-zone {
-  margin-bottom: 10px;
+  margin-bottom: 6px;
   flex: 0 0 auto;
 }
 .pool-head-inline {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
-  gap: 8px;
-  margin-bottom: 4px;
+  gap: 6px;
+  margin-bottom: 2px;
 }
 .pool-head-inline h4 {
   margin: 0;
@@ -876,10 +876,10 @@ button.ghost {
     overflow: visible;
   }
   .compose-workbench-frame {
-    grid-template-columns: minmax(0, 1.34fr) minmax(198px, .66fr);
-    height: clamp(236px, 30vh, 280px);
-    min-height: 236px;
-    max-height: 280px;
+    grid-template-columns: minmax(0, 1.38fr) minmax(188px, .62fr);
+    height: clamp(224px, 28vh, 264px);
+    min-height: 224px;
+    max-height: 264px;
     overflow: hidden;
   }
   .compose-main-column,

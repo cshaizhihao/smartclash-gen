@@ -118,6 +118,7 @@ const el = {
   groupName: document.getElementById('groupName'),
   groupType: document.getElementById('groupType'),
   addGroup: document.getElementById('addGroup'),
+  createComposePreset: document.getElementById('createComposePreset'),
   nodePool: document.getElementById('nodePool'),
   nodeEditorSelect: document.getElementById('nodeEditorSelect'),
   nodeEditorName: document.getElementById('nodeEditorName'),
@@ -763,6 +764,26 @@ function makeGroupRefLi(group) {
   return li;
 }
 
+function ensureComposeGroup(name, type = 'select') {
+  const finalName = (name || '').trim();
+  if (!finalName) return null;
+  let group = state.groups.find((g) => g.name === finalName);
+  if (!group) {
+    group = { id: makeId(), name: finalName, type, members: [] };
+    state.groups.push(group);
+  } else if (type) {
+    group.type = type;
+  }
+  return group;
+}
+
+function removeMemberFromGroup(groupId, memberKey) {
+  const group = state.groups.find((item) => item.id === groupId);
+  if (!group) return;
+  const idx = (group.members || []).findIndex((item) => String(item) === String(memberKey));
+  if (idx >= 0) group.members.splice(idx, 1);
+}
+
 function render() {
   const transitGroupName = state.transitGroupName || 'Smart-Transit';
   const egressGroupName = state.egressGroupName || 'Smart-Egress';
@@ -773,9 +794,7 @@ function render() {
     { name: egressGroupName, type: 'select' },
     { name: chainGroupName, type: 'select' },
   ];
-  guaranteed.forEach(({ name, type }) => {
-    if (!state.groups.find((g) => g.name === name)) state.groups.push({ id: makeId(), name, type, members: [] });
-  });
+  guaranteed.forEach(({ name, type }) => ensureComposeGroup(name, type));
 
   el.nodePool.innerHTML = '';
   if (el.groupPool) el.groupPool.innerHTML = '';
@@ -800,14 +819,27 @@ function render() {
     const ul = box.querySelector('ul');
     (g.members || []).forEach((member) => {
       const key = String(member || '');
+      let li = null;
       if (key.startsWith('group:')) {
         const ref = state.groups.find((item) => item.id === key.slice(6));
-        if (ref) ul.appendChild(makeGroupRefLi(ref));
-        return;
+        if (ref) li = makeGroupRefLi(ref);
+      } else {
+        const nodeId = key.startsWith('node:') ? key.slice(5) : key;
+        const node = state.nodes.find((n) => n.id === nodeId);
+        if (node) li = mkNodeLi(node);
       }
-      const nodeId = key.startsWith('node:') ? key.slice(5) : key;
-      const node = state.nodes.find((n) => n.id === nodeId);
-      if (node) ul.appendChild(mkNodeLi(node));
+      if (!li) return;
+      li.dataset.memberKey = key;
+      li.insertAdjacentHTML('beforeend', '<button class="member-remove-btn" type="button" title="移出当前组">×</button>');
+      li.querySelector('.member-remove-btn')?.addEventListener('click', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        pushHistory('移出组成员');
+        removeMemberFromGroup(g.id, key);
+        render();
+        persistState();
+      });
+      ul.appendChild(li);
     });
     const deleteBtn = box.querySelector('[data-action="delete-group"]');
     deleteBtn?.addEventListener('click', () => {
@@ -852,15 +884,19 @@ function render() {
 
   el.rules.value = state.rules.join('\n');
   el.mixedPort.value = state.mixedPort;
-  if (el.transitGroupName) el.transitGroupName.value = state.transitGroupName || 'Smart-Transit';
-  if (el.egressGroupName) el.egressGroupName.value = state.egressGroupName || 'Smart-Egress';
-  if (el.chainGroupName) el.chainGroupName.value = state.chainGroupName || 'Smart-Chain';
-  const transitLabel = document.getElementById('transitGroupLabel');
-  const egressLabel = document.getElementById('egressGroupLabel');
-  const chainLabel = document.getElementById('chainGroupLabel');
-  if (transitLabel) transitLabel.textContent = transitGroupName;
-  if (egressLabel) egressLabel.textContent = egressGroupName;
-  if (chainLabel) chainLabel.textContent = chainGroupName;
+  const groupOptions = state.groups.map((g) => `<option value="${g.name}">${g.name} (${g.type})</option>`).join('');
+  if (el.transitGroupName) {
+    el.transitGroupName.innerHTML = groupOptions;
+    el.transitGroupName.value = transitGroupName;
+  }
+  if (el.egressGroupName) {
+    el.egressGroupName.innerHTML = groupOptions;
+    el.egressGroupName.value = egressGroupName;
+  }
+  if (el.chainGroupName) {
+    el.chainGroupName.innerHTML = groupOptions;
+    el.chainGroupName.value = chainGroupName;
+  }
   syncNodeEditorOptions();
   refreshMarkdownPreview();
 }
@@ -1009,6 +1045,7 @@ function validateState() {
   const suggestions = [];
   const risks = [];
   const knownNodeIds = new Set(state.nodes.map((n) => n.id));
+  const knownGroupIds = new Set(state.groups.map((g) => g.id));
   const knownGroupNames = new Set(state.groups.map((g) => g.name));
   knownGroupNames.add((el.transitGroupName?.value || state.transitGroupName || 'Smart-Transit').trim() || 'Smart-Transit');
   knownGroupNames.add((el.egressGroupName?.value || state.egressGroupName || 'Smart-Egress').trim() || 'Smart-Egress');
@@ -1022,9 +1059,20 @@ function validateState() {
       suggestions.push(`可将至少 1 个节点拖入 Smart 组「${g.name}」`);
     }
     g.members.forEach((id) => {
-      if (!knownNodeIds.has(id)) {
-        warnings.push(`策略组「${g.name}」存在无效节点引用：${id}`);
-        blockers.push(`策略组「${g.name}」含无效节点引用，禁止发布`);
+      const key = String(id || '');
+      if (key.startsWith('relay:')) return;
+      if (key.startsWith('group:')) {
+        const groupId = key.slice(6);
+        if (!knownGroupIds.has(groupId)) {
+          warnings.push(`策略组「${g.name}」引用了一个已不存在的组：${key}`);
+          blockers.push(`策略组「${g.name}」含失效组引用，禁止发布`);
+        }
+        return;
+      }
+      const nodeId = key.startsWith('node:') ? key.slice(5) : key;
+      if (!knownNodeIds.has(nodeId)) {
+        warnings.push(`策略组「${g.name}」引用了一个已不存在的节点：${key}`);
+        blockers.push(`策略组「${g.name}」含失效节点引用，禁止发布`);
       }
     });
   });
@@ -1517,32 +1565,66 @@ el.mixedPort.addEventListener('input', () => {
   persistState();
 });
 
-el.transitGroupName?.addEventListener('input', () => {
+el.transitGroupName?.addEventListener('change', () => {
   state.transitGroupName = (el.transitGroupName.value || 'Smart-Transit').trim() || 'Smart-Transit';
-  refreshMarkdownPreview();
+  ensureComposeGroup(state.transitGroupName, 'select');
+  render();
   persistState();
 });
 
-el.egressGroupName?.addEventListener('input', () => {
+el.egressGroupName?.addEventListener('change', () => {
   state.egressGroupName = (el.egressGroupName.value || 'Smart-Egress').trim() || 'Smart-Egress';
-  refreshMarkdownPreview();
+  ensureComposeGroup(state.egressGroupName, 'select');
+  render();
   persistState();
 });
 
-el.chainGroupName?.addEventListener('input', () => {
+el.chainGroupName?.addEventListener('change', () => {
   state.chainGroupName = (el.chainGroupName.value || 'Smart-Chain').trim() || 'Smart-Chain';
-  refreshMarkdownPreview();
+  ensureComposeGroup(state.chainGroupName, 'select');
+  render();
   persistState();
+});
+
+el.createComposePreset?.addEventListener('click', () => {
+  pushHistory('创建链路组');
+  let idx = 1;
+  let transit = `Transit-${idx}`;
+  let egress = `Egress-${idx}`;
+  let chain = `Chain-${idx}`;
+  const names = new Set(state.groups.map((g) => g.name));
+  while (names.has(transit) || names.has(egress) || names.has(chain)) {
+    idx += 1;
+    transit = `Transit-${idx}`;
+    egress = `Egress-${idx}`;
+    chain = `Chain-${idx}`;
+  }
+  ensureComposeGroup(transit, 'select');
+  ensureComposeGroup(egress, 'select');
+  ensureComposeGroup(chain, 'select');
+  state.transitGroupName = transit;
+  state.egressGroupName = egress;
+  state.chainGroupName = chain;
+  render();
+  persistState();
+  setPublishStatus(`已创建可自定义链路组：${transit} / ${egress} / ${chain}`, 'success');
 });
 
 el.autoFixBtn?.addEventListener('click', () => {
   pushHistory();
   let fixed = 0;
-  const validIds = new Set(state.nodes.map((n) => n.id));
+  const validNodeIds = new Set(state.nodes.map((n) => n.id));
+  const validGroupIds = new Set(state.groups.map((g) => g.id));
 
   state.groups.forEach((g) => {
     const before = g.members.length;
-    g.members = g.members.filter((id) => validIds.has(id));
+    g.members = g.members.filter((member) => {
+      const key = String(member || '');
+      if (key.startsWith('relay:')) return false;
+      if (key.startsWith('group:')) return validGroupIds.has(key.slice(6));
+      const nodeId = key.startsWith('node:') ? key.slice(5) : key;
+      return validNodeIds.has(nodeId);
+    });
     fixed += before - g.members.length;
   });
 
@@ -1565,7 +1647,7 @@ el.autoFixBtn?.addEventListener('click', () => {
   state.rules = fixedRules;
   render();
   persistState();
-  setPublishStatus(fixed ? `自动修复完成：共修复 ${fixed} 处引用` : '自动修复完成：未发现可修复问题', fixed ? 'success' : 'idle');
+  setPublishStatus(fixed ? `自动修复完成：共修复 ${fixed} 处失效引用/规则` : '自动修复完成：未发现可修复问题', fixed ? 'success' : 'idle');
 });
 
 el.resetBtn?.addEventListener('click', () => {

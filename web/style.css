@@ -343,6 +343,22 @@ header p { margin: 6px 0 0; color: var(--sub); }
 .route-action-btn {
   width: 100%;
 }
+.route-config-panel {
+  display: grid;
+  gap: 8px;
+}
+.route-config-item {
+  display: grid;
+  gap: 6px;
+  color: #cbd5e1;
+  font-size: 13px;
+}
+.route-config-actions {
+  margin-bottom: 0;
+}
+.route-config-actions > button {
+  flex: 1 1 0;
+}
 .compose-column {
   display: grid;
   gap: 14px;
@@ -353,9 +369,9 @@ header p { margin: 6px 0 0; color: var(--sub); }
   display: grid;
   grid-template-columns: minmax(0, 1.42fr) minmax(320px, .78fr);
   gap: 12px;
-  height: clamp(420px, 54vh, 620px);
-  min-height: 420px;
-  max-height: 620px;
+  height: clamp(360px, 46vh, 520px);
+  min-height: 360px;
+  max-height: 520px;
   overflow: hidden;
 }
 .compose-main-column,
@@ -571,13 +587,33 @@ button.ghost {
   margin: 0;
 }
 .item {
-  padding: 10px 12px;
+  padding: 10px 42px 10px 12px;
   margin: 8px 0;
   background: linear-gradient(180deg, rgba(30,41,59,.96), rgba(15,23,42,.96));
   border: 1px solid rgba(71,85,105,.6);
   border-radius: 10px;
   cursor: grab;
   box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+  position: relative;
+}
+.member-remove-btn {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border-radius: 999px;
+  border: 1px solid rgba(248,113,113,.45);
+  background: rgba(127,29,29,.42);
+  color: #fecaca;
+  font-size: 14px;
+  line-height: 1;
+}
+.member-remove-btn:hover {
+  filter: none;
+  background: rgba(190,24,93,.6);
 }
 .node-pool .item,
 .group-pool .item {
@@ -773,9 +809,9 @@ button.ghost {
   }
   .compose-workbench-frame {
     grid-template-columns: minmax(0, 1.18fr) minmax(280px, .82fr);
-    height: clamp(380px, 48vh, 520px);
-    min-height: 380px;
-    max-height: 520px;
+    height: clamp(320px, 40vh, 420px);
+    min-height: 320px;
+    max-height: 420px;
     overflow: hidden;
   }
   .compose-main-column,

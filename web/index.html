@@ -140,12 +140,23 @@
             <div class="route-card">
               <span class="route-card-label">链路模板</span>
               <strong>中转 → 落地 → 输出</strong>
-              <small>你只需要分配角色，不需要手写链式组合。</small>
+              <small>组名现在可自定义；链式组会按你选的中转组 / 落地组自动生成。</small>
             </div>
-            <span class="route-chip">中转组：<b id="transitGroupLabel">Smart-Transit</b></span>
-            <span class="route-chip">落地组：<b id="egressGroupLabel">Smart-Egress</b></span>
-            <span class="route-chip">链式组：<b id="chainGroupLabel">Smart-Chain</b></span>
-            <button id="applyRegionModules" class="ghost route-action-btn">自动补齐默认组结构</button>
+            <div class="route-config-panel">
+              <label class="route-config-item">中转组
+                <select id="transitGroupName"></select>
+              </label>
+              <label class="route-config-item">落地组
+                <select id="egressGroupName"></select>
+              </label>
+              <label class="route-config-item">链式组
+                <select id="chainGroupName"></select>
+              </label>
+            </div>
+            <div class="route-config-actions row compact-row">
+              <button id="createComposePreset" class="ghost">快速创建中转/落地/链式组</button>
+              <button id="applyRegionModules" class="ghost route-action-btn">自动补齐默认组结构</button>
+            </div>
           </div>
         </div>
 

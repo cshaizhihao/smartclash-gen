@@ -1,5 +1,5 @@
-const STORAGE_KEY = 'smartclash-web-v1310';
-const APP_VERSION = '0.13.10';
+const STORAGE_KEY = 'smartclash-web-v1311';
+const APP_VERSION = '0.13.11';
 const UPDATE_CMD = 'bash -c "$(curl -fsSL https://raw.githubusercontent.com/cshaizhihao/smartclash-gen/main/install.sh)" -- --update -d ~/.smartclash-gen';
 const AUTH_DISABLED = true;
 const AUTH_KEY = 'smartclash-web-auth';
@@ -1143,10 +1143,10 @@ function validateState() {
 
   state.groups.forEach((g) => {
     if (g.type === 'smart' && g.members.length === 0) {
-      warnings.push(`Smart 组「${g.name}」当前为空成员`);
-      blockers.push(`Smart 组「${g.name}」为空，禁止发布`);
-      risks.push(`高风险：Smart 组「${g.name}」为空，会导致策略不可用`);
-      suggestions.push(`可将至少 1 个节点拖入 Smart 组「${g.name}」`);
+      warnings.push(`分组「${g.name}」现在是空的`);
+      blockers.push(`分组「${g.name}」还没有节点，当前不能发布`);
+      risks.push(`高风险：分组「${g.name}」为空，导出后这条分流会失效`);
+      suggestions.push(`给分组「${g.name}」至少放入 1 个节点后再发布`);
     }
     g.members.forEach((id) => {
       const key = String(id || '');
@@ -1154,15 +1154,15 @@ function validateState() {
       if (key.startsWith('group:')) {
         const groupId = key.slice(6);
         if (!knownGroupIds.has(groupId)) {
-          warnings.push(`策略组「${g.name}」引用了一个已不存在的组：${key}`);
-          blockers.push(`策略组「${g.name}」含失效组引用，禁止发布`);
+          warnings.push(`分组「${g.name}」里有一个已经被删掉的组引用`);
+          blockers.push(`分组「${g.name}」里有失效组引用，当前不能发布`);
         }
         return;
       }
       const nodeId = key.startsWith('node:') ? key.slice(5) : key;
       if (!knownNodeIds.has(nodeId)) {
-        warnings.push(`策略组「${g.name}」引用了一个已不存在的节点：${key}`);
-        blockers.push(`策略组「${g.name}」含失效节点引用，禁止发布`);
+        warnings.push(`分组「${g.name}」里有一个已经被删掉的节点`);
+        blockers.push(`分组「${g.name}」里有失效节点引用，当前不能发布`);
       }
     });
   });
@@ -1171,42 +1171,42 @@ function validateState() {
   lines.forEach((line, i) => {
     const segs = line.split(',').map((s) => s.trim()).filter(Boolean);
     if (segs.length < 2) {
-      blockers.push(`规则第 ${i + 1} 行格式错误，禁止发布`);
-      suggestions.push(`规则第 ${i + 1} 行至少需要“类型,值[,策略组]”`);
+      blockers.push(`规则第 ${i + 1} 行格式不对，当前不能发布`);
+      suggestions.push(`规则第 ${i + 1} 行至少要写成“类型,值[,分组]”`);
       return;
     }
     if (segs.length >= 3) {
       const target = segs[2];
       if (target !== 'DIRECT' && !knownGroupNames.has(target)) {
-        blockers.push(`规则第 ${i + 1} 行引用不存在策略组，禁止发布`);
-        suggestions.push(`将规则第 ${i + 1} 行目标策略组改为已存在组，或改为 Smart-AUTO`);
+        blockers.push(`规则第 ${i + 1} 行指向了一个不存在的分组，当前不能发布`);
+        suggestions.push(`把规则第 ${i + 1} 行改到现有分组，或改成 Smart-AUTO`);
       }
     }
   });
 
   state.nodes.forEach((node, index) => {
     if (!node.url) {
-      warnings.push(`节点「${node.name}」未填写真实 URL，将以占位配置导出`);
+      warnings.push(`节点「${node.name}」还没填真实链接，导出时会变成占位内容`);
       return;
     }
     try {
       buildProxyFromNode(node, index);
     } catch (error) {
-      blockers.push(`节点「${node.name}」解析失败：${error.message}`);
-      suggestions.push(`修正节点「${node.name}」URL 协议/参数后再发布`);
+      blockers.push(`节点「${node.name}」链接解析失败：${error.message}`);
+      suggestions.push(`先修正节点「${node.name}」的协议或参数，再发布`);
     }
   });
 
   const p = Number(el.mixedPort.value || 0);
   if (!Number.isInteger(p) || p < 1 || p > 65535) {
-    blockers.push('mixed-port 必须是 1-65535 之间的整数，禁止发布');
-    risks.push('高风险：端口非法将导致配置不可启动');
-    suggestions.push('将 mixed-port 设置为 1-65535 的整数（建议 7892）');
+    blockers.push('端口填写不合法，当前不能发布');
+    risks.push('高风险：端口不合法会导致配置无法启动');
+    suggestions.push('把 mixed-port 改成 1-65535 的整数（建议 7892）');
   }
 
   const lines2 = el.rules.value.split('\n').map((x) => x.trim()).filter(Boolean);
   if (!lines2.some((r) => r.startsWith('MATCH,'))) {
-    risks.push('高风险：缺少 MATCH 兜底规则，可能出现未命中流量异常');
+    risks.push('高风险：缺少 MATCH 兜底规则，可能会有流量找不到出口');
   }
 
   const transitGroupName = (el.transitGroupName?.value || state.transitGroupName || 'Smart-Transit').trim() || 'Smart-Transit';
@@ -1214,9 +1214,9 @@ function validateState() {
   const transitCount = getGroupProxyNames(transitGroupName).length;
   const egressCount = getGroupProxyNames(egressGroupName).length;
   if (!transitCount || !egressCount) {
-    suggestions.push(`链式代理待激活：请先把“入口跳板”拖入「${transitGroupName}」，再把“最终落点”拖入「${egressGroupName}」`);
+    suggestions.push(`链式分组还没激活：先往「${transitGroupName}」放中转节点，再往「${egressGroupName}」放落地节点`);
   } else {
-    suggestions.push(`链式代理已就绪：当前会按「${transitGroupName} → ${egressGroupName}」自动生成组合`);
+    suggestions.push(`链式分组已就绪：当前会按「${transitGroupName} → ${egressGroupName}」自动生成组合`);
   }
 
   return { warnings, blockers, suggestions, risks };
@@ -1261,10 +1261,10 @@ function renderQuickChecks(result) {
   }
   if (el.publishHeroHint) {
     el.publishHeroHint.textContent = result.blockers.length
-      ? `当前仍有 ${result.blockers.length} 条阻塞，建议先处理后再导出`
+      ? `还有 ${result.blockers.length} 个问题必须先修，修完再导出`
       : result.warnings.length
-        ? `当前无阻塞，剩余 ${result.warnings.length} 条提醒可按需处理`
-        : '当前状态干净，可直接保存、导出或发布';
+        ? `当前可以继续，但还有 ${result.warnings.length} 条提醒建议处理`
+        : '当前状态正常，可以直接保存、导出或发布';
   }
   updateSmartActionLabel(result);
 }
@@ -1281,17 +1281,17 @@ function renderWarnings(result) {
   if (el.publishChecklist) {
     const checks = [
       {
-        text: result.blockers.length ? `⛔ 阻塞项 ${result.blockers.length} 条（需先修复）` : '✅ 无阻塞项，可发布',
+        text: result.blockers.length ? `⛔ 还有 ${result.blockers.length} 个问题必须先修` : '✅ 当前没有阻塞项，可以发布',
         jump: 'nodes/import/quick',
       },
       {
-        text: result.warnings.length ? `⚠️ 警告 ${result.warnings.length} 条（建议处理）` : '✅ 无警告项',
+        text: result.warnings.length ? `⚠️ 还有 ${result.warnings.length} 条提醒，建议看一眼` : '✅ 当前没有提醒项',
         jump: 'rules/editor/line',
       },
-      { text: '📦 已确认导出格式：YAML + Markdown', jump: 'publish/actions/output' },
-      { text: '🧪 已完成规则与引用一致性检查', jump: 'rules/editor/line' },
+      { text: '📦 导出格式已确认：YAML + Markdown', jump: 'publish/actions/output' },
+      { text: '🧪 规则、节点、分组引用已完成一致性检查', jump: 'rules/editor/line' },
       {
-        text: result.risks?.length ? `🚨 高风险改动 ${result.risks.length} 项（点击排查）` : '✅ 无高风险改动',
+        text: result.risks?.length ? `🚨 还有 ${result.risks.length} 个高风险点，建议逐项确认` : '✅ 当前没有高风险项',
         jump: 'rules/editor/line',
       },
     ];

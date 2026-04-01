@@ -1,5 +1,5 @@
-const STORAGE_KEY = 'smartclash-web-v1308';
-const APP_VERSION = '0.13.8';
+const STORAGE_KEY = 'smartclash-web-v1309';
+const APP_VERSION = '0.13.9';
 const UPDATE_CMD = 'bash -c "$(curl -fsSL https://raw.githubusercontent.com/cshaizhihao/smartclash-gen/main/install.sh)" -- --update -d ~/.smartclash-gen';
 const AUTH_DISABLED = true;
 const AUTH_KEY = 'smartclash-web-auth';
@@ -872,7 +872,7 @@ function render() {
     box.className = 'group';
     box.dataset.id = g.id;
     const memberCount = Array.isArray(g.members) ? g.members.length : 0;
-    const canDelete = !['Smart-AUTO', transitGroupName, egressGroupName, chainGroupName].includes(g.name);
+    const canDelete = g.name !== 'Smart-AUTO';
     box.innerHTML = `<div class="group-head"><h4>${g.name} <small>(${g.type}) · ${memberCount} 项</small></h4><div class="group-actions">${canDelete ? '<button class="ghost group-action-btn" data-action="delete-group">删除组</button>' : ''}</div></div><ul class="list" id="group-${g.id}"></ul>`;
     const ul = box.querySelector('ul');
     (g.members || []).forEach((member) => {
@@ -901,12 +901,17 @@ function render() {
     });
     const deleteBtn = box.querySelector('[data-action="delete-group"]');
     deleteBtn?.addEventListener('click', () => {
+      const fallbackGroup = state.groups.find((item) => item.id !== g.id && item.name !== 'Smart-AUTO') || state.groups.find((item) => item.name === 'Smart-AUTO');
       state.groups.forEach((group) => {
         group.members = (group.members || []).filter((member) => String(member) !== `group:${g.id}`);
       });
       state.groups.splice(state.groups.findIndex((item) => item.id === g.id), 1);
+      if (state.transitGroupName === g.name) state.transitGroupName = fallbackGroup?.name || 'Smart-Transit';
+      if (state.egressGroupName === g.name) state.egressGroupName = fallbackGroup?.name || 'Smart-Egress';
+      if (state.chainGroupName === g.name) state.chainGroupName = fallbackGroup?.name || 'Smart-Chain';
       render();
       persistState();
+      setPublishStatus(`已删除组：${g.name}`, 'success');
     });
     el.groups.appendChild(box);
     new Sortable(ul, { group: { name: 'nodes-and-groups', pull: true, put: true }, animation: 150, onSort: syncFromDom });

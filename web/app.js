@@ -1177,13 +1177,13 @@ el.publishBtn.addEventListener('click', () => {
   setPublishStatus(`发布成功：无阻塞项（警告 ${result.warnings.length}）`, 'success');
 });
 
-el.copyBtn.addEventListener('click', async () => {
+el.copyBtn?.addEventListener('click', async () => {
   await navigator.clipboard.writeText(el.markdown.value);
   el.copyBtn.textContent = '已复制 ✅';
   setTimeout(() => (el.copyBtn.textContent = '复制 Markdown'), 1200);
 });
 
-el.downloadBtn.addEventListener('click', () => {
+el.downloadBtn?.addEventListener('click', () => {
   const blob = new Blob([el.markdown.value], { type: 'text/markdown;charset=utf-8' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -1261,7 +1261,7 @@ el.autoFixBtn?.addEventListener('click', () => {
   setPublishStatus(fixed ? `自动修复完成：共修复 ${fixed} 处引用` : '自动修复完成：未发现可修复问题', fixed ? 'success' : 'idle');
 });
 
-el.resetBtn.addEventListener('click', () => {
+el.resetBtn?.addEventListener('click', () => {
   pushHistory();
   replaceState(createDefaultState());
   el.nodeName.value = '';

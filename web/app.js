@@ -881,6 +881,12 @@ function render() {
   if (el.composeTransitCount) el.composeTransitCount.textContent = String(transitMembers);
   if (el.composeEgressCount) el.composeEgressCount.textContent = String(egressMembers);
   if (el.composeChainCount) el.composeChainCount.textContent = chainCount ? `${chainCount}` : '0';
+  const routeLiveTransit = document.getElementById('routeLiveTransit');
+  const routeLiveEgress = document.getElementById('routeLiveEgress');
+  const routeLiveStatus = document.getElementById('routeLiveStatus');
+  if (routeLiveTransit) routeLiveTransit.textContent = transitGroupName;
+  if (routeLiveEgress) routeLiveEgress.textContent = egressGroupName;
+  if (routeLiveStatus) routeLiveStatus.textContent = transitMembers && egressMembers ? `已生成 ${chainCount} 条组合` : '待放入中转 / 落地节点';
 
   el.rules.value = state.rules.join('\n');
   el.mixedPort.value = state.mixedPort;

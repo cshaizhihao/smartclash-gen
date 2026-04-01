@@ -154,7 +154,7 @@ header p { margin: 6px 0 0; color: var(--sub); }
   -webkit-backdrop-filter: blur(22px) saturate(130%);
 }
 .stage-pane[data-main="groups"].panel {
-  padding: 16px;
+  padding: 14px;
 }
 .stage-card {
   min-height: 0;
@@ -219,10 +219,10 @@ header p { margin: 6px 0 0; color: var(--sub); }
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 14px;
-  margin-top: 12px;
-  padding-top: 10px;
-  border-top: 1px dashed rgba(148,163,184,.2);
+  gap: 12px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed rgba(148,163,184,.18);
   flex-wrap: wrap;
   flex: 0 0 auto;
 }
@@ -363,13 +363,40 @@ header p { margin: 6px 0 0; color: var(--sub); }
   padding-top: 8px;
   padding-bottom: 8px;
 }
+.route-live-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.route-live-item {
+  border: 1px solid rgba(71,85,105,.42);
+  border-radius: 12px;
+  padding: 8px 10px;
+  background: rgba(8,15,29,.42);
+  display: grid;
+  gap: 3px;
+}
+.route-live-item span {
+  font-size: 11px;
+  color: #94a3b8;
+}
+.route-live-item strong {
+  font-size: 12px;
+  color: #e2e8f0;
+  line-height: 1.35;
+  word-break: break-word;
+}
+.route-live-accent {
+  border-color: rgba(56,189,248,.35);
+  background: linear-gradient(180deg, rgba(14,165,233,.14), rgba(8,15,29,.42));
+}
 .route-config-actions {
   margin-bottom: 0;
 }
 .route-config-actions > button {
   flex: 1 1 0;
-  padding-top: 9px;
-  padding-bottom: 9px;
+  padding-top: 8px;
+  padding-bottom: 8px;
 }
 .compose-column {
   display: grid;
@@ -379,11 +406,11 @@ header p { margin: 6px 0 0; color: var(--sub); }
 }
 .compose-workbench-frame {
   display: grid;
-  grid-template-columns: minmax(0, 1.54fr) minmax(280px, .68fr);
-  gap: 10px;
-  height: clamp(330px, 42vh, 430px);
-  min-height: 330px;
-  max-height: 430px;
+  grid-template-columns: minmax(0, 1.58fr) minmax(260px, .64fr);
+  gap: 8px;
+  height: clamp(312px, 40vh, 400px);
+  min-height: 312px;
+  max-height: 400px;
   overflow: hidden;
 }
 .compose-main-column,
@@ -802,7 +829,8 @@ button.ghost {
   .compose-guide-strip {
     grid-template-columns: 1fr;
   }
-  .route-config-panel {
+  .route-config-panel,
+  .route-live-summary {
     grid-template-columns: 1fr;
   }
   .compose-workbench-head,
@@ -838,10 +866,10 @@ button.ghost {
     overflow: visible;
   }
   .compose-workbench-frame {
-    grid-template-columns: minmax(0, 1.2fr) minmax(250px, .8fr);
-    height: clamp(300px, 38vh, 380px);
-    min-height: 300px;
-    max-height: 380px;
+    grid-template-columns: minmax(0, 1.24fr) minmax(230px, .76fr);
+    height: clamp(280px, 36vh, 340px);
+    min-height: 280px;
+    max-height: 340px;
     overflow: hidden;
   }
   .compose-main-column,

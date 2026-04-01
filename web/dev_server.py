@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
+import base64
 import json
 import os
 import subprocess
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from urllib.request import urlopen
+from urllib.request import Request, urlopen
 
 ROOT = Path(__file__).resolve().parent
 PROJECT_ROOT = ROOT.parent
@@ -40,6 +41,28 @@ class Handler(SimpleHTTPRequestHandler):
             return
         return super().do_GET()
 
+    def _read_json_body(self):
+        size = int(self.headers.get('Content-Length', '0') or 0)
+        raw = self.rfile.read(size) if size > 0 else b'{}'
+        try:
+            return json.loads(raw.decode('utf-8'))
+        except Exception:
+            return {}
+
+    def _normalize_sub_text(self, text):
+        txt = (text or '').strip()
+        if not txt:
+            return ''
+        if '://' in txt and ('\n' in txt or txt.startswith('vless://') or txt.startswith('vmess://') or txt.startswith('trojan://') or txt.startswith('ss://')):
+            return txt
+        try:
+            data = base64.b64decode(txt + '===', validate=False).decode('utf-8', errors='ignore')
+            if '://' in data:
+                return data
+        except Exception:
+            pass
+        return txt
+
     def do_POST(self):
         if self.path.startswith('/api/update'):
             cmd = ['bash', str(INSTALL_SH), '--update', '-d', DEFAULT_TARGET]
@@ -56,6 +79,37 @@ class Handler(SimpleHTTPRequestHandler):
             except Exception as e:
                 self._json(500, {'ok': False, 'error': str(e)})
             return
+
+        if self.path.startswith('/api/subscriptions/fetch'):
+            body = self._read_json_body()
+            urls = body.get('urls') or []
+            if not isinstance(urls, list):
+                return self._json(400, {'ok': False, 'error': 'urls must be array'})
+
+            merged = []
+            errors = []
+            for u in urls[:10]:
+                url = (u or '').strip()
+                if not url.startswith(('http://', 'https://')):
+                    continue
+                try:
+                    req = Request(url, headers={'User-Agent': 'smartclash-gen/1.0'})
+                    with urlopen(req, timeout=12) as r:
+                        raw = r.read().decode('utf-8', errors='ignore')
+                    txt = self._normalize_sub_text(raw)
+                    lines = [x.strip() for x in txt.splitlines() if '://' in x]
+                    merged.extend(lines)
+                except Exception as e:
+                    errors.append(f'{url}: {e}')
+
+            self._json(200, {
+                'ok': True,
+                'count': len(merged),
+                'lines': merged,
+                'errors': errors[-10:],
+            })
+            return
+
         self._json(404, {'ok': False, 'error': 'not found'})
 
 

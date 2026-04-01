@@ -64,6 +64,11 @@
           <button id="addNode">添加节点</button>
         </div>
         <textarea id="nodeUrls" rows="4" placeholder="粘贴节点 URL（每行一条，支持 vless/vmess/trojan/ss）"></textarea>
+        <textarea id="subUrls" rows="3" placeholder="机场订阅链接（每行一个 https://...）"></textarea>
+        <div class="row">
+          <button id="fetchSubsBtn" class="ghost">拉取订阅并填充节点</button>
+          <span id="subFetchStatus" class="import-status">未拉取订阅</span>
+        </div>
         <div class="row">
           <button id="importUrlsBtn">批量导入 URL</button>
           <button id="clearUrlsBtn" class="ghost">清空已导入 URL</button>
@@ -194,6 +199,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
-  <script src="./app.js?v=0.9.3"></script>
+  <script src="./app.js?v=0.10.0"></script>
 </body>
 </html>

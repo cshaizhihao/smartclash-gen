@@ -1,5 +1,5 @@
-const STORAGE_KEY = 'smartclash-web-v093';
-const APP_VERSION = '0.9.3';
+const STORAGE_KEY = 'smartclash-web-v100';
+const APP_VERSION = '0.10.0';
 const UPDATE_CMD = 'bash -c "$(curl -fsSL https://raw.githubusercontent.com/cshaizhihao/smartclash-gen/main/install.sh)" -- --update -d ~/.smartclash-gen';
 const AUTH_DISABLED = true;
 const AUTH_KEY = 'smartclash-web-auth';
@@ -98,6 +98,9 @@ const el = {
   nodeName: document.getElementById('nodeName'),
   addNode: document.getElementById('addNode'),
   nodeUrls: document.getElementById('nodeUrls'),
+  subUrls: document.getElementById('subUrls'),
+  fetchSubsBtn: document.getElementById('fetchSubsBtn'),
+  subFetchStatus: document.getElementById('subFetchStatus'),
   importUrlsBtn: document.getElementById('importUrlsBtn'),
   clearUrlsBtn: document.getElementById('clearUrlsBtn'),
   importStatus: document.getElementById('importStatus'),
@@ -562,6 +565,7 @@ function getSerializableState() {
     egressGroupName: (el.egressGroupName?.value || state.egressGroupName || 'Smart-Egress').trim() || 'Smart-Egress',
     chainGroupName: (el.chainGroupName?.value || state.chainGroupName || 'Smart-Chain').trim() || 'Smart-Chain',
     nodeUrls: el.nodeUrls.value || '',
+    subUrls: el.subUrls?.value || '',
   };
 }
 
@@ -587,6 +591,7 @@ function applySnapshot(snap) {
     chainGroupName: snap.chainGroupName || 'Smart-Chain',
   });
   el.nodeUrls.value = snap.nodeUrls || '';
+  if (el.subUrls) el.subUrls.value = snap.subUrls || '';
   render();
   persistState();
 }
@@ -709,6 +714,7 @@ function hydrateState() {
       chainGroupName: parsed.chainGroupName || 'Smart-Chain',
     });
     if (typeof parsed.nodeUrls === 'string') el.nodeUrls.value = parsed.nodeUrls;
+    if (typeof parsed.subUrls === 'string' && el.subUrls) el.subUrls.value = parsed.subUrls;
   } catch {
     // ignore
   }
@@ -1030,6 +1036,12 @@ function setPublishStatus(text, type = 'idle') {
   el.publishStatus.dataset.type = type;
 }
 
+function setSubFetchStatus(text, type = 'idle') {
+  if (!el.subFetchStatus) return;
+  el.subFetchStatus.textContent = text;
+  el.subFetchStatus.dataset.type = type;
+}
+
 async function checkUpdate() {
   if (!el.updateStatus) return;
   el.updateStatus.textContent = '正在检查更新...';
@@ -1066,6 +1078,34 @@ el.addNode.addEventListener('click', () => {
   el.nodeName.value = '';
   render();
   persistState();
+});
+
+el.fetchSubsBtn?.addEventListener('click', async () => {
+  const urls = (el.subUrls?.value || '').split('\n').map((x) => x.trim()).filter(Boolean);
+  if (!urls.length) return setSubFetchStatus('请先填写订阅链接', 'error');
+
+  setSubFetchStatus('正在拉取订阅...', 'idle');
+  try {
+    const resp = await fetch('/api/subscriptions/fetch', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ urls }),
+    });
+    const data = await resp.json();
+    const lines = Array.isArray(data.lines) ? data.lines : [];
+    if (!lines.length) {
+      const tip = (data.errors && data.errors.length) ? `，错误 ${data.errors.length} 条` : '';
+      return setSubFetchStatus(`未拉到可用节点${tip}`, 'error');
+    }
+
+    const old = (el.nodeUrls.value || '').split('\n').map((x) => x.trim()).filter(Boolean);
+    const merged = [...new Set([...old, ...lines])];
+    el.nodeUrls.value = merged.join('\n');
+    persistState();
+    setSubFetchStatus(`拉取完成：${lines.length} 条（已填充到节点 URL 区）`, 'success');
+  } catch {
+    setSubFetchStatus('拉取失败，请确认使用 dev_server.py 启动网页', 'error');
+  }
 });
 
 el.importUrlsBtn.addEventListener('click', () => {
@@ -1380,6 +1420,7 @@ el.resetBtn?.addEventListener('click', () => {
 });
 
 el.nodeUrls.addEventListener('input', persistState);
+el.subUrls?.addEventListener('input', persistState);
 el.markdown.addEventListener('input', () => (el.markdown.dataset.manualEdit = '1'));
 
 el.stepPrev?.addEventListener('click', () => {

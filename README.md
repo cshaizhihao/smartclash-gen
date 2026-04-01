@@ -1,6 +1,6 @@
 # smartclash-gen
 
-> 版本：**v0.9.3**
+> 版本：**v0.10.0**
 
 一个面向 **OpenClash + mihomo(type: smart)** 的配置生成器：
 
@@ -15,7 +15,7 @@
 
 ## 安装后应用示意图
 
-![应用示意图](docs/app-preview-v0.9.3-web.svg)
+![应用示意图](docs/app-preview-v0.10.0-web.svg)
 
 ---
 
@@ -143,6 +143,13 @@ python3 generate.py \
 ---
 
 ## 版本更新说明
+
+### v0.10.0
+- 节点导入新增“机场订阅链接”输入区：支持每行一个订阅 URL
+- 新增“拉取订阅并填充节点”按钮：自动请求订阅内容并提取全部节点 URL
+- 订阅拉取支持 Base64 订阅内容自动解码（常见机场格式）
+- `web/dev_server.py` 新增 `/api/subscriptions/fetch` 接口，前端可直接拉取并导入
+- README 版本号与截图引用同步到 v0.10.0
 
 ### v0.9.3
 - 彻底关闭登录门禁展示：`authGate` 默认隐藏，避免页面初始仍出现密码框

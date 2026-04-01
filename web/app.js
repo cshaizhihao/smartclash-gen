@@ -1,5 +1,5 @@
-const STORAGE_KEY = 'smartclash-web-v106';
-const APP_VERSION = '0.10.6';
+const STORAGE_KEY = 'smartclash-web-v110';
+const APP_VERSION = '0.11.0';
 const UPDATE_CMD = 'bash -c "$(curl -fsSL https://raw.githubusercontent.com/cshaizhihao/smartclash-gen/main/install.sh)" -- --update -d ~/.smartclash-gen';
 const AUTH_DISABLED = true;
 const AUTH_KEY = 'smartclash-web-auth';
@@ -350,11 +350,17 @@ function jumpTo(main, sub, third) {
 
 function renderPanes() {
   document.querySelectorAll('.pane').forEach((pane) => {
-    const ok =
-      pane.dataset.main === viewState.main &&
-      pane.dataset.sub === viewState.sub &&
-      pane.dataset.third === viewState.third;
-    pane.classList.toggle('active', ok);
+    const main = pane.dataset.main;
+    const sub = pane.dataset.sub;
+    const third = pane.dataset.third;
+    const show =
+      (main === 'nodes' && (sub === 'import' || sub === 'editor')) ||
+      (main === 'groups' && sub === 'canvas') ||
+      (main === 'rules' && sub === 'editor') ||
+      (main === 'publish' && sub === 'actions');
+
+    pane.classList.toggle('active', show);
+    pane.hidden = !show;
   });
   updatePathline();
 }
@@ -1164,9 +1170,11 @@ el.importUrlsBtn.addEventListener('click', () => {
   refreshConflictPanel();
 
   if (errors.length || dupCount) {
-    setImportStatus(`导入 ${okCount}，重复 ${dupCount}，失败 ${errors.length}｜可点“自动处理重复”后进入第 2 步`, 'error');
+    setImportStatus(`导入 ${okCount}，重复 ${dupCount}，失败 ${errors.length}｜可点“自动处理重复”后进入编排区`, 'error');
   } else {
-    setImportStatus(`导入成功 ${okCount} 条｜下一步：点“直接进入第 2 步”开始拖拽编排`, 'success');
+    setImportStatus(`导入成功 ${okCount} 条｜已自动切到编排区`, 'success');
+    jumpTo('groups', 'canvas', 'drag');
+    setPublishStatus('开始第 2 步：把节点拖入中转组 / 落地组', 'success');
   }
 });
 
@@ -1464,19 +1472,17 @@ el.subUrls?.addEventListener('input', persistState);
 el.markdown.addEventListener('input', () => (el.markdown.dataset.manualEdit = '1'));
 
 el.stepPrev?.addEventListener('click', () => {
-  const triples = getNavTriples();
-  const idx = triples.findIndex((t) => t.main === viewState.main && t.sub === viewState.sub && t.third === viewState.third);
-  if (idx <= 0) return;
-  const prev = triples[idx - 1];
-  jumpTo(prev.main, prev.sub, prev.third);
+  const step = getWizardStep();
+  if (step === 3) return jumpTo('groups', 'canvas', 'drag');
+  if (step === 2) return jumpTo('nodes', 'import', 'quick');
+  return jumpTo('nodes', 'import', 'quick');
 });
 
 el.stepNext?.addEventListener('click', () => {
-  const triples = getNavTriples();
-  const idx = triples.findIndex((t) => t.main === viewState.main && t.sub === viewState.sub && t.third === viewState.third);
-  if (idx < 0 || idx >= triples.length - 1) return;
-  const next = triples[idx + 1];
-  jumpTo(next.main, next.sub, next.third);
+  const step = getWizardStep();
+  if (step === 1) return jumpTo('groups', 'canvas', 'drag');
+  if (step === 2) return jumpTo('publish', 'actions', 'output');
+  return jumpTo('publish', 'actions', 'output');
 });
 
 el.quickFlowBtn?.addEventListener('click', () => {

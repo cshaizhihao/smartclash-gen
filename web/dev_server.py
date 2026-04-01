@@ -251,10 +251,12 @@ class Handler(SimpleHTTPRequestHandler):
                     continue
                 try:
                     req = Request(url, headers={
-                        'User-Agent': 'Mozilla/5.0 (smartclash-gen)',
-                        'Accept': '*/*',
+                        'User-Agent': 'clash-verge/v1.7.7',
+                        'Accept': 'application/yaml,text/yaml,*/*',
                         'Accept-Encoding': 'gzip, deflate',
                         'Cache-Control': 'no-cache',
+                        'subscription-userinfo': 'upload=0; download=0; total=0; expire=0',
+                        'Profile-Update-Interval': '24',
                     })
                     with urlopen(req, timeout=12) as r:
                         body = r.read()

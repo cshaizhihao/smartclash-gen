@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>smartclash-gen 可视化编排器</title>
-  <link rel="stylesheet" href="./style.css?v=0.13.14" />
+  <link rel="stylesheet" href="./style.css?v=0.13.15" />
 </head>
 <body>
   <div class="ambient-grid" aria-hidden="true"></div>
@@ -35,7 +35,7 @@
   <div class="app-window-shell">
     <div class="app-window">
       <header>
-        <h1>smartclash-gen v0.13.14</h1>
+        <h1>smartclash-gen v0.13.15</h1>
         <p>单页流程 · 极简编排 · 动画过渡 · YAML 即时交付</p>
       </header>
 
@@ -288,9 +288,9 @@
             <div class="row compact-row">
               <input id="mixedPort" type="number" min="1" max="65535" placeholder="mixed-port，默认 7892" />
               <button id="smartActionBtn">自动推进</button>
-              <button id="toggleAdvanced" class="ghost">高级</button>
+              <button id="toggleAdvanced" class="ghost">收起高级区</button>
             </div>
-            <div id="advancedOps" class="row hidden">
+            <div id="advancedOps" class="row">
               <button id="saveBtn" class="ghost">保存并生成 Markdown</button>
               <button id="downloadYamlBtn" class="ghost">下载 YAML</button>
               <button id="publishBtn" class="ghost">发布配置</button>
@@ -342,7 +342,7 @@
                 <h3>YAML / Markdown 预览</h3>
                 <p class="helper-text">当前导出内容会实时映射到这里。</p>
               </div>
-              <span id="updateStatus" class="helper-text">当前版本：v0.13.14</span>
+              <span id="updateStatus" class="helper-text">当前版本：v0.13.15</span>
             </div>
             <textarea id="markdown" class="code-preview" rows="24"></textarea>
           </section>
@@ -375,6 +375,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
-  <script src="./app.js?v=0.13.14"></script>
+  <script src="./app.js?v=0.13.15"></script>
 </body>
 </html>

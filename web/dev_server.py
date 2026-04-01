@@ -5,7 +5,13 @@ import os
 import subprocess
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+from urllib.parse import quote
 from urllib.request import Request, urlopen
+
+try:
+    import yaml
+except Exception:
+    yaml = None
 
 ROOT = Path(__file__).resolve().parent
 PROJECT_ROOT = ROOT.parent
@@ -62,19 +68,76 @@ class Handler(SimpleHTTPRequestHandler):
         except Exception:
             return {}
 
-    def _normalize_sub_text(self, text):
+    def _proxy_to_url(self, proxy, index=0):
+        ptype = (proxy.get('type') or '').lower()
+        name = quote(str(proxy.get('name') or f'node-{index+1}'))
+        server = proxy.get('server') or '127.0.0.1'
+        port = proxy.get('port') or 443
+        if ptype == 'ss':
+            cipher = proxy.get('cipher') or 'aes-128-gcm'
+            password = proxy.get('password') or 'change-me'
+            auth = base64.b64encode(f'{cipher}:{password}'.encode()).decode().rstrip('=')
+            return f'ss://{auth}@{server}:{port}#{name}'
+        if ptype == 'trojan':
+            password = quote(str(proxy.get('password') or 'change-me'))
+            sni = quote(str(proxy.get('sni') or proxy.get('servername') or server))
+            return f'trojan://{password}@{server}:{port}?sni={sni}#{name}'
+        if ptype == 'vless':
+            uuid = proxy.get('uuid') or ''
+            network = proxy.get('network') or 'tcp'
+            tls = 'tls' if proxy.get('tls') else 'none'
+            sni = quote(str(proxy.get('servername') or proxy.get('sni') or server))
+            return f'vless://{uuid}@{server}:{port}?type={network}&security={tls}&sni={sni}#{name}'
+        if ptype == 'vmess':
+            payload = {
+                'v': '2',
+                'ps': proxy.get('name') or f'vmess-{index+1}',
+                'add': server,
+                'port': str(port),
+                'id': proxy.get('uuid') or '',
+                'aid': str(proxy.get('alterId') or 0),
+                'scy': proxy.get('cipher') or 'auto',
+                'net': proxy.get('network') or 'tcp',
+                'type': 'none',
+                'host': '',
+                'path': '',
+                'tls': 'tls' if proxy.get('tls') else '',
+            }
+            encoded = base64.b64encode(json.dumps(payload, ensure_ascii=False).encode()).decode()
+            return f'vmess://{encoded}'
+        return None
+
+    def _extract_proxy_urls(self, text):
         txt = (text or '').strip()
         if not txt:
-            return ''
-        if '://' in txt and ('\n' in txt or txt.startswith('vless://') or txt.startswith('vmess://') or txt.startswith('trojan://') or txt.startswith('ss://')):
-            return txt
+            return []
+        direct = [x.strip() for x in txt.splitlines() if x.strip().startswith(('vless://', 'vmess://', 'trojan://', 'ss://'))]
+        if direct:
+            return direct
         try:
             data = base64.b64decode(txt + '===', validate=False).decode('utf-8', errors='ignore')
-            if '://' in data:
-                return data
+            direct = [x.strip() for x in data.splitlines() if x.strip().startswith(('vless://', 'vmess://', 'trojan://', 'ss://'))]
+            if direct:
+                return direct
+            txt = data
         except Exception:
             pass
-        return txt
+        if yaml is not None:
+            try:
+                obj = yaml.safe_load(txt)
+                proxies = obj.get('proxies') if isinstance(obj, dict) else None
+                if isinstance(proxies, list):
+                    lines = []
+                    for i, proxy in enumerate(proxies):
+                        if isinstance(proxy, dict):
+                            line = self._proxy_to_url(proxy, i)
+                            if line:
+                                lines.append(line)
+                    if lines:
+                        return lines
+            except Exception:
+                pass
+        return []
 
     def do_POST(self):
         if self.path.startswith('/api/update'):
@@ -109,8 +172,7 @@ class Handler(SimpleHTTPRequestHandler):
                     req = Request(url, headers={'User-Agent': 'smartclash-gen/1.0'})
                     with urlopen(req, timeout=12) as r:
                         raw = r.read().decode('utf-8', errors='ignore')
-                    txt = self._normalize_sub_text(raw)
-                    lines = [x.strip() for x in txt.splitlines() if '://' in x]
+                    lines = self._extract_proxy_urls(raw)
                     merged.extend(lines)
                 except Exception as e:
                     errors.append(f'{url}: {e}')

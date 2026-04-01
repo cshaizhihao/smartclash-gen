@@ -1,5 +1,5 @@
-const STORAGE_KEY = 'smartclash-web-v1314';
-const APP_VERSION = '0.13.14';
+const STORAGE_KEY = 'smartclash-web-v1315';
+const APP_VERSION = '0.13.15';
 const UPDATE_CMD = 'bash -c "$(curl -fsSL https://raw.githubusercontent.com/cshaizhihao/smartclash-gen/main/install.sh)" -- --update -d ~/.smartclash-gen';
 const AUTH_DISABLED = true;
 const AUTH_KEY = 'smartclash-web-auth';
@@ -406,13 +406,37 @@ function jumpTo(main, sub, third) {
 }
 
 function renderPanes() {
+  const direction = el.flowStage?.dataset.motion === 'backward' ? -1 : 1;
   document.querySelectorAll('.pane').forEach((pane) => {
     const main = pane.dataset.main;
     const step = main === 'nodes' ? 1 : main === 'publish' ? 3 : 2;
     const show = step === getWizardStep();
     pane.classList.toggle('active', show);
-    pane.hidden = !show;
     pane.setAttribute('aria-hidden', show ? 'false' : 'true');
+
+    if (show) {
+      pane.hidden = false;
+      pane.animate(
+        [
+          { opacity: 0, transform: `translateX(${16 * direction}px)` },
+          { opacity: 1, transform: 'translateX(0)' },
+        ],
+        { duration: 220, easing: 'cubic-bezier(0.16, 1, 0.3, 1)', fill: 'both' }
+      );
+    } else if (!pane.hidden) {
+      const anim = pane.animate(
+        [
+          { opacity: 1, transform: 'translateX(0)' },
+          { opacity: 0, transform: `translateX(${-12 * direction}px)` },
+        ],
+        { duration: 160, easing: 'ease', fill: 'both' }
+      );
+      anim.onfinish = () => {
+        if (!pane.classList.contains('active')) pane.hidden = true;
+      };
+    } else {
+      pane.hidden = true;
+    }
   });
   if (el.flowStage) el.flowStage.style.height = 'auto';
   updatePathline();
@@ -1922,7 +1946,8 @@ el.jumpToGroupStep?.addEventListener('click', () => {
 });
 el.goStep3?.addEventListener('click', () => jumpTo('publish', 'actions', 'output'));
 el.toggleAdvanced?.addEventListener('click', () => {
-  el.advancedOps?.classList.toggle('hidden');
+  const hidden = el.advancedOps?.classList.toggle('hidden');
+  if (el.toggleAdvanced) el.toggleAdvanced.textContent = hidden ? '展开高级区' : '收起高级区';
 });
 
 async function runWebUpdate() {

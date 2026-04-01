@@ -1,5 +1,5 @@
-const STORAGE_KEY = 'smartclash-web-v105';
-const APP_VERSION = '0.10.5';
+const STORAGE_KEY = 'smartclash-web-v106';
+const APP_VERSION = '0.10.6';
 const UPDATE_CMD = 'bash -c "$(curl -fsSL https://raw.githubusercontent.com/cshaizhihao/smartclash-gen/main/install.sh)" -- --update -d ~/.smartclash-gen';
 const AUTH_DISABLED = true;
 const AUTH_KEY = 'smartclash-web-auth';
@@ -739,7 +739,17 @@ function render() {
     .filter((n) => !used.has(n.id))
     .forEach((n) => el.nodePool.appendChild(mkNodeLi(n)));
 
+  const transitGroupName = state.transitGroupName || 'Smart-Transit';
+  const egressGroupName = state.egressGroupName || 'Smart-Egress';
+  const chainGroupName = state.chainGroupName || 'Smart-Chain';
+  const preferredOrder = [transitGroupName, egressGroupName, chainGroupName, 'Smart-AUTO'];
+  const orderedGroups = [
+    ...preferredOrder.map((name) => state.groups.find((g) => g.name === name)).filter(Boolean),
+    ...state.groups.filter((g) => !preferredOrder.includes(g.name)),
+  ];
+
   el.groups.innerHTML = '';
+  state.groups.splice(0, state.groups.length, ...orderedGroups);
   state.groups.forEach((g) => {
     const box = document.createElement('article');
     box.className = 'group';

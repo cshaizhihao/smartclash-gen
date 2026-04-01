@@ -92,6 +92,7 @@ const el = {
   importConflicts: document.getElementById('importConflicts'),
   resolveAllDup: document.getElementById('resolveAllDup'),
   resolveOneDup: document.getElementById('resolveOneDup'),
+  replaceExistingBtn: document.getElementById('replaceExistingBtn'),
   ignoreConflicts: document.getElementById('ignoreConflicts'),
   dupEditName: document.getElementById('dupEditName'),
   applyDupEdit: document.getElementById('applyDupEdit'),
@@ -551,7 +552,17 @@ function renderDiffSummary() {
   const diffs = [];
   if (curr.nodes.length !== savedBaseline.nodes.length) diffs.push(`节点数量：${savedBaseline.nodes.length} → ${curr.nodes.length}`);
   if (curr.groups.length !== savedBaseline.groups.length) diffs.push(`策略组数量：${savedBaseline.groups.length} → ${curr.groups.length}`);
-  if (curr.rules.join('\n') !== savedBaseline.rules.join('\n')) diffs.push('规则内容已变更');
+
+  const prevRules = savedBaseline.rules || [];
+  const currRules = curr.rules || [];
+  const addedRules = currRules.filter((r) => !prevRules.includes(r));
+  const removedRules = prevRules.filter((r) => !currRules.includes(r));
+  if (addedRules.length || removedRules.length) {
+    diffs.push(`规则变更：+${addedRules.length} / -${removedRules.length}`);
+    addedRules.slice(0, 2).forEach((r) => diffs.push(`规则新增：${r}`));
+    removedRules.slice(0, 2).forEach((r) => diffs.push(`规则删除：${r}`));
+  }
+
   if (curr.mixedPort !== savedBaseline.mixedPort) diffs.push(`mixed-port：${savedBaseline.mixedPort} → ${curr.mixedPort}`);
   el.diffSummary.innerHTML = diffs.length ? diffs.map((x) => `<li>🧾 ${x}</li>`).join('') : '<li class="ok">✅ 与上次保存相比无差异</li>';
 }
@@ -750,6 +761,7 @@ function validateState() {
   const warnings = [];
   const blockers = [];
   const suggestions = [];
+  const risks = [];
   const knownNodeIds = new Set(state.nodes.map((n) => n.id));
   const knownGroupNames = new Set(state.groups.map((g) => g.name));
 
@@ -757,6 +769,7 @@ function validateState() {
     if (g.type === 'smart' && g.members.length === 0) {
       warnings.push(`Smart 组「${g.name}」当前为空成员`);
       blockers.push(`Smart 组「${g.name}」为空，禁止发布`);
+      risks.push(`高风险：Smart 组「${g.name}」为空，会导致策略不可用`);
       suggestions.push(`可将至少 1 个节点拖入 Smart 组「${g.name}」`);
     }
     g.members.forEach((id) => {
@@ -800,10 +813,16 @@ function validateState() {
   const p = Number(el.mixedPort.value || 0);
   if (!Number.isInteger(p) || p < 1 || p > 65535) {
     blockers.push('mixed-port 必须是 1-65535 之间的整数，禁止发布');
+    risks.push('高风险：端口非法将导致配置不可启动');
     suggestions.push('将 mixed-port 设置为 1-65535 的整数（建议 7892）');
   }
 
-  return { warnings, blockers, suggestions };
+  const lines2 = el.rules.value.split('\n').map((x) => x.trim()).filter(Boolean);
+  if (!lines2.some((r) => r.startsWith('MATCH,'))) {
+    risks.push('高风险：缺少 MATCH 兜底规则，可能出现未命中流量异常');
+  }
+
+  return { warnings, blockers, suggestions, risks };
 }
 
 function renderWarnings(result) {
@@ -811,6 +830,7 @@ function renderWarnings(result) {
   result.blockers.forEach((x) => items.push(`<li>⛔ ${x}</li>`));
   result.warnings.forEach((x) => items.push(`<li>⚠️ ${x}</li>`));
   result.suggestions.forEach((x) => items.push(`<li>💡 ${x}</li>`));
+  result.risks?.forEach((x) => items.push(`<li>🚨 ${x}</li>`));
   el.warnings.innerHTML = items.length ? items.join('') : '<li class="ok">✅ 状态校验通过，可保存可发布</li>';
 
   if (el.publishChecklist) {
@@ -825,6 +845,10 @@ function renderWarnings(result) {
       },
       { text: '📦 已确认导出格式：YAML + Markdown', jump: 'publish/actions/output' },
       { text: '🧪 已完成规则与引用一致性检查', jump: 'rules/editor/line' },
+      {
+        text: result.risks?.length ? `🚨 高风险改动 ${result.risks.length} 项（点击排查）` : '✅ 无高风险改动',
+        jump: 'rules/editor/line',
+      },
     ];
     el.publishChecklist.innerHTML = checks.map((x) => `<li data-jump="${x.jump}">${x.text}</li>`).join('');
     el.publishChecklist.querySelectorAll('li[data-jump]').forEach((li) => {
@@ -1004,6 +1028,24 @@ el.applyDupEdit?.addEventListener('click', () => {
   persistState();
   refreshConflictPanel();
   setImportStatus(`已按自定义名称导入：${finalName}`, 'success');
+});
+
+el.replaceExistingBtn?.addEventListener('click', () => {
+  if (!importConflictState.dupEntries.length) return setImportStatus('没有可替换的重复节点', 'idle');
+  pushHistory('替换同名节点URL');
+  const item = importConflictState.dupEntries.shift();
+  const target = state.nodes.find((n) => n.name === item.name);
+  if (target) {
+    target.url = item.url;
+    target.region = inferRegion(target.name);
+    setImportStatus(`已替换同名节点 URL：${item.name}`, 'success');
+  } else {
+    state.nodes.push({ id: makeId(), name: item.name, url: item.url, region: inferRegion(item.name) });
+    setImportStatus(`未找到同名节点，已新建：${item.name}`, 'success');
+  }
+  render();
+  persistState();
+  refreshConflictPanel();
 });
 
 el.ignoreConflicts?.addEventListener('click', () => {

@@ -163,8 +163,8 @@ header p { margin: 6px 0 0; color: var(--sub); }
 }
 .stage-card {
   min-height: 0;
-  display: grid;
-  grid-template-rows: auto 1fr auto;
+  display: flex;
+  flex-direction: column;
 }
 .stage-head {
   display: flex;
@@ -180,10 +180,13 @@ header p { margin: 6px 0 0; color: var(--sub); }
   align-items: stretch;
   gap: 22px;
 }
-.stage-body { min-height: 0; }
-.stage-body-import { display: grid; grid-template-columns: 1fr 1.2fr; gap: 14px; }
+.stage-body {
+  min-height: 0;
+  flex: 0 0 auto;
+}
+.stage-body-import { display: grid; grid-template-columns: 1fr 1.2fr; gap: 14px; align-items: start; }
 .stage-body-compose { display: grid; grid-template-columns: .92fr 1.28fr; gap: 14px; align-items: start; }
-.stage-body-publish { display: grid; grid-template-columns: .9fr 1.1fr; gap: 14px; }
+.stage-body-publish { display: grid; grid-template-columns: .9fr 1.1fr; gap: 14px; align-items: start; }
 .flow-footer {
   display: flex;
   justify-content: space-between;
@@ -192,6 +195,10 @@ header p { margin: 6px 0 0; color: var(--sub); }
   margin-top: 14px;
   padding-top: 12px;
   border-top: 1px dashed rgba(148,163,184,.2);
+  flex-wrap: wrap;
+}
+.flow-footer > .row {
+  margin-bottom: 0;
 }
 .hint-inline { color: var(--sub); font-size: 13px; }
 .compose-status-row {
@@ -271,6 +278,7 @@ header p { margin: 6px 0 0; color: var(--sub); }
 .publish-overview-panel,
 .publish-code-panel {
   padding: 14px;
+  min-width: 0;
 }
 .publish-list-block + .publish-list-block {
   margin-top: 14px;
@@ -341,7 +349,7 @@ button.ghost {
   background: rgba(8, 15, 29, 0.58);
 }
 .node-pool {
-  min-height: 280px;
+  min-height: 180px;
   max-height: 360px;
   overflow-y: auto;
   overscroll-behavior: contain;

@@ -47,14 +47,14 @@ const NAV_SCHEMA = {
   nodes: {
     label: '节点模块',
     subs: {
-      import: { label: '导入', thirds: { quick: '快速导入' } },
-      editor: { label: '编辑', thirds: { meta: '元信息' } },
-      generator: { label: '生成', thirds: { region: '按分区' } },
+      import: { label: '导入节点', thirds: { quick: '批量导入' } },
+      editor: { label: '整理节点', thirds: { meta: '节点信息' } },
+      generator: { label: '生成模块', thirds: { region: '按地区生成' } },
     },
   },
-  groups: { label: '策略组模块', subs: { canvas: { label: '编排', thirds: { drag: '拖拽画布' } } } },
-  rules: { label: '规则模块', subs: { editor: { label: '编辑器', thirds: { line: '行编辑' } } } },
-  publish: { label: '发布模块', subs: { actions: { label: '发布', thirds: { output: '导出与发布' } } } },
+  groups: { label: '策略组模块', subs: { canvas: { label: '编排策略', thirds: { drag: '拖拽画布' } } } },
+  rules: { label: '规则模块', subs: { editor: { label: '规则检查', thirds: { line: '规则列表' } } } },
+  publish: { label: '发布模块', subs: { actions: { label: '确认发布', thirds: { output: '导出与发布' } } } },
 };
 
 const viewState = { main: 'nodes', sub: 'import', third: 'quick' };
@@ -79,6 +79,7 @@ const el = {
   stepProgressFill: document.getElementById('stepProgressFill'),
   stepPrev: document.getElementById('stepPrev'),
   stepNext: document.getElementById('stepNext'),
+  quickFlowBtn: document.getElementById('quickFlowBtn'),
   undoBtn: document.getElementById('undoBtn'),
   redoBtn: document.getElementById('redoBtn'),
 
@@ -1191,6 +1192,11 @@ el.stepNext?.addEventListener('click', () => {
   if (idx < 0 || idx >= triples.length - 1) return;
   const next = triples[idx + 1];
   jumpTo(next.main, next.sub, next.third);
+});
+
+el.quickFlowBtn?.addEventListener('click', () => {
+  jumpTo('nodes', 'import', 'quick');
+  setPublishStatus('已进入三步流程：1导入节点 → 2生成模块 → 3发布', 'success');
 });
 
 el.undoBtn?.addEventListener('click', () => {

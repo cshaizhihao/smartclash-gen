@@ -1,0 +1,10 @@
+<svg xmlns='http://www.w3.org/2000/svg' width='1600' height='900' viewBox='0 0 1600 900'>
+<rect width='1600' height='900' fill='#0a1120'/>
+<rect x='48' y='48' width='1504' height='804' rx='20' fill='#111b33' stroke='#334155'/>
+<text x='96' y='116' fill='#7dd3fc' font-size='40' font-family='Inter,Arial'>smartclash-gen v0.8.2</text>
+<text x='96' y='156' fill='#94a3b8' font-size='22' font-family='Inter,Arial'>模块化 + 多级工作台优先（简化路径）</text>
+<text x='110' y='230' fill='#cbd5e1' font-size='20'>快速入口：[进入三步流程]</text>
+<text x='110' y='274' fill='#86efac' font-size='18'>1 导入节点 → 2 生成模块 → 3 确认发布</text>
+<text x='110' y='320' fill='#cbd5e1' font-size='18'>保留高频操作：保存 / 下载 YAML / 发布</text>
+<text x='110' y='364' fill='#93c5fd' font-size='18'>多级文案任务化：导入节点 / 整理节点 / 生成模块 / 确认发布</text>
+</svg>

@@ -158,6 +158,11 @@ header p { margin: 6px 0 0; color: var(--sub); }
   display: flex;
   flex-direction: column;
 }
+.stage-pane[data-main="groups"].stage-card {
+  display: grid;
+  grid-template-rows: auto auto auto;
+  align-content: start;
+}
 .stage-pane[data-main="groups"] {
   height: auto;
   min-height: 0;
@@ -184,6 +189,7 @@ header p { margin: 6px 0 0; color: var(--sub); }
 }
 .stage-head-compose {
   align-items: stretch;
+  margin-bottom: 10px;
 }
 .stage-head-publish {
   align-items: stretch;
@@ -227,6 +233,17 @@ header p { margin: 6px 0 0; color: var(--sub); }
 .compose-guide-strip-strong .guide-step strong {
   color: #f8fafc;
 }
+.compose-guide-strip-compact {
+  margin: 10px 0 8px;
+}
+.compose-guide-strip-compact .guide-step {
+  min-height: 60px;
+  padding: 10px 12px;
+}
+.compose-guide-strip-compact .guide-step span {
+  font-size: 13px;
+  line-height: 1.35;
+}
 .guide-step {
   display: flex;
   gap: 10px;
@@ -250,12 +267,12 @@ header p { margin: 6px 0 0; color: var(--sub); }
 .compose-status-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 12px;
+  gap: 8px;
+  margin-top: 8px;
 }
 .status-chip {
-  min-width: 118px;
-  padding: 10px 12px;
+  min-width: 102px;
+  padding: 8px 10px;
   border-radius: 14px;
   border: 1px solid rgba(71,85,105,.45);
   background: rgba(8,15,29,.48);
@@ -263,7 +280,7 @@ header p { margin: 6px 0 0; color: var(--sub); }
   gap: 4px;
 }
 .status-chip strong {
-  font-size: 22px;
+  font-size: 18px;
   line-height: 1;
 }
 .status-chip-label {
@@ -285,14 +302,15 @@ header p { margin: 6px 0 0; color: var(--sub); }
   display: grid;
   justify-items: stretch;
   align-content: start;
+  gap: 8px;
 }
 .route-card {
   border: 1px solid rgba(56,189,248,.28);
   background: linear-gradient(180deg, rgba(14,165,233,.14), rgba(8,15,29,.5));
   border-radius: 18px;
-  padding: 14px;
+  padding: 12px;
   display: grid;
-  gap: 6px;
+  gap: 4px;
 }
 .route-card-label {
   color: #7dd3fc;
@@ -325,11 +343,11 @@ header p { margin: 6px 0 0; color: var(--sub); }
 }
 .compose-workbench-frame {
   display: grid;
-  grid-template-columns: minmax(0, 1.32fr) minmax(340px, .78fr);
-  gap: 14px;
-  height: clamp(480px, 62vh, 640px);
-  min-height: 480px;
-  max-height: 640px;
+  grid-template-columns: minmax(0, 1.42fr) minmax(320px, .78fr);
+  gap: 12px;
+  height: clamp(520px, 66vh, 720px);
+  min-height: 520px;
+  max-height: 720px;
   overflow: hidden;
 }
 .compose-main-column,
@@ -344,7 +362,7 @@ header p { margin: 6px 0 0; color: var(--sub); }
   grid-template-rows: minmax(0, 1fr);
 }
 .compose-side-column {
-  grid-template-rows: minmax(280px, 1fr) auto;
+  grid-template-rows: minmax(320px, 1fr) auto;
 }
 .compose-workbench-panel,
 .node-pool-panel {
@@ -474,20 +492,34 @@ button.ghost {
   background: rgba(8, 15, 29, 0.58);
 }
 .node-pool {
-  min-height: 180px;
+  min-height: 240px;
   max-height: 100%;
   flex: 1 1 auto;
   overflow-y: auto;
   overscroll-behavior: contain;
 }
 .group-pool {
-  min-height: 96px;
-  max-height: 132px;
+  min-height: 112px;
+  max-height: 148px;
   overflow-y: auto;
 }
 .group-meta-zone {
   margin-bottom: 10px;
   flex: 0 0 auto;
+}
+.pool-head-inline {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.pool-head-inline h4 {
+  margin: 0;
+  color: #e2e8f0;
+}
+.pool-head-inline .helper-text {
+  margin: 0;
 }
 .item {
   padding: 10px 12px;
@@ -631,8 +663,7 @@ button.ghost {
   .stage-body-compose,
   .stage-body-publish,
   .publish-hero-grid,
-  .compose-guide-strip,
-  .compose-workbench-frame { grid-template-columns: 1fr; }
+  .compose-guide-strip { grid-template-columns: 1fr; }
   .stage-pane[data-main="groups"],
   .stage-pane[data-main="groups"].stage-card {
     height: auto;
@@ -641,6 +672,22 @@ button.ghost {
     overflow: visible;
   }
   .compose-workbench-frame {
+    grid-template-columns: minmax(0, 1.2fr) minmax(300px, .8fr);
+    height: clamp(500px, 64vh, 680px);
+    min-height: 500px;
+    max-height: 680px;
+    overflow: hidden;
+  }
+  .compose-main-column,
+  .compose-side-column { height: 100%; }
+  .group-canvas,
+  .node-pool {
+    max-height: 100%;
+  }
+}
+@media (max-width: 900px) {
+  .compose-workbench-frame {
+    grid-template-columns: 1fr;
     min-height: auto;
     height: auto;
     max-height: none;

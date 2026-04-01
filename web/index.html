@@ -112,10 +112,10 @@
           <div>
             <h2>步骤 2：中转 / 落地编排 <span id="doneGenerate" class="helper-text"></span></h2>
             <p class="helper-text">这一步只做编排，不再塞规则编辑。先决定“谁做中转、谁做落地”，链式结果会自动生成。</p>
-            <div class="compose-guide-strip compose-guide-strip-strong">
-              <div class="guide-step"><b>1</b><span><strong>右侧节点池</strong>可反复拖拽，同一个节点可进多个组</span></div>
-              <div class="guide-step"><b>2</b><span><strong>左侧工作台</strong>负责中转组 / 落地组 / 自定义组编排</span></div>
-              <div class="guide-step"><b>3</b><span><strong>链式代理</strong>自动按“中转 → 落地”生成，可直接去发布页验收</span></div>
+            <div class="compose-guide-strip compose-guide-strip-strong compose-guide-strip-compact">
+              <div class="guide-step"><b>1</b><span><strong>右侧挑节点</strong>，支持重复分配</span></div>
+              <div class="guide-step"><b>2</b><span><strong>左侧放组里</strong>，先中转后落地</span></div>
+              <div class="guide-step"><b>3</b><span><strong>系统自动出链式组合</strong></span></div>
             </div>
             <div class="compose-status-row">
               <div class="status-chip">
@@ -171,8 +171,10 @@
                 </div>
                 <div class="group-meta-zone">
                   <div>
-                    <h4>组引用池</h4>
-                    <p class="helper-text">把组拖进其他组，实现组中套组；删除组时会自动清理引用。</p>
+                    <div class="pool-head-inline">
+                      <h4>组引用池</h4>
+                      <p class="helper-text">组中套组</p>
+                    </div>
                     <ul id="groupPool" class="list group-pool"></ul>
                   </div>
                 </div>

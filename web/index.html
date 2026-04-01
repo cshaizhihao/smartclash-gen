@@ -29,7 +29,7 @@
   </div>
 
   <header>
-    <h1>smartclash-gen v0.8.4</h1>
+    <h1>smartclash-gen v0.8.5</h1>
     <p>模块化编辑 · 拖拽编排 · Markdown/YAML 交付 · 隐私登录保护</p>
   </header>
 
@@ -147,12 +147,13 @@
         <h2>发布与导出（二级：发布）<span id="donePublish" class="helper-text"></span></h2>
         <div class="row controls">
           <input id="mixedPort" type="number" min="1" max="65535" placeholder="mixed-port，默认 7892" />
-          <button id="saveBtn">保存并生成 Markdown</button>
-          <button id="downloadYamlBtn">下载 YAML</button>
-          <button id="publishBtn">发布配置</button>
+          <button id="smartActionBtn">继续下一步</button>
           <button id="toggleAdvanced" class="ghost">高级操作</button>
         </div>
         <div id="advancedOps" class="row hidden">
+          <button id="saveBtn" class="ghost">保存并生成 Markdown</button>
+          <button id="downloadYamlBtn" class="ghost">下载 YAML</button>
+          <button id="publishBtn" class="ghost">发布配置</button>
           <button id="autoFixBtn" class="ghost">自动修复引用</button>
         </div>
         <div class="publish-quickcheck">

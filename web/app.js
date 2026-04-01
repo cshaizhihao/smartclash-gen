@@ -83,6 +83,7 @@ const el = {
   goStep2: document.getElementById('goStep2'),
   goStep3: document.getElementById('goStep3'),
   toggleAdvanced: document.getElementById('toggleAdvanced'),
+  smartActionBtn: document.getElementById('smartActionBtn'),
   advancedOps: document.getElementById('advancedOps'),
   undoBtn: document.getElementById('undoBtn'),
   redoBtn: document.getElementById('redoBtn'),
@@ -836,6 +837,28 @@ function validateState() {
   return { warnings, blockers, suggestions, risks };
 }
 
+function updateSmartActionLabel(result) {
+  if (!el.smartActionBtn) return;
+  const hasImported = state.nodes.some((n) => n.url);
+  const smart = state.groups.find((g) => g.name === 'Smart-AUTO');
+  const hasGenerated = !!(smart?.members?.length);
+  const canPublish = result.blockers.length === 0;
+
+  if (!hasImported) {
+    el.smartActionBtn.textContent = '继续下一步：先导入节点';
+    return;
+  }
+  if (!hasGenerated) {
+    el.smartActionBtn.textContent = '继续下一步：生成模块';
+    return;
+  }
+  if (!canPublish) {
+    el.smartActionBtn.textContent = '继续下一步：修复后发布';
+    return;
+  }
+  el.smartActionBtn.textContent = '继续下一步：发布配置';
+}
+
 function renderQuickChecks(result) {
   if (el.qcRules) el.qcRules.textContent = result.blockers.length ? `有 ${result.blockers.length} 条阻塞` : '规则无阻塞';
   const smart = state.groups.find((g) => g.name === 'Smart-AUTO');
@@ -846,6 +869,7 @@ function renderQuickChecks(result) {
   if (el.doneImport) el.doneImport.textContent = state.nodes.some((n) => n.url) ? '✅ 已完成' : '⏳ 未完成';
   if (el.doneGenerate) el.doneGenerate.textContent = smart?.members?.length ? '✅ 已完成' : '⏳ 未完成';
   if (el.donePublish) el.donePublish.textContent = result.blockers.length ? '⏳ 待处理' : '✅ 可发布';
+  updateSmartActionLabel(result);
 }
 
 function renderWarnings(result) {
@@ -1226,6 +1250,37 @@ el.goStep2?.addEventListener('click', () => jumpTo('nodes', 'generator', 'region
 el.goStep3?.addEventListener('click', () => jumpTo('publish', 'actions', 'output'));
 el.toggleAdvanced?.addEventListener('click', () => {
   el.advancedOps?.classList.toggle('hidden');
+});
+
+el.smartActionBtn?.addEventListener('click', () => {
+  const result = validateState();
+  const hasImported = state.nodes.some((n) => n.url);
+  const smart = state.groups.find((g) => g.name === 'Smart-AUTO');
+  const hasGenerated = !!(smart?.members?.length);
+
+  if (!hasImported) {
+    jumpTo('nodes', 'import', 'quick');
+    return setPublishStatus('先导入节点 URL，再继续', 'idle');
+  }
+  if (!hasGenerated) {
+    jumpTo('nodes', 'generator', 'region');
+    applyRegionModulesFromNodes();
+    render();
+    persistState();
+    return setPublishStatus('已自动生成模块，继续去发布', 'success');
+  }
+  if (result.blockers.length) {
+    jumpTo('publish', 'actions', 'output');
+    renderWarnings(result);
+    return setPublishStatus('发现阻塞项，先修复后发布', 'error');
+  }
+
+  el.markdown.dataset.manualEdit = '';
+  el.markdown.value = buildMarkdown();
+  state.mixedPort = Number(el.mixedPort.value || 7892);
+  savedBaseline = getSerializableState();
+  persistState();
+  setPublishStatus('已完成发布链路（模拟发布）', 'success');
 });
 
 el.stepNext?.addEventListener('dblclick', () => {

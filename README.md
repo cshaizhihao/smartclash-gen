@@ -1,6 +1,6 @@
 # smartclash-gen
 
-> 版本：**v0.13.0**
+> 版本：**v0.13.1**
 
 一个面向 **OpenClash + mihomo(type: smart)** 的配置生成器：
 
@@ -143,6 +143,11 @@ python3 generate.py \
 ---
 
 ## 版本更新说明
+
+### v0.13.1
+- 修复真实线上生效链路：此前连续修改 `style.css` 但未继续提升资源 query 版本，导致 Cloudflare 命中旧 CSS 缓存，用户看到“代码已推但页面没变”
+- 本次统一提升 `index.html` 中的静态资源版本到 `v0.13.1`，并同步可见版本号、`APP_VERSION`、`STORAGE_KEY`
+- 这次不是单纯推代码，而是明确处理“HTML 已更新、CSS 仍被 CDN 缓存”的缓存穿透问题
 
 ### v0.13.0
 - **重构 Step 2 外壳结构**：规则编辑彻底移出编排页，Step 2 只保留“组工作台 + 复用节点池”，不再把规则区塞进同一屏

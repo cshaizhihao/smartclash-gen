@@ -66,6 +66,7 @@ const el = {
   authGate: document.getElementById('authGate'),
   authUser: document.getElementById('authUser'),
   authPass: document.getElementById('authPass'),
+  toggleAuthPass: document.getElementById('toggleAuthPass'),
   authRemember: document.getElementById('authRemember'),
   authBtn: document.getElementById('authBtn'),
   authTips: document.getElementById('authTips'),
@@ -177,12 +178,20 @@ function showApp() {
 }
 
 function showAuth(message) {
-  el.authTips.textContent = message || '请登录后使用';
+  const hasAccount = !!getAuthConfig();
+  el.authBtn.textContent = hasAccount ? '登录' : '开始使用';
+  if (!message) {
+    el.authTips.textContent = hasAccount
+      ? '请输入已设置的用户名和密码登录。'
+      : '首次使用：输入用户名和密码后点击“开始使用”。';
+  } else {
+    el.authTips.textContent = message;
+  }
   el.authGate.classList.remove('hidden');
   el.appShell.classList.add('blurred');
 }
 
-el.authBtn.addEventListener('click', () => {
+function submitAuth() {
   const username = el.authUser.value.trim();
   const password = el.authPass.value.trim();
   if (!username || !password) {
@@ -204,6 +213,15 @@ el.authBtn.addEventListener('click', () => {
   } else {
     showAuth('登录失败：用户名或密码错误');
   }
+}
+
+el.authBtn.addEventListener('click', submitAuth);
+el.authUser.addEventListener('keydown', (e) => e.key === 'Enter' && submitAuth());
+el.authPass.addEventListener('keydown', (e) => e.key === 'Enter' && submitAuth());
+el.toggleAuthPass?.addEventListener('click', () => {
+  const visible = el.authPass.type === 'text';
+  el.authPass.type = visible ? 'password' : 'text';
+  el.toggleAuthPass.textContent = visible ? '显示' : '隐藏';
 });
 
 el.logoutBtn.addEventListener('click', () => {

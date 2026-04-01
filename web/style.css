@@ -492,7 +492,11 @@ button.ghost {
   .status-chip,
   .publish-control-stack { width: 100%; }
   .flow-stage,
-  .stage-card { min-height: 0; }
-  .app-window { border-radius: 24px; }
-  .flow-shell { padding: 16px; }
+  .stage-card,
+  .stage-pane { min-height: 0; }
+  .app-window {
+    width: min(1380px, calc(100vw - 20px));
+    border-radius: 20px;
+  }
+  .flow-shell { padding: 14px; }
 }

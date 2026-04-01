@@ -1,6 +1,6 @@
 # smartclash-gen
 
-> 版本：**v0.12.7**
+> 版本：**v0.12.8**
 
 一个面向 **OpenClash + mihomo(type: smart)** 的配置生成器：
 
@@ -143,6 +143,11 @@ python3 generate.py \
 ---
 
 ## 版本更新说明
+
+### v0.12.8
+- 修复步骤切换回归：恢复 `renderPanes()` 对 `hidden` 的正确控制，避免导入/编排/发布三个按钮都显示成同一界面
+- 移除旧舞台高度脚本 `syncStageHeight()` 的残留副作用，避免窄屏下容器被强行拉成长框
+- 继续收紧移动/窄屏窗口宽度与内边距，减少小窗口下的空壳感
 
 ### v0.12.7
 - 编排页补完真实工作流：`Smart-Transit / Smart-Egress / Smart-Chain` 作为真实策略组常驻显示，不再只是上方三个无效占位输入

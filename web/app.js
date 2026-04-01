@@ -1,5 +1,5 @@
-const STORAGE_KEY = 'smartclash-web-v127';
-const APP_VERSION = '0.12.7';
+const STORAGE_KEY = 'smartclash-web-v128';
+const APP_VERSION = '0.12.8';
 const UPDATE_CMD = 'bash -c "$(curl -fsSL https://raw.githubusercontent.com/cshaizhihao/smartclash-gen/main/install.sh)" -- --update -d ~/.smartclash-gen';
 const AUTH_DISABLED = true;
 const AUTH_KEY = 'smartclash-web-auth';
@@ -364,24 +364,17 @@ function jumpTo(main, sub, third) {
   renderPanes();
 }
 
-function syncStageHeight() {
-  if (!el.flowStage) return;
-  const activePane = el.flowStage.querySelector('.pane.active');
-  if (!activePane) return;
-  const nextHeight = Math.ceil(activePane.scrollHeight);
-  if (nextHeight > 0) el.flowStage.style.height = `${nextHeight}px`;
-}
-
 function renderPanes() {
   document.querySelectorAll('.pane').forEach((pane) => {
     const main = pane.dataset.main;
     const step = main === 'nodes' ? 1 : main === 'publish' ? 3 : 2;
     const show = step === getWizardStep();
     pane.classList.toggle('active', show);
+    pane.hidden = !show;
     pane.setAttribute('aria-hidden', show ? 'false' : 'true');
   });
+  if (el.flowStage) el.flowStage.style.height = 'auto';
   updatePathline();
-  requestAnimationFrame(syncStageHeight);
 }
 
 function mkNodeLi(node) {
@@ -1735,7 +1728,6 @@ savedBaseline = getSerializableState();
 render();
 renderNavigation();
 renderPanes();
-window.addEventListener('resize', () => requestAnimationFrame(syncStageHeight));
 setPublishStatus('尚未发布', 'idle');
 setImportStatus('未导入', 'idle');
 if (el.updateStatus) el.updateStatus.textContent = `当前版本：v${APP_VERSION}`;

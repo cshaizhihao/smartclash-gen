@@ -275,10 +275,12 @@ header p { margin: 6px 0 0; color: var(--sub); }
   align-items: stretch;
   min-height: 620px;
   max-height: 620px;
+  overflow: hidden;
 }
 .compose-main-column,
 .compose-side-column {
   min-width: 0;
+  min-height: 0;
   display: grid;
   gap: 14px;
   height: 100%;
@@ -294,10 +296,12 @@ header p { margin: 6px 0 0; color: var(--sub); }
   min-height: 0;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 .rules-editor-panel,
 .node-editor-panel {
   align-self: start;
+  min-height: 0;
 }
 .wide-compose {
   grid-template-rows: auto auto;
@@ -423,6 +427,7 @@ button.ghost {
 }
 .group-meta-zone {
   margin-bottom: 12px;
+  flex: 0 0 auto;
 }
 .item {
   padding: 10px 12px;
@@ -443,6 +448,7 @@ button.ghost {
   align-content: start;
   overflow-y: auto;
   min-height: 0;
+  flex: 1 1 auto;
   padding-right: 4px;
 }
 .group {
@@ -542,9 +548,14 @@ button.ghost {
   .stage-body-compose-workbench {
     min-height: auto;
     max-height: none;
+    overflow: visible;
   }
   .compose-main-column,
   .compose-side-column { height: auto; }
+  .group-canvas,
+  .node-pool {
+    max-height: 320px;
+  }
 }
 @media (max-width: 900px) {
   .wizard-steps,

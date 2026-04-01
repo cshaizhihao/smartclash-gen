@@ -2,6 +2,11 @@ const STORAGE_KEY = 'smartclash-web-v075';
 const AUTH_KEY = 'smartclash-web-auth';
 const AUTH_SESSION_KEY = 'smartclash-web-auth-session';
 
+function makeId() {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) return makeId();
+  return `id-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+}
+
 const DEFAULT_RULE_PROVIDERS = {
   BanAD: { type: 'http', behavior: 'classical', format: 'text', path: './providers/BanAD.txt', url: 'https://cdn.jsdelivr.net/gh/ACL4SSR/ACL4SSR@master/Clash/BanAD.list', interval: 86400 },
   BanProgramAD: { type: 'http', behavior: 'classical', format: 'text', path: './providers/BanProgramAD.txt', url: 'https://cdn.jsdelivr.net/gh/ACL4SSR/ACL4SSR@master/Clash/BanProgramAD.list', interval: 86400 },
@@ -23,13 +28,13 @@ const DEFAULT_RULE_PROVIDERS = {
 function createDefaultState() {
   return {
     nodes: [
-      { id: crypto.randomUUID(), name: 'HK-01', url: '', region: 'HK' },
-      { id: crypto.randomUUID(), name: 'SG-01', url: '', region: 'SG' },
-      { id: crypto.randomUUID(), name: 'JP-01', url: '', region: 'JP' },
+      { id: makeId(), name: 'HK-01', url: '', region: 'HK' },
+      { id: makeId(), name: 'SG-01', url: '', region: 'SG' },
+      { id: makeId(), name: 'JP-01', url: '', region: 'JP' },
     ],
     groups: [
-      { id: crypto.randomUUID(), name: 'Smart-AUTO', type: 'smart', members: [] },
-      { id: crypto.randomUUID(), name: 'Smart-HK', type: 'select', members: [] },
+      { id: makeId(), name: 'Smart-AUTO', type: 'smart', members: [] },
+      { id: makeId(), name: 'Smart-HK', type: 'select', members: [] },
     ],
     rules: ['DOMAIN-SUFFIX,google.com,Smart-AUTO', 'MATCH,Smart-AUTO'],
     mixedPort: 7892,
@@ -397,7 +402,7 @@ function applyRegionModulesFromNodes() {
   const byName = new Map();
   state.groups.forEach((g) => byName.set(g.name, g));
 
-  const smartAuto = byName.get('Smart-AUTO') || { id: crypto.randomUUID(), name: 'Smart-AUTO', type: 'smart', members: [] };
+  const smartAuto = byName.get('Smart-AUTO') || { id: makeId(), name: 'Smart-AUTO', type: 'smart', members: [] };
   smartAuto.type = 'smart';
   smartAuto.members = state.nodes.map((n) => n.id);
   keep.push(smartAuto);
@@ -405,13 +410,13 @@ function applyRegionModulesFromNodes() {
   const regions = ['HK', 'SG', 'JP', 'US', 'OTHER'];
   regions.forEach((region) => {
     const name = `Smart-${region}`;
-    const g = byName.get(name) || { id: crypto.randomUUID(), name, type: 'select', members: [] };
+    const g = byName.get(name) || { id: makeId(), name, type: 'select', members: [] };
     g.type = 'select';
     g.members = state.nodes.filter((n) => (n.region || 'AUTO') === region).map((n) => n.id);
     keep.push(g);
   });
 
-  const direct = byName.get('DIRECT') || { id: crypto.randomUUID(), name: 'DIRECT', type: 'select', members: [] };
+  const direct = byName.get('DIRECT') || { id: makeId(), name: 'DIRECT', type: 'select', members: [] };
   direct.type = 'select';
   keep.push(direct);
 
@@ -630,7 +635,7 @@ function setPublishStatus(text, type = 'idle') {
 el.addNode.addEventListener('click', () => {
   const name = el.nodeName.value.trim();
   if (!name) return;
-  state.nodes.push({ id: crypto.randomUUID(), name, url: '', region: inferRegion(name) });
+  state.nodes.push({ id: makeId(), name, url: '', region: inferRegion(name) });
   el.nodeName.value = '';
   render();
   persistState();
@@ -651,7 +656,7 @@ el.importUrlsBtn.addEventListener('click', () => {
     if (!parsed.ok) return errors.push(parsed.error);
     if (exists.has(parsed.name)) return dupCount++;
     exists.add(parsed.name);
-    state.nodes.push({ id: crypto.randomUUID(), name: parsed.name, url: parsed.url, region: inferRegion(parsed.name) });
+    state.nodes.push({ id: makeId(), name: parsed.name, url: parsed.url, region: inferRegion(parsed.name) });
     okCount++;
   });
 
@@ -664,7 +669,7 @@ el.importUrlsBtn.addEventListener('click', () => {
 el.addGroup.addEventListener('click', () => {
   const name = el.groupName.value.trim();
   if (!name) return;
-  state.groups.push({ id: crypto.randomUUID(), name, type: el.groupType.value, members: [] });
+  state.groups.push({ id: makeId(), name, type: el.groupType.value, members: [] });
   el.groupName.value = '';
   render();
   persistState();

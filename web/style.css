@@ -75,6 +75,18 @@ header p { margin: 6px 0 0; color: var(--sub); }
   box-shadow: 0 10px 25px rgba(3, 7, 18, 0.34);
 }
 
+.panel.nav-panel {
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.panel.nav-panel .nav-shell {
+  display: block;
+  width: 100%;
+}
+
 .sticky { position: sticky; top: 12px; height: calc(100vh - 24px); }
 .preview-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
 

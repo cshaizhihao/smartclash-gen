@@ -1,5 +1,5 @@
-const STORAGE_KEY = 'smartclash-web-v110';
-const APP_VERSION = '0.11.0';
+const STORAGE_KEY = 'smartclash-web-v120';
+const APP_VERSION = '0.12.0';
 const UPDATE_CMD = 'bash -c "$(curl -fsSL https://raw.githubusercontent.com/cshaizhihao/smartclash-gen/main/install.sh)" -- --update -d ~/.smartclash-gen';
 const AUTH_DISABLED = true;
 const AUTH_KEY = 'smartclash-web-auth';
@@ -82,6 +82,8 @@ const el = {
   stepProgressFill: document.getElementById('stepProgressFill'),
   stepPrev: document.getElementById('stepPrev'),
   stepNext: document.getElementById('stepNext'),
+  stepNextCompose: document.getElementById('stepNextCompose'),
+  stepPrevPublish: document.getElementById('stepPrevPublish'),
   quickFlowBtn: document.getElementById('quickFlowBtn'),
   wizStep1: document.getElementById('wizStep1'),
   wizStep2: document.getElementById('wizStep2'),
@@ -351,14 +353,8 @@ function jumpTo(main, sub, third) {
 function renderPanes() {
   document.querySelectorAll('.pane').forEach((pane) => {
     const main = pane.dataset.main;
-    const sub = pane.dataset.sub;
-    const third = pane.dataset.third;
-    const show =
-      (main === 'nodes' && (sub === 'import' || sub === 'editor')) ||
-      (main === 'groups' && sub === 'canvas') ||
-      (main === 'rules' && sub === 'editor') ||
-      (main === 'publish' && sub === 'actions');
-
+    const step = main === 'nodes' ? 1 : main === 'publish' ? 3 : 2;
+    const show = step === getWizardStep();
     pane.classList.toggle('active', show);
     pane.hidden = !show;
   });
@@ -1483,6 +1479,14 @@ el.stepNext?.addEventListener('click', () => {
   if (step === 1) return jumpTo('groups', 'canvas', 'drag');
   if (step === 2) return jumpTo('publish', 'actions', 'output');
   return jumpTo('publish', 'actions', 'output');
+});
+
+el.stepNextCompose?.addEventListener('click', () => {
+  jumpTo('publish', 'actions', 'output');
+});
+
+el.stepPrevPublish?.addEventListener('click', () => {
+  jumpTo('groups', 'canvas', 'drag');
 });
 
 el.quickFlowBtn?.addEventListener('click', () => {

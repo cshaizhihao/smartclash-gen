@@ -30,177 +30,230 @@
   </div>
 
   <header>
-    <h1>smartclash-gen v0.11.0</h1>
-    <p>单屏向导 · 订阅导入 · 链式代理编排 · YAML 即时交付</p>
+    <h1>smartclash-gen v0.12.0</h1>
+    <p>单页流程 · 极简编排 · 动画过渡 · YAML 即时交付</p>
   </header>
 
-  <main class="workspace-shell" id="appShell">
-    <header class="workflow-bar">
-      <div class="workflow-title">
-        <h2>配置工作台</h2>
+  <main class="flow-shell" id="appShell">
+    <section class="flow-topbar">
+      <div class="flow-title">
+        <h2>配置生成流程</h2>
         <p id="breadcrumbText" class="helper-text">路径：节点模块 / 导入 / 快速导入</p>
       </div>
-      <div class="workflow-controls">
+      <div class="flow-progress-wrap">
         <div class="wizard-steps">
           <button id="wizStep1" class="wiz-step active" type="button">① 导入</button>
           <button id="wizStep2" class="wiz-step" type="button">② 编排</button>
           <button id="wizStep3" class="wiz-step" type="button">③ 发布</button>
         </div>
         <div class="progress-track"><i id="stepProgressFill"></i></div>
-        <div class="row compact-row">
-          <span id="stepProgressText" class="helper-text">Step 1 / 3</span>
-          <button id="stepPrev" class="ghost">上一步</button>
-          <button id="stepNext" class="ghost">下一步</button>
-          <button id="quickFlowBtn" class="ghost">回到导入</button>
-        </div>
+        <p id="stepProgressText" class="helper-text">Step 1 / 3</p>
       </div>
-      <div id="mainTabs" class="tabs level-1 hidden"></div>
-      <div id="subTabs" class="tabs level-2 hidden"></div>
-      <div id="thirdTabs" class="tabs level-3 hidden"></div>
-    </header>
+    </section>
 
-    <section class="workbench-grid">
-      <section class="workbench-column column-input">
-        <article class="panel pane active" data-main="nodes" data-sub="import" data-third="quick">
-          <h2>① 导入订阅 / 节点 <span id="doneImport" class="helper-text"></span></h2>
-          <textarea id="subUrls" rows="4" placeholder="机场订阅链接（每行一个 https://...）"></textarea>
-          <div class="row">
-            <button id="fetchSubsBtn" class="ghost">拉取订阅并填充节点</button>
-            <span id="subFetchStatus" class="import-status">未拉取订阅</span>
+    <section class="flow-stage">
+      <article class="panel stage-card pane stage-pane active" data-main="nodes" data-sub="import" data-third="quick">
+        <div class="stage-head">
+          <div>
+            <h2>步骤 1：导入订阅 / 节点 <span id="doneImport" class="helper-text"></span></h2>
+            <p class="helper-text">把机场订阅或节点 URL 丢进来，系统会自动帮你进入下一步。</p>
           </div>
-          <textarea id="nodeUrls" rows="10" placeholder="粘贴节点 URL（每行一条，支持 vless/vmess/trojan/ss）"></textarea>
-          <div class="row">
-            <button id="importUrlsBtn">导入全部节点</button>
-            <button id="resolveAllDup" class="ghost">自动处理重复</button>
-          </div>
-          <div class="row">
-            <button id="clearUrlsBtn" class="ghost">清空输入</button>
-            <button id="jumpToGroupStep" class="ghost">导入后直接去编排</button>
-            <span id="importStatus" class="import-status">未导入</span>
-          </div>
-          <div id="importConflictBox" class="conflict-box hidden">
-            <h3>导入冲突清单</h3>
-            <ul id="importConflicts" class="warnings"></ul>
-            <div class="row">
-              <input id="dupEditName" placeholder="重复节点新名称（可选）" />
-              <button id="applyDupEdit" class="ghost">应用到当前重复</button>
-              <button id="ignoreConflicts" class="ghost">忽略提示</button>
-            </div>
-          </div>
-          <div class="conflict-box modern-hint">
-            <h3>系统会自动推进</h3>
-            <div class="hint-grid">
-              <div><b>导入完成</b><span>自动切到编排工作台</span></div>
-              <div><b>拖入组内</b><span>实时生成链式结果</span></div>
-              <div><b>校验通过</b><span>右侧直接可导出 YAML</span></div>
-            </div>
-          </div>
-        </article>
+        </div>
 
-        <article class="panel pane active" data-main="nodes" data-sub="editor" data-third="meta">
-          <div class="section-head">
-            <h2>节点池 / 节点编辑</h2>
+        <div class="stage-body stage-body-import">
+          <div class="import-card">
+            <h3>机场订阅</h3>
+            <textarea id="subUrls" rows="4" placeholder="机场订阅链接（每行一个 https://...）"></textarea>
             <div class="row compact-row">
-              <input id="nodeName" placeholder="手动新增节点名" />
-              <button id="addNode">添加</button>
+              <button id="fetchSubsBtn" class="ghost">拉取订阅并填充节点</button>
+              <span id="subFetchStatus" class="import-status">未拉取订阅</span>
             </div>
           </div>
-          <div class="row stack-row">
-            <select id="nodeEditorSelect"></select>
-            <div class="row compact-row">
-              <input id="nodeEditorName" placeholder="节点展示名" />
-              <select id="nodeEditorRegion">
-                <option value="AUTO">AUTO</option>
-                <option value="HK">HK</option>
-                <option value="SG">SG</option>
-                <option value="JP">JP</option>
-                <option value="US">US</option>
-                <option value="OTHER">OTHER</option>
-              </select>
-            </div>
-            <input id="nodeEditorUrl" placeholder="可直接编辑节点 URL" />
-            <div class="row compact-row">
-              <button id="saveNodeMeta" class="ghost">保存节点信息</button>
-              <button id="deleteNodeBtn" class="danger">删除当前节点</button>
-            </div>
-          </div>
-          <ul id="nodePool" class="list node-pool"></ul>
-        </article>
-      </section>
 
-      <section class="workbench-column column-compose">
-        <article class="panel pane active" data-main="groups" data-sub="canvas" data-third="drag">
-          <div class="section-head">
-            <h2>② 编排工作台</h2>
+          <div class="import-card">
+            <h3>节点 URL</h3>
+            <textarea id="nodeUrls" rows="12" placeholder="粘贴节点 URL（每行一条，支持 vless/vmess/trojan/ss）"></textarea>
             <div class="row compact-row">
-              <input id="transitGroupName" placeholder="中转组名，默认 Smart-Transit" />
-              <input id="egressGroupName" placeholder="落地组名，默认 Smart-Egress" />
-              <input id="chainGroupName" placeholder="链式组名，默认 Smart-Chain" />
+              <button id="importUrlsBtn">导入全部节点</button>
+              <button id="resolveAllDup" class="ghost">自动处理重复</button>
+              <button id="clearUrlsBtn" class="ghost">清空输入</button>
             </div>
+            <p id="importStatus" class="import-status">未导入</p>
           </div>
-          <div class="row compact-row add-group-row">
-            <input id="groupName" placeholder="附加策略组名" />
-            <select id="groupType">
-              <option value="smart">smart</option>
-              <option value="select">select</option>
-              <option value="url-test">url-test</option>
-              <option value="fallback">fallback</option>
-            </select>
-            <button id="addGroup">添加组</button>
-          </div>
-          <div id="groups" class="group-canvas"></div>
-          <div class="row">
-            <button id="applyRegionModules" class="ghost">自动补齐默认组结构</button>
-            <button id="goStep2" class="ghost">聚焦当前编排区</button>
-          </div>
-        </article>
+        </div>
 
-        <article class="panel pane active" data-main="rules" data-sub="editor" data-third="line">
-          <h2>规则编辑</h2>
-          <textarea id="rules" rows="10" placeholder="DOMAIN-SUFFIX,google.com,Smart-AUTO&#10;MATCH,Smart-AUTO"></textarea>
-          <ul id="warnings" class="warnings"></ul>
-        </article>
-      </section>
+        <div id="importConflictBox" class="conflict-box hidden">
+          <h3>导入冲突清单</h3>
+          <ul id="importConflicts" class="warnings"></ul>
+          <div class="row compact-row">
+            <input id="dupEditName" placeholder="重复节点新名称（可选）" />
+            <button id="applyDupEdit" class="ghost">应用到当前重复</button>
+            <button id="ignoreConflicts" class="ghost">忽略提示</button>
+          </div>
+        </div>
 
-      <aside class="workbench-column column-output">
-        <article class="panel pane active" data-main="publish" data-sub="actions" data-third="output">
-          <div class="preview-head">
-            <h2>③ 输出 / 发布</h2>
-            <button id="logoutBtn" class="danger">退出登录</button>
+        <div class="flow-footer">
+          <div class="hint-inline">
+            <span>导入成功后将自动切换到步骤 2</span>
+          </div>
+          <div class="row compact-row">
+            <button id="stepNext" class="primary">下一步</button>
+          </div>
+        </div>
+      </article>
+
+      <article class="panel stage-card pane stage-pane" data-main="groups" data-sub="canvas" data-third="drag" hidden>
+        <div class="stage-head">
+          <div>
+            <h2>步骤 2：中转 / 落地编排 <span id="doneGenerate" class="helper-text"></span></h2>
+            <p class="helper-text">在本页把节点拖到中转组和落地组，系统会实时生成链式结果。</p>
+          </div>
+          <div class="row compact-row">
+            <input id="transitGroupName" placeholder="中转组名，默认 Smart-Transit" />
+            <input id="egressGroupName" placeholder="落地组名，默认 Smart-Egress" />
+            <input id="chainGroupName" placeholder="链式组名，默认 Smart-Chain" />
+          </div>
+        </div>
+
+        <div class="stage-body stage-body-compose">
+          <section class="compose-column">
+            <div class="mini-panel">
+              <div class="section-head">
+                <h3>未分配节点池</h3>
+                <div class="row compact-row">
+                  <input id="nodeName" placeholder="手动新增节点名" />
+                  <button id="addNode">添加</button>
+                </div>
+              </div>
+              <ul id="nodePool" class="list node-pool"></ul>
+            </div>
+
+            <div class="mini-panel">
+              <h3>节点编辑</h3>
+              <div class="row stack-row">
+                <select id="nodeEditorSelect"></select>
+                <div class="row compact-row">
+                  <input id="nodeEditorName" placeholder="节点展示名" />
+                  <select id="nodeEditorRegion">
+                    <option value="AUTO">AUTO</option>
+                    <option value="HK">HK</option>
+                    <option value="SG">SG</option>
+                    <option value="JP">JP</option>
+                    <option value="US">US</option>
+                    <option value="OTHER">OTHER</option>
+                  </select>
+                </div>
+                <input id="nodeEditorUrl" placeholder="可直接编辑节点 URL" />
+                <div class="row compact-row">
+                  <button id="saveNodeMeta" class="ghost">保存节点信息</button>
+                  <button id="deleteNodeBtn" class="danger">删除当前节点</button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="compose-column wide-compose">
+            <div class="mini-panel">
+              <div class="section-head">
+                <h3>策略组工作台</h3>
+                <div class="row compact-row add-group-row">
+                  <input id="groupName" placeholder="附加策略组名" />
+                  <select id="groupType">
+                    <option value="smart">smart</option>
+                    <option value="select">select</option>
+                    <option value="url-test">url-test</option>
+                    <option value="fallback">fallback</option>
+                  </select>
+                  <button id="addGroup">添加组</button>
+                </div>
+              </div>
+              <div id="groups" class="group-canvas"></div>
+            </div>
+
+            <div class="mini-panel">
+              <div class="section-head">
+                <h3>规则编辑</h3>
+                <button id="applyRegionModules" class="ghost">自动补齐默认组结构</button>
+              </div>
+              <textarea id="rules" rows="10" placeholder="DOMAIN-SUFFIX,google.com,Smart-AUTO&#10;MATCH,Smart-AUTO"></textarea>
+              <ul id="warnings" class="warnings"></ul>
+            </div>
+          </section>
+        </div>
+
+        <div class="flow-footer">
+          <div class="hint-inline">
+            <span>拖入中转组 / 落地组后，链式结果会自动反映到发布页</span>
+          </div>
+          <div class="row compact-row">
+            <button id="stepPrev" class="ghost">上一步</button>
+            <button id="stepNextCompose" class="primary">下一步</button>
+          </div>
+        </div>
+      </article>
+
+      <article class="panel stage-card pane stage-pane" data-main="publish" data-sub="actions" data-third="output" hidden>
+        <div class="stage-head">
+          <div>
+            <h2>步骤 3：生成并发布 <span id="donePublish" class="helper-text"></span></h2>
+            <p class="helper-text">检查状态、查看 YAML、确认无误后导出或发布。</p>
           </div>
           <div class="row compact-row">
             <input id="mixedPort" type="number" min="1" max="65535" placeholder="mixed-port，默认 7892" />
             <button id="smartActionBtn">自动推进</button>
             <button id="toggleAdvanced" class="ghost">高级</button>
           </div>
-          <div class="publish-quickcheck">
-            <div><b>规则</b><span id="qcRules">规则未阻塞</span></div>
-            <div><b>节点</b><span id="qcNodes">节点已分配</span></div>
-            <div><b>端口</b><span id="qcPort">端口有效</span></div>
-          </div>
-          <p id="publishStatus" class="publish-status">尚未发布</p>
-          <ul id="publishChecklist" class="warnings"></ul>
-          <ul id="diffSummary" class="warnings"></ul>
-          <div id="advancedOps" class="row hidden">
-            <button id="saveBtn" class="ghost">保存并生成 Markdown</button>
-            <button id="downloadYamlBtn" class="ghost">下载 YAML</button>
-            <button id="publishBtn" class="ghost">发布配置</button>
-            <button id="autoFixBtn" class="ghost">自动修复引用</button>
-          </div>
-          <textarea id="markdown" class="code-preview" rows="28"></textarea>
+        </div>
+
+        <div class="stage-body stage-body-publish">
+          <section class="mini-panel">
+            <div class="publish-quickcheck">
+              <div><b>规则</b><span id="qcRules">规则未阻塞</span></div>
+              <div><b>节点</b><span id="qcNodes">节点已分配</span></div>
+              <div><b>端口</b><span id="qcPort">端口有效</span></div>
+            </div>
+            <p id="publishStatus" class="publish-status">尚未发布</p>
+            <ul id="publishChecklist" class="warnings"></ul>
+            <ul id="diffSummary" class="warnings"></ul>
+          </section>
+
+          <section class="mini-panel">
+            <div id="advancedOps" class="row hidden">
+              <button id="saveBtn" class="ghost">保存并生成 Markdown</button>
+              <button id="downloadYamlBtn" class="ghost">下载 YAML</button>
+              <button id="publishBtn" class="ghost">发布配置</button>
+              <button id="autoFixBtn" class="ghost">自动修复引用</button>
+            </div>
+            <textarea id="markdown" class="code-preview" rows="24"></textarea>
+          </section>
+        </div>
+
+        <div class="flow-footer">
           <div class="row compact-row">
             <button id="smartUpdateBtn">一键检查并更新</button>
             <button id="checkUpdateBtn" class="ghost">仅检查更新</button>
             <button id="copyUpdateCmdBtn" class="ghost">复制更新命令</button>
+            <span id="updateStatus" class="helper-text">当前版本：v0.12.0</span>
           </div>
-          <p id="updateStatus" class="helper-text">当前版本：v0.10.6</p>
-        </article>
-      </aside>
+          <div class="row compact-row">
+            <button id="stepPrevPublish" class="ghost">上一步</button>
+            <button id="quickFlowBtn" class="ghost">回到导入</button>
+            <button id="logoutBtn" class="danger">退出登录</button>
+          </div>
+        </div>
+      </article>
     </section>
+
+    <div id="mainTabs" class="tabs level-1 hidden"></div>
+    <div id="subTabs" class="tabs level-2 hidden"></div>
+    <div id="thirdTabs" class="tabs level-3 hidden"></div>
+    <button id="goStep2" class="hidden">go step2</button>
+    <button id="goStep3" class="hidden">go step3</button>
+    <button id="jumpToGroupStep" class="hidden">jump</button>
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
-  <script src="./app.js?v=0.11.0"></script>
+  <script src="./app.js?v=0.12.0"></script>
 </body>
 </html>

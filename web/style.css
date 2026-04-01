@@ -34,10 +34,10 @@ header p { margin: 6px 0 0; color: var(--sub); }
 .nav-panel .helper-text { margin: 2px 0 6px; }
 
 .nav-shell {
-  background: linear-gradient(180deg, rgba(15, 23, 42, 0.76), rgba(15, 23, 42, 0.42));
-  border: 1px solid rgba(56, 189, 248, 0.22);
-  border-radius: 12px;
-  padding: 10px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 2px 0 4px;
 }
 .wizard-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
 .wizard-head h2 { margin: 0; font-size: 18px; }
@@ -80,11 +80,17 @@ header p { margin: 6px 0 0; color: var(--sub); }
   background: transparent !important;
   border: none !important;
   box-shadow: none !important;
+  height: auto !important;
+  min-height: 0 !important;
 }
 
 .panel.nav-panel .nav-shell {
   display: block;
   width: 100%;
+  background: transparent;
+  border: none;
+  padding: 0;
+  min-height: 0 !important;
 }
 
 .sticky { position: sticky; top: 12px; height: calc(100vh - 24px); }

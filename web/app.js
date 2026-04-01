@@ -1,5 +1,5 @@
-const STORAGE_KEY = 'smartclash-web-v104';
-const APP_VERSION = '0.10.4';
+const STORAGE_KEY = 'smartclash-web-v105';
+const APP_VERSION = '0.10.5';
 const UPDATE_CMD = 'bash -c "$(curl -fsSL https://raw.githubusercontent.com/cshaizhihao/smartclash-gen/main/install.sh)" -- --update -d ~/.smartclash-gen';
 const AUTH_DISABLED = true;
 const AUTH_KEY = 'smartclash-web-auth';
@@ -30,11 +30,7 @@ const DEFAULT_RULE_PROVIDERS = {
 
 function createDefaultState() {
   return {
-    nodes: [
-      { id: makeId(), name: 'HK-01', url: '', region: 'HK' },
-      { id: makeId(), name: 'SG-01', url: '', region: 'SG' },
-      { id: makeId(), name: 'JP-01', url: '', region: 'JP' },
-    ],
+    nodes: [],
     groups: [
       { id: makeId(), name: 'Smart-AUTO', type: 'smart', members: [] },
       { id: makeId(), name: 'Smart-HK', type: 'select', members: [] },
@@ -126,6 +122,7 @@ const el = {
   nodeEditorRegion: document.getElementById('nodeEditorRegion'),
   nodeEditorUrl: document.getElementById('nodeEditorUrl'),
   saveNodeMeta: document.getElementById('saveNodeMeta'),
+  deleteNodeBtn: document.getElementById('deleteNodeBtn'),
   applyRegionModules: document.getElementById('applyRegionModules'),
   groups: document.getElementById('groups'),
 
@@ -1191,6 +1188,20 @@ el.saveNodeMeta?.addEventListener('click', () => {
   render();
   persistState();
   setImportStatus(`已更新节点：${selected.name}`, 'success');
+});
+
+el.deleteNodeBtn?.addEventListener('click', () => {
+  const id = el.nodeEditorSelect?.value;
+  const node = state.nodes.find((n) => n.id === id);
+  if (!id || !node) return setImportStatus('没有可删除的节点', 'error');
+  pushHistory();
+  state.nodes = state.nodes.filter((n) => n.id !== id);
+  state.groups.forEach((g) => {
+    g.members = g.members.filter((mid) => mid !== id);
+  });
+  render();
+  persistState();
+  setImportStatus(`已删除节点：${node.name}`, 'success');
 });
 
 el.applyRegionModules?.addEventListener('click', () => {

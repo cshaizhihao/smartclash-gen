@@ -1,5 +1,5 @@
-const STORAGE_KEY = 'smartclash-web-v1311';
-const APP_VERSION = '0.13.11';
+const STORAGE_KEY = 'smartclash-web-v1312';
+const APP_VERSION = '0.13.12';
 const UPDATE_CMD = 'bash -c "$(curl -fsSL https://raw.githubusercontent.com/cshaizhihao/smartclash-gen/main/install.sh)" -- --update -d ~/.smartclash-gen';
 const AUTH_DISABLED = true;
 const AUTH_KEY = 'smartclash-web-auth';
@@ -1603,10 +1603,10 @@ el.publishBtn.addEventListener('click', () => {
   renderWarnings(result);
   if (result.blockers.length) {
     const summary = result.blockers.slice(0, 2).join('；');
-    return setPublishStatus(`发布失败（阻塞 ${result.blockers.length} / 警告 ${result.warnings.length}）：${summary}${result.blockers.length > 2 ? '…' : ''}`, 'error');
+    return setPublishStatus(`现在还不能发布：有 ${result.blockers.length} 个必须先修的问题。${summary}${result.blockers.length > 2 ? '…' : ''}`, 'error');
   }
   persistState();
-  setPublishStatus(`发布成功：无阻塞项（警告 ${result.warnings.length}）`, 'success');
+  setPublishStatus(result.warnings.length ? `可以发布，另外还有 ${result.warnings.length} 条提醒可按需处理` : '发布检查通过：现在可以直接导出或发布', 'success');
 });
 
 el.copyBtn?.addEventListener('click', async () => {
@@ -1710,19 +1710,40 @@ el.quickGroupBtn?.addEventListener('click', quickGroupNodes);
 el.autoFixBtn?.addEventListener('click', () => {
   pushHistory();
   let fixed = 0;
+  let fixedNodeRefs = 0;
+  let fixedGroupRefs = 0;
+  let fixedRelayRefs = 0;
+  let fixedRulesCount = 0;
   const validNodeIds = new Set(state.nodes.map((n) => n.id));
   const validGroupIds = new Set(state.groups.map((g) => g.id));
 
   state.groups.forEach((g) => {
-    const before = g.members.length;
-    g.members = g.members.filter((member) => {
+    const nextMembers = [];
+    (g.members || []).forEach((member) => {
       const key = String(member || '');
-      if (key.startsWith('relay:')) return false;
-      if (key.startsWith('group:')) return validGroupIds.has(key.slice(6));
+      if (key.startsWith('relay:')) {
+        fixed += 1;
+        fixedRelayRefs += 1;
+        return;
+      }
+      if (key.startsWith('group:')) {
+        if (!validGroupIds.has(key.slice(6))) {
+          fixed += 1;
+          fixedGroupRefs += 1;
+          return;
+        }
+        nextMembers.push(member);
+        return;
+      }
       const nodeId = key.startsWith('node:') ? key.slice(5) : key;
-      return validNodeIds.has(nodeId);
+      if (!validNodeIds.has(nodeId)) {
+        fixed += 1;
+        fixedNodeRefs += 1;
+        return;
+      }
+      nextMembers.push(member);
     });
-    fixed += before - g.members.length;
+    g.members = nextMembers;
   });
 
   const groupNames = new Set(state.groups.map((g) => g.name));
@@ -1734,6 +1755,7 @@ el.autoFixBtn?.addEventListener('click', () => {
       if (target !== 'DIRECT' && !groupNames.has(target)) {
         segs[2] = 'Smart-AUTO';
         fixed += 1;
+        fixedRulesCount += 1;
       }
       return segs.join(',');
     }
@@ -1744,7 +1766,17 @@ el.autoFixBtn?.addEventListener('click', () => {
   state.rules = fixedRules;
   render();
   persistState();
-  setPublishStatus(fixed ? `自动修复完成：共修复 ${fixed} 处失效引用/规则` : '自动修复完成：未发现可修复问题', fixed ? 'success' : 'idle');
+  if (!fixed) {
+    setPublishStatus('自动修复完成：没有发现需要修的内容', 'idle');
+    return;
+  }
+  const summary = [
+    fixedNodeRefs ? `失效节点 ${fixedNodeRefs} 处` : '',
+    fixedGroupRefs ? `失效组 ${fixedGroupRefs} 处` : '',
+    fixedRelayRefs ? `旧链式残留 ${fixedRelayRefs} 处` : '',
+    fixedRulesCount ? `规则目标 ${fixedRulesCount} 处` : '',
+  ].filter(Boolean).join('，');
+  setPublishStatus(`自动修复完成：${summary}。共修复 ${fixed} 处`, 'success');
 });
 
 el.resetBtn?.addEventListener('click', () => {

@@ -1,5 +1,5 @@
-const STORAGE_KEY = 'smartclash-web-v1321';
-const APP_VERSION = '0.13.21';
+const STORAGE_KEY = 'smartclash-web-v1322';
+const APP_VERSION = '0.13.22';
 const UPDATE_CMD = 'bash -c "$(curl -fsSL https://raw.githubusercontent.com/cshaizhihao/smartclash-gen/main/install.sh)" -- --update -d ~/.smartclash-gen';
 const AUTH_DISABLED = true;
 const AUTH_KEY = 'smartclash-web-auth';
@@ -1656,6 +1656,15 @@ el.saveBtn.addEventListener('click', () => {
   setPublishStatus('已保存最新 Markdown，等待发布', 'idle');
 });
 
+function focusAndSelectInput(input) {
+  if (!input) return;
+  input.focus();
+  input.removeAttribute('readonly');
+  input.select();
+  input.setSelectionRange?.(0, input.value.length);
+  input.setAttribute('readonly', 'readonly');
+}
+
 async function generateSubscriptionLink() {
   const result = validateState();
   renderWarnings(result);
@@ -1672,7 +1681,10 @@ async function generateSubscriptionLink() {
   });
   const data = await resp.json();
   if (!resp.ok || !data.ok || !data.url) throw new Error(data.error || '生成失败');
-  if (el.subLinkOutput) el.subLinkOutput.value = data.url;
+  if (el.subLinkOutput) {
+    el.subLinkOutput.value = data.url;
+    focusAndSelectInput(el.subLinkOutput);
+  }
   setPublishStatus(`订阅链接已生成，可直接给 Clash 使用`, 'success');
   return data.url;
 }
@@ -1730,8 +1742,12 @@ el.copySubBtn?.addEventListener('click', async () => {
 });
 
 el.copyBtn?.addEventListener('click', async () => {
-  await navigator.clipboard.writeText(el.markdown.value);
-  el.copyBtn.textContent = '已复制 ✅';
+  try {
+    const ok = await copyTextSmart(el.markdown.value);
+    el.copyBtn.textContent = ok ? '已复制 ✅' : '请手动复制';
+  } catch {
+    el.copyBtn.textContent = '请手动复制';
+  }
   setTimeout(() => (el.copyBtn.textContent = '复制 Markdown'), 1200);
 });
 

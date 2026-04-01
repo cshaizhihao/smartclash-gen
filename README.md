@@ -1,6 +1,6 @@
 # smartclash-gen
 
-> 版本：**v0.13.21**
+> 版本：**v0.13.22**
 
 一个面向 **OpenClash + mihomo(type: smart)** 的配置生成器：
 
@@ -143,6 +143,11 @@ python3 generate.py \
 ---
 
 ## 版本更新说明
+
+### v0.13.22
+- 继续优化订阅链接复制体验：生成后自动选中链接输入框，移动端/内嵌浏览器即使复制失败也能直接长按复制
+- Markdown 复制也补了同样的降级逻辑，不再只依赖 Clipboard API
+- 维持每轮同步升级可见版本号与静态资源 query 的规则
 
 ### v0.13.21
 - 修复“复制订阅链接失败：Cannot read properties of undefined (reading 'writeText')”问题

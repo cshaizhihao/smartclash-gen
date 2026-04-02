@@ -1,0 +1,12 @@
+services:
+  clash-smart:
+    build: .
+    container_name: clash-smart-editor
+    restart: unless-stopped
+    ports:
+      - "10100:10100"
+    environment:
+      HOST: 0.0.0.0
+      PORT: 10100
+    volumes:
+      - ./web/published:/app/web/published

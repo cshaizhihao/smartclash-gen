@@ -51,44 +51,59 @@ Clash Smart 分组编辑器专注解决一个高频问题：
 
 ---
 
-## 一键安装
+## 推荐安装方式：Docker 一键部署
 
-### 快速安装
+### 一键部署
+
+```bash
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/cshaizhihao/smartclash-gen/main/install-docker.sh)"
+```
+
+### 指定网页端口部署
+
+```bash
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/cshaizhihao/smartclash-gen/main/install-docker.sh)" -- --web-port 10111
+```
+
+部署完成后，脚本会自动：
+- 下载项目文件
+- 构建 Docker 镜像
+- 后台启动容器
+- 尝试放通本机防火墙端口
+- 输出最终可访问地址
+
+### 停止容器
+
+```bash
+cd ~/.smartclash-gen && docker compose down
+```
+
+---
+
+## 备用安装方式：原生脚本安装
+
+如果你不想使用 Docker，也可以使用原生安装脚本：
 
 ```bash
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/cshaizhihao/smartclash-gen/main/install.sh)"
 ```
 
-### 指定端口安装
+指定端口：
 
 ```bash
-bash -c "$(curl -fsSL https://raw.githubusercontent.com/cshaizhihao/smartclash-gen/main/install.sh)" -- --port 10801
-```
-
-### 更新已有安装
-
-```bash
-bash -c "$(curl -fsSL https://raw.githubusercontent.com/cshaizhihao/smartclash-gen/main/install.sh)" -- --update
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/cshaizhihao/smartclash-gen/main/install.sh)" -- --port 10801 --web-port 10111
 ```
 
 ---
 
-## 安装后启动
+## 安装后启动（原生方式）
 
 ### 启动 Web 编排台
 
 ```bash
 cd ~/.smartclash-gen/web
-python3 dev_server.py
+../.venv/bin/python dev_server.py
 ```
-
-启动后即可通过浏览器访问，并完成：
-- 订阅导入
-- 节点整理
-- 分组编排
-- 规则调整
-- YAML 导出
-- 订阅链接生成
 
 ---
 
@@ -162,7 +177,10 @@ Web 发布页内置可叠加规则预设：
 ```text
 smartclash-gen/
 ├── generate.py          # 命令行生成入口
-├── install.sh           # 安装脚本
+├── install.sh           # 原生安装脚本
+├── install-docker.sh    # Docker 一键部署脚本
+├── Dockerfile           # Docker 镜像定义
+├── docker-compose.yml   # 容器编排文件
 ├── VERSION              # 当前版本
 ├── requirements.txt     # Python 依赖
 └── web/
@@ -184,6 +202,7 @@ smartclash-gen/
 - 订阅链接可生成、打开、复制
 - Web 页面已完成一轮产品化 polish
 - 安装脚本已完成中文化与端口选择优化
+- 已补充 Docker 一键部署路径
 
 ---
 

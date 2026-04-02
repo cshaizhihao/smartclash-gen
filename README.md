@@ -45,16 +45,9 @@ Clash Smart 分组编辑器专注解决一个高频问题：
 
 ---
 
-## 应用截图
+## 项目封面
 
-### 导入订阅 / 节点
-![导入页面](docs/screenshots/app-step1.jpg)
-
-### 中转 / 落地编排
-![编排页面](docs/screenshots/app-step2.jpg)
-
-### 发布与订阅生成
-![发布页面](docs/screenshots/app-step3.jpg)
+![Clash Smart 分组编辑器封面](docs/readme-cover.svg)
 
 ---
 

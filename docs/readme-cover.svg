@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#050816"/>
+      <stop offset="55%" stop-color="#0B1224"/>
+      <stop offset="100%" stop-color="#111827"/>
+    </linearGradient>
+    <linearGradient id="panel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#111a33" stop-opacity="0.96"/>
+      <stop offset="100%" stop-color="#0a1020" stop-opacity="0.92"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#2563EB"/>
+      <stop offset="60%" stop-color="#0EA5E9"/>
+      <stop offset="100%" stop-color="#7DD3FC"/>
+    </linearGradient>
+    <filter id="blurA">
+      <feGaussianBlur stdDeviation="42"/>
+    </filter>
+  </defs>
+
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <circle cx="180" cy="120" r="170" fill="#0EA5E9" fill-opacity="0.18" filter="url(#blurA)"/>
+  <circle cx="1450" cy="760" r="210" fill="#8B5CF6" fill-opacity="0.14" filter="url(#blurA)"/>
+
+  <rect x="58" y="54" width="1484" height="792" rx="34" fill="#0b1120" stroke="#263248" stroke-opacity="0.9"/>
+  <rect x="58.5" y="54.5" width="1483" height="791" rx="33.5" stroke="white" stroke-opacity="0.06"/>
+
+  <text x="110" y="142" fill="#F8FAFC" font-size="56" font-family="Arial, sans-serif" font-weight="700">Clash Smart 分组编辑器</text>
+  <text x="110" y="190" fill="#94A3B8" font-size="24" font-family="Arial, sans-serif">极简编排 · YAML 即时交付 · 订阅导入 / 分组编排 / 一键发布</text>
+
+  <rect x="1230" y="102" width="168" height="42" rx="21" fill="#111827" stroke="#334155"/>
+  <text x="1267" y="129" fill="#CBD5E1" font-size="18" font-family="Arial, sans-serif">@cshaizhihao</text>
+  <circle cx="1444" cy="123" r="20" fill="#111827" stroke="#334155"/>
+  <path d="M1444 111c-6.6 0-12 5.4-12 12 0 5.3 3.4 9.7 8.2 11.3.6.1.8-.2.8-.6v-2.1c-3.3.7-4-1.6-4-1.6-.5-1.4-1.3-1.7-1.3-1.7-1.1-.8.1-.8.1-.8 1.2.1 1.8 1.2 1.8 1.2 1.1 1.9 2.8 1.3 3.5 1 .1-.8.4-1.3.8-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.4 11.4 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.7 1.7.3 2.9.1 3.2.8.8 1.3 1.9 1.3 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.2c0 .4.2.7.8.6 4.8-1.6 8.2-6 8.2-11.3 0-6.6-5.4-12-12-12Z" fill="#CBD5E1"/>
+
+  <rect x="96" y="236" width="1408" height="548" rx="28" fill="url(#panel)" stroke="#223047"/>
+
+  <rect x="126" y="272" width="1348" height="82" rx="20" fill="#0d1529" stroke="#1f2c43"/>
+  <text x="156" y="323" fill="#E2E8F0" font-size="30" font-family="Arial, sans-serif" font-weight="700">配置生成流程</text>
+  <text x="156" y="347" fill="#7C8CA7" font-size="16" font-family="Arial, sans-serif">从订阅导入到中转 / 落地编排，再到 YAML 与订阅交付</text>
+
+  <rect x="840" y="287" width="186" height="44" rx="16" fill="url(#accent)"/>
+  <text x="915" y="315" fill="white" font-size="20" font-family="Arial, sans-serif" font-weight="700">① 导入</text>
+  <rect x="1044" y="287" width="186" height="44" rx="16" fill="#111827" stroke="#273549"/>
+  <text x="1118" y="315" fill="#CBD5E1" font-size="20" font-family="Arial, sans-serif" font-weight="700">② 编排</text>
+  <rect x="1248" y="287" width="186" height="44" rx="16" fill="#111827" stroke="#273549"/>
+  <text x="1322" y="315" fill="#CBD5E1" font-size="20" font-family="Arial, sans-serif" font-weight="700">③ 发布</text>
+  <rect x="840" y="342" width="594" height="8" rx="4" fill="#111827"/>
+  <rect x="840" y="342" width="198" height="8" rx="4" fill="url(#accent)"/>
+
+  <rect x="126" y="386" width="1348" height="358" rx="24" fill="#0b1224" stroke="#1f2c43"/>
+  <text x="156" y="432" fill="#F8FAFC" font-size="34" font-family="Arial, sans-serif" font-weight="700">步骤 1：导入订阅 / 节点</text>
+  <text x="156" y="466" fill="#94A3B8" font-size="18" font-family="Arial, sans-serif">先把机场订阅或节点链接导入进来，系统会自动识别节点并进入下一步编排。</text>
+
+  <rect x="156" y="500" width="600" height="148" rx="18" fill="#0d1529" stroke="#2a3953"/>
+  <text x="180" y="536" fill="#E2E8F0" font-size="22" font-family="Arial, sans-serif" font-weight="700">机场订阅</text>
+  <text x="180" y="574" fill="#64748B" font-size="18" font-family="Arial, sans-serif">机场订阅链接（每行一个 https://...）</text>
+  <rect x="180" y="598" width="190" height="36" rx="12" fill="url(#accent)"/>
+  <text x="212" y="621" fill="white" font-size="16" font-family="Arial, sans-serif" font-weight="700">拉取订阅并填充节点</text>
+  <text x="390" y="621" fill="#7C8CA7" font-size="16" font-family="Arial, sans-serif">已兼容常见 Clash 订阅</text>
+
+  <rect x="794" y="500" width="650" height="148" rx="18" fill="#0d1529" stroke="#2a3953"/>
+  <text x="818" y="536" fill="#E2E8F0" font-size="22" font-family="Arial, sans-serif" font-weight="700">节点 URL</text>
+  <text x="818" y="574" fill="#64748B" font-size="18" font-family="Arial, sans-serif">粘贴节点 URL（每行一条，支持 vless / vmess / trojan / ss）</text>
+  <rect x="818" y="598" width="138" height="36" rx="12" fill="url(#accent)"/>
+  <text x="850" y="621" fill="white" font-size="16" font-family="Arial, sans-serif" font-weight="700">导入全部节点</text>
+  <rect x="968" y="598" width="142" height="36" rx="12" fill="#111827" stroke="#334155"/>
+  <text x="997" y="621" fill="#CBD5E1" font-size="16" font-family="Arial, sans-serif">自动处理重复</text>
+  <rect x="1120" y="598" width="108" height="36" rx="12" fill="#111827" stroke="#334155"/>
+  <text x="1155" y="621" fill="#CBD5E1" font-size="16" font-family="Arial, sans-serif">清空输入</text>
+
+  <rect x="1292" y="684" width="118" height="42" rx="14" fill="url(#accent)"/>
+  <text x="1332" y="711" fill="white" font-size="18" font-family="Arial, sans-serif" font-weight="700">下一步</text>
+
+  <text x="126" y="832" fill="#64748B" font-size="16" font-family="Arial, sans-serif">V1.0.0 · 可视化中转 / 落地编排、规则预设叠加、订阅链接生成与 YAML 交付</text>
+</svg>

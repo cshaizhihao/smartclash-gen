@@ -3,23 +3,26 @@ set -euo pipefail
 
 VERSION="1.0.0"
 PORT=7892
+WEB_PORT=10100
 TARGET_DIR="$HOME/.smartclash-gen"
 BASE_URL="https://raw.githubusercontent.com/cshaizhihao/smartclash-gen/main"
 MODE="install"
 PORT_EXPLICIT=0
+WEB_PORT_EXPLICIT=0
 
 usage() {
   cat <<EOF
 Clash Smart 分组编辑器 安装脚本 v${VERSION}
 
 用法：
-  bash install.sh [-p 端口] [-d 安装目录] [--update]
+  bash install.sh [-p 端口] [-w 网页端口] [-d 安装目录] [--update]
 
 参数：
-  -p, --port   指定默认 mixed-port（默认：7892）
-  -d, --dir    指定安装目录（默认：~/.smartclash-gen）
-  --update     在现有目录中执行更新
-  -h, --help   显示帮助信息
+  -p, --port       指定默认 mixed-port（默认：7892）
+  -w, --web-port   指定 Web 编排台访问端口（默认：10100）
+  -d, --dir        指定安装目录（默认：~/.smartclash-gen）
+  --update         在现有目录中执行更新
+  -h, --help       显示帮助信息
 EOF
 }
 
@@ -29,6 +32,12 @@ while [[ $# -gt 0 ]]; do
       [[ $# -ge 2 ]] || { echo "参数 $1 缺少端口值" >&2; exit 1; }
       PORT="$2"
       PORT_EXPLICIT=1
+      shift 2
+      ;;
+    -w|--web-port)
+      [[ $# -ge 2 ]] || { echo "参数 $1 缺少网页端口值" >&2; exit 1; }
+      WEB_PORT="$2"
+      WEB_PORT_EXPLICIT=1
       shift 2
       ;;
     -d|--dir)
@@ -52,15 +61,24 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-if [[ "$MODE" == "install" && "$PORT_EXPLICIT" -eq 0 && -t 0 ]]; then
+if [[ "$MODE" == "install" && -t 0 ]]; then
   echo ""
   echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
   echo "Clash Smart 分组编辑器 安装向导"
   echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-  echo "默认 mixed-port 为 7892。"
-  read -r -p "请输入要使用的 mixed-port（直接回车使用 7892）：" INPUT_PORT
-  if [[ -n "${INPUT_PORT:-}" ]]; then
-    PORT="$INPUT_PORT"
+  if [[ "$PORT_EXPLICIT" -eq 0 ]]; then
+    echo "配置代理端口（mixed-port）默认是 7892。"
+    read -r -p "请输入 mixed-port（直接回车使用 7892）：" INPUT_PORT
+    if [[ -n "${INPUT_PORT:-}" ]]; then
+      PORT="$INPUT_PORT"
+    fi
+  fi
+  if [[ "$WEB_PORT_EXPLICIT" -eq 0 ]]; then
+    echo "网页编排台访问端口默认是 10100。"
+    read -r -p "请输入 Web 访问端口（直接回车使用 10100）：" INPUT_WEB_PORT
+    if [[ -n "${INPUT_WEB_PORT:-}" ]]; then
+      WEB_PORT="$INPUT_WEB_PORT"
+    fi
   fi
 fi
 
@@ -72,6 +90,17 @@ case "$PORT" in
 esac
 if (( PORT < 1 || PORT > 65535 )); then
   echo "端口超出范围（1-65535）：$PORT" >&2
+  exit 1
+fi
+
+case "$WEB_PORT" in
+  ''|*[!0-9]*)
+    echo "网页访问端口必须是整数：$WEB_PORT" >&2
+    exit 1
+    ;;
+esac
+if (( WEB_PORT < 1 || WEB_PORT > 65535 )); then
+  echo "网页访问端口超出范围（1-65535）：$WEB_PORT" >&2
   exit 1
 fi
 
@@ -94,7 +123,13 @@ curl -fsSL -o web/index.html "${BASE_URL}/web/index.html"
 curl -fsSL -o web/style.css "${BASE_URL}/web/style.css"
 curl -fsSL -o web/app.js "${BASE_URL}/web/app.js"
 curl -fsSL -o web/dev_server.py "${BASE_URL}/web/dev_server.py"
-chmod +x generate.py web/dev_server.py
+cat > start-web.sh <<EOF
+#!/usr/bin/env bash
+set -e
+cd "${TARGET_DIR}/web"
+PORT=${WEB_PORT} ../.venv/bin/python dev_server.py
+EOF
+chmod +x generate.py web/dev_server.py start-web.sh
 
 if [[ -d .venv ]]; then
   rm -rf .venv
@@ -116,15 +151,22 @@ if [[ "$MODE" == "update" ]]; then
 else
   echo "Clash Smart 分组编辑器 v$(cat VERSION 2>/dev/null || echo "$VERSION") 已安装完成"
   echo "安装目录：$TARGET_DIR"
-  echo "默认 mixed-port：$PORT"
+  echo "配置代理端口（mixed-port）：$PORT"
+  echo "网页访问端口（Web Port）：$WEB_PORT"
   echo ""
   echo "命令行生成示例："
   echo "  cd $TARGET_DIR && .venv/bin/python generate.py --urls urls.txt --rules rules.txt --port $PORT --output openclash.yaml"
   echo ""
   echo "启动 Web 编排台："
-  echo "  cd $TARGET_DIR/web && ../.venv/bin/python dev_server.py"
+  echo "  cd $TARGET_DIR/web && PORT=$WEB_PORT ../.venv/bin/python dev_server.py"
   echo ""
-  echo "后续如果想改端口，可重新执行脚本并使用：--port <1-65535>"
+  echo "浏览器访问地址："
+  echo "  http://127.0.0.1:$WEB_PORT"
+  echo ""
+  echo "后续如果想改端口，可重新执行脚本并使用："
+  echo "  --port <1-65535>      # 修改配置代理端口"
+  echo "  --web-port <1-65535> # 修改网页访问端口"
+  echo ""
   echo "依赖已安装在：$TARGET_DIR/.venv"
   echo ""
   echo "如果你的系统仍然拦截 pip，可手动执行："

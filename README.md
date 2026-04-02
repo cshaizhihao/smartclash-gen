@@ -71,7 +71,7 @@ bash -c "$(curl -fsSL https://raw.githubusercontent.com/cshaizhihao/smartclash-g
 - 后台启动容器
 - 尝试放通本机防火墙端口
 - 输出本机 / 内网 / 公网访问地址
-- 自动做本机健康检查
+- 自动做本机健康检查（`/api/health`）
 
 ### Docker 方式的优点
 - 不依赖目标机系统 Python 环境

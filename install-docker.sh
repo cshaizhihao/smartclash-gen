@@ -159,7 +159,7 @@ PUBLIC_IP=$(curl --max-time 5 -fsSL https://api.ipify.org 2>/dev/null || true)
 [[ -n "${PUBLIC_IP:-}" ]] || PUBLIC_IP="$PUBLIC_HOST"
 
 sleep 2
-if curl -fsS "http://127.0.0.1:${WEB_PORT}" >/dev/null 2>&1; then
+if curl -fsS "http://127.0.0.1:${WEB_PORT}/api/health" >/dev/null 2>&1; then
   STATUS_TEXT="Web 编排台容器启动成功"
 else
   STATUS_TEXT="容器已启动，但本机健康检查未通过，请执行 ${COMPOSE_CMD} logs -n 100 排查"

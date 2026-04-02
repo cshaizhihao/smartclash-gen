@@ -10,3 +10,9 @@ services:
       PORT: 10100
     volumes:
       - ./web/published:/app/web/published
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:10100/api/health', timeout=2)"]
+      interval: 20s
+      timeout: 3s
+      retries: 3
+      start_period: 10s

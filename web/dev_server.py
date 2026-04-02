@@ -94,6 +94,14 @@ class Handler(SimpleHTTPRequestHandler):
             latest = self._latest_version()
             self._json(200, {'ok': True, 'local': local, 'latest': latest})
             return
+        if self.path.startswith('/api/health'):
+            self._json(200, {
+                'ok': True,
+                'service': 'clash-smart-web',
+                'version': VERSION_FILE.read_text(encoding='utf-8').strip() if VERSION_FILE.exists() else 'unknown',
+                'subscriptionReady': PUBLISHED_FILE.exists(),
+            })
+            return
         if self.path.startswith('/sub/latest'):
             if not PUBLISHED_FILE.exists():
                 self.send_error(404, 'subscription not generated yet')

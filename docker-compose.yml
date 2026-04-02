@@ -4,7 +4,7 @@ services:
     container_name: clash-smart-editor
     restart: unless-stopped
     ports:
-      - "10100:10100"
+      - "${WEB_PORT:-10100}:10100"
     environment:
       HOST: 0.0.0.0
       PORT: 10100

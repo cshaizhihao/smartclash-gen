@@ -70,13 +70,45 @@ bash -c "$(curl -fsSL https://raw.githubusercontent.com/cshaizhihao/smartclash-g
 - 构建 Docker 镜像
 - 后台启动容器
 - 尝试放通本机防火墙端口
-- 输出最终可访问地址
+- 输出本机 / 内网 / 公网访问地址
+- 自动做本机健康检查
+
+### Docker 方式的优点
+- 不依赖目标机系统 Python 环境
+- 不受 `externally-managed-environment` 影响
+- 容器可直接后台常驻
+- 更适合作为正式交付与上线部署主路径
 
 ### 停止容器
 
 ```bash
 cd ~/.smartclash-gen && docker compose down
 ```
+
+### 查看日志
+
+```bash
+cd ~/.smartclash-gen && docker compose logs -n 100
+```
+
+### 常见问题
+
+#### 1. 端口已被占用
+请换一个网页端口重新部署，例如：
+
+```bash
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/cshaizhihao/smartclash-gen/main/install-docker.sh)" -- --web-port 18080
+```
+
+#### 2. 容器已启动但外网打不开
+优先检查：
+- 本机防火墙是否已放行端口
+- 云服务器安全组 / 云防火墙是否已放行 `WEB_PORT/tcp`
+
+#### 3. Docker 已安装但 compose 不可用
+请确认系统里可用以下任一命令：
+- `docker compose`
+- `docker-compose`
 
 ---
 
@@ -202,7 +234,7 @@ smartclash-gen/
 - 订阅链接可生成、打开、复制
 - Web 页面已完成一轮产品化 polish
 - 安装脚本已完成中文化与端口选择优化
-- 已补充 Docker 一键部署路径
+- 已补充 Docker 一键部署路径，并作为主推荐安装方式
 
 ---
 

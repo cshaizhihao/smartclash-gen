@@ -125,6 +125,31 @@ download_file() {
   return 1
 }
 
+auto_open_firewall() {
+  local port="$1"
+
+  if command -v ufw >/dev/null 2>&1; then
+    local ufw_state
+    ufw_state="$(sudo ufw status 2>/dev/null | head -n 1 || true)"
+    if echo "$ufw_state" | grep -qi "Status: active"; then
+      sudo ufw allow "${port}/tcp" >/dev/null 2>&1 || true
+      echo "已尝试通过 UFW 放行端口：${port}/tcp"
+      return 0
+    fi
+  fi
+
+  if command -v firewall-cmd >/dev/null 2>&1; then
+    if sudo firewall-cmd --state >/dev/null 2>&1; then
+      sudo firewall-cmd --permanent --add-port="${port}/tcp" >/dev/null 2>&1 || true
+      sudo firewall-cmd --reload >/dev/null 2>&1 || true
+      echo "已尝试通过 firewalld 放行端口：${port}/tcp"
+      return 0
+    fi
+  fi
+
+  return 0
+}
+
 mkdir -p "$TARGET_DIR"
 cd "$TARGET_DIR"
 
@@ -191,6 +216,7 @@ if [[ "$MODE" == "update" ]]; then
   echo "Clash Smart 分组编辑器 已更新到：v$(cat VERSION 2>/dev/null || echo "$VERSION")"
   echo "安装目录：$TARGET_DIR"
   ( cd "$TARGET_DIR" && ./start-web-bg.sh )
+  auto_open_firewall "$WEB_PORT"
 else
   echo "Clash Smart 分组编辑器 v$(cat VERSION 2>/dev/null || echo "$VERSION") 已安装完成"
   echo "安装目录：$TARGET_DIR"
@@ -202,6 +228,7 @@ else
   echo ""
   echo "正在自动后台启动 Web 编排台..."
   ( cd "$TARGET_DIR" && ./start-web-bg.sh )
+  auto_open_firewall "$WEB_PORT"
   echo ""
   echo "浏览器访问地址："
   echo "  http://127.0.0.1:$WEB_PORT"
@@ -213,6 +240,8 @@ else
   echo ""
   echo "依赖已安装在：$TARGET_DIR/.venv"
   echo "日志文件：$TARGET_DIR/runtime/web.log"
+  echo ""
+  echo "如果浏览器仍然无法从外网打开，请继续检查云服务器安全组 / 云防火墙是否已放行 ${WEB_PORT}/tcp。"
   echo ""
   echo "如果你的系统仍然拦截 pip，可手动执行："
   echo "  sudo apt-get install -y python3-full python3-venv"

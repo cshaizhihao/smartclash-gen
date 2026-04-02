@@ -183,15 +183,15 @@ set -e
 cd "${TARGET_DIR}/web"
 mkdir -p ../runtime
 if [[ -f ../runtime/web.pid ]]; then
-  old_pid="$(cat ../runtime/web.pid 2>/dev/null || true)"
-  if [[ -n "${old_pid:-}" ]] && kill -0 "$old_pid" >/dev/null 2>&1; then
-    kill "$old_pid" >/dev/null 2>&1 || true
+  old_pid="\$(cat ../runtime/web.pid 2>/dev/null || true)"
+  if [[ -n "\${old_pid:-}" ]] && kill -0 "\$old_pid" >/dev/null 2>&1; then
+    kill "\$old_pid" >/dev/null 2>&1 || true
     sleep 1
   fi
 fi
 nohup env PORT=${WEB_PORT} ../.venv/bin/python dev_server.py > ../runtime/web.log 2>&1 < /dev/null &
-echo $! > ../runtime/web.pid
-echo "已在后台启动 Web 编排台，PID: $(cat ../runtime/web.pid)"
+echo \$! > ../runtime/web.pid
+echo "已在后台启动 Web 编排台，PID: \$(cat ../runtime/web.pid)"
 EOF
 chmod +x generate.py web/dev_server.py start-web.sh start-web-bg.sh
 

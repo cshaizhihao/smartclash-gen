@@ -206,6 +206,8 @@ Web 发布页内置可叠加规则预设：
 
 ## 项目结构
 
+仓库目录名仍为 `smartclash-gen/`，产品对外名称为 **Clash Smart 分组编辑器**。
+
 ```text
 smartclash-gen/
 ├── generate.py          # 命令行生成入口

@@ -1317,7 +1317,7 @@ function updateSmartActionLabel(result) {
     el.smartActionBtn.textContent = '继续下一步：修复后发布';
     return;
   }
-  el.smartActionBtn.textContent = '继续下一步：发布配置';
+  el.smartActionBtn.textContent = '继续下一步：完成发布校验';
 }
 
 function renderQuickChecks(result) {
@@ -1817,7 +1817,7 @@ el.downloadYamlBtn.addEventListener('click', () => {
 
 el.exportDiffBtn?.addEventListener('click', () => {
   const text = (el.diffSummary?.innerText || '暂无变更').trim();
-  const report = `# smartclash-gen 变更报告\n\n${text}\n`;
+  const report = `# Clash Smart 分组编辑器 变更报告\n\n${text}\n`;
   const blob = new Blob([report], { type: 'text/markdown;charset=utf-8' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');

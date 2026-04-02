@@ -66,6 +66,13 @@ if (( WEB_PORT < 1 || WEB_PORT > 65535 )); then
   exit 1
 fi
 
+if command -v ss >/dev/null 2>&1; then
+  if ss -ltn "( sport = :${WEB_PORT} )" 2>/dev/null | grep -q ":${WEB_PORT}"; then
+    echo "网页访问端口 ${WEB_PORT} 已被占用，请重新运行脚本并换一个 --web-port。" >&2
+    exit 1
+  fi
+fi
+
 download_file() {
   local rel="$1"
   local dest="$2"
@@ -138,7 +145,11 @@ services:
       - ./web/published:/app/web/published
 EOF
 
-${COMPOSE_CMD} up -d --build
+if ! ${COMPOSE_CMD} up -d --build; then
+  echo "Docker 容器启动失败，请执行以下命令查看日志：" >&2
+  echo "  cd $TARGET_DIR && ${COMPOSE_CMD} logs -n 100" >&2
+  exit 1
+fi
 
 auto_open_firewall "$WEB_PORT"
 PUBLIC_HOST=$(hostname -I 2>/dev/null | awk '{print $1}')
@@ -149,6 +160,13 @@ if curl -fsS "http://127.0.0.1:${WEB_PORT}" >/dev/null 2>&1; then
   STATUS_TEXT="Web 编排台容器启动成功"
 else
   STATUS_TEXT="容器已启动，但本机健康检查未通过，请执行 ${COMPOSE_CMD} logs -n 100 排查"
+fi
+
+if command -v docker >/dev/null 2>&1; then
+  CONTAINER_STATE="$(docker ps --filter name=clash-smart-editor --format '{{.Status}}' | head -n 1 || true)"
+  if [[ -n "${CONTAINER_STATE:-}" ]]; then
+    STATUS_TEXT="${STATUS_TEXT}（容器状态：${CONTAINER_STATE}）"
+  fi
 fi
 
 echo "Clash Smart 分组编辑器 Docker 版已部署完成"

@@ -6,6 +6,7 @@ PORT=7892
 WEB_PORT=10100
 TARGET_DIR="$HOME/.smartclash-gen"
 BASE_URL="https://raw.githubusercontent.com/cshaizhihao/smartclash-gen/main"
+FALLBACK_BASE_URL="https://cdn.jsdelivr.net/gh/cshaizhihao/smartclash-gen@main"
 MODE="install"
 PORT_EXPLICIT=0
 WEB_PORT_EXPLICIT=0
@@ -104,6 +105,26 @@ if (( WEB_PORT < 1 || WEB_PORT > 65535 )); then
   exit 1
 fi
 
+download_file() {
+  local rel="$1"
+  local dest="$2"
+  local primary_url="${BASE_URL}/${rel}"
+  local fallback_url="${FALLBACK_BASE_URL}/${rel}"
+
+  if curl --retry 3 --retry-delay 2 --retry-all-errors -fsSL -o "$dest" "$primary_url"; then
+    return 0
+  fi
+
+  echo "主下载源失败，尝试备用镜像：$rel"
+  if curl --retry 3 --retry-delay 2 --retry-all-errors -fsSL -o "$dest" "$fallback_url"; then
+    return 0
+  fi
+
+  echo "下载失败：$rel" >&2
+  echo "可能原因：GitHub Raw / CDN 限流或网络异常。" >&2
+  return 1
+}
+
 mkdir -p "$TARGET_DIR"
 cd "$TARGET_DIR"
 
@@ -114,15 +135,17 @@ elif command -v apk >/dev/null 2>&1; then
   sudo apk add --no-cache python3 py3-pip curl >/dev/null 2>&1 || true
 fi
 
-curl -fsSL -o generate.py "${BASE_URL}/generate.py"
-curl -fsSL -o requirements.txt "${BASE_URL}/requirements.txt"
-curl -fsSL -o VERSION "${BASE_URL}/VERSION" || echo "$VERSION" > VERSION
+download_file generate.py generate.py
+download_file requirements.txt requirements.txt
+if ! download_file VERSION VERSION; then
+  echo "$VERSION" > VERSION
+fi
 
 mkdir -p web
-curl -fsSL -o web/index.html "${BASE_URL}/web/index.html"
-curl -fsSL -o web/style.css "${BASE_URL}/web/style.css"
-curl -fsSL -o web/app.js "${BASE_URL}/web/app.js"
-curl -fsSL -o web/dev_server.py "${BASE_URL}/web/dev_server.py"
+download_file web/index.html web/index.html
+download_file web/style.css web/style.css
+download_file web/app.js web/app.js
+download_file web/dev_server.py web/dev_server.py
 cat > start-web.sh <<EOF
 #!/usr/bin/env bash
 set -e

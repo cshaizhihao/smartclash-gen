@@ -1,5 +1,5 @@
-const STORAGE_KEY = 'smartclash-web-v1337';
-const APP_VERSION = '0.13.37';
+const STORAGE_KEY = 'smartclash-web-v1338';
+const APP_VERSION = '0.13.38';
 const UPDATE_CMD = 'bash -c "$(curl -fsSL https://raw.githubusercontent.com/cshaizhihao/smartclash-gen/main/install.sh)" -- --update -d ~/.smartclash-gen';
 const AUTH_DISABLED = true;
 const AUTH_KEY = 'smartclash-web-auth';
@@ -1658,7 +1658,7 @@ el.saveBtn.addEventListener('click', () => {
   state.mixedPort = Number(el.mixedPort.value || 7892);
   savedBaseline = getSerializableState();
   persistState();
-  setPublishStatus('已保存最新 YAML，等待发布', 'idle');
+  setPublishStatus('已保存最新 YAML，可继续检查或生成订阅', 'idle');
 });
 
 function focusAndSelectInput(input) {
@@ -1712,7 +1712,7 @@ el.publishBtn.addEventListener('click', () => {
     return setPublishStatus(`现在还不能发布：有 ${result.blockers.length} 个必须先修的问题。${summary}${result.blockers.length > 2 ? '…' : ''}`, 'error');
   }
   persistState();
-  setPublishStatus(result.warnings.length ? `可以发布，另外还有 ${result.warnings.length} 条提醒可按需处理` : '发布检查通过：现在可以直接导出或发布', 'success');
+  setPublishStatus(result.warnings.length ? `发布检查已通过，另外还有 ${result.warnings.length} 条提醒可按需处理` : '发布检查通过：现在可以直接导出或生成订阅', 'success');
 });
 
 el.generateSubBtn?.addEventListener('click', async () => {

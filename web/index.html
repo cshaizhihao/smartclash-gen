@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Clash smart 分组编辑器 V0.13.37</title>
-  <link rel="stylesheet" href="./style.css?v=0.13.37" />
+  <title>Clash smart 分组编辑器 V0.13.38</title>
+  <link rel="stylesheet" href="./style.css?v=0.13.38" />
 </head>
 <body>
   <div id="splashScreen" class="splash-screen" aria-hidden="true">
@@ -45,7 +45,7 @@
       <header>
         <div class="header-bar">
           <div>
-            <h1>Clash smart 分组编辑器 V0.13.37</h1>
+            <h1>Clash smart 分组编辑器 V0.13.38</h1>
             <p>极简编排 · YAML 即时交付</p>
           </div>
           <div class="header-links">
@@ -303,13 +303,13 @@
           <div class="publish-control-stack">
             <div class="row compact-row">
               <input id="mixedPort" type="number" min="1" max="65535" placeholder="mixed-port，默认 7892" />
-              <button id="smartActionBtn">自动推进</button>
+              <button id="smartActionBtn">执行发布检查</button>
               <button id="toggleAdvanced" class="ghost">收起高级区</button>
             </div>
             <div id="advancedOps" class="row">
               <button id="saveBtn" class="ghost">保存当前 YAML</button>
               <button id="downloadYamlBtn" class="ghost">下载 YAML</button>
-              <button id="publishBtn" class="ghost">发布配置</button>
+              <button id="publishBtn" class="ghost">完成发布校验</button>
               <button id="generateSubBtn" class="ghost">生成订阅链接</button>
               <button id="copySubBtn" class="ghost">复制订阅链接</button>
               <button id="openSubBtn" class="ghost">打开订阅链接</button>
@@ -351,11 +351,11 @@
               <ul id="warnings" class="warnings"></ul>
             </div>
             <div class="publish-list-block">
-              <h3>发布前检查</h3>
+              <h3>发布前检查清单</h3>
               <ul id="publishChecklist" class="warnings"></ul>
             </div>
             <div class="publish-list-block">
-              <h3>与上次保存相比</h3>
+              <h3>与上次保存相比的变化</h3>
               <ul id="diffSummary" class="warnings"></ul>
             </div>
           </section>
@@ -366,7 +366,7 @@
                 <h3>YAML 预览</h3>
                 <p class="helper-text">这里展示的是可直接复制为 `.yaml` 的最终内容。</p>
               </div>
-              <span id="updateStatus" class="helper-text">当前版本：v0.13.37</span>
+              <span id="updateStatus" class="helper-text">当前版本：v0.13.38</span>
             </div>
             <textarea id="markdown" class="code-preview" rows="24"></textarea>
           </section>
@@ -399,6 +399,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
-  <script src="./app.js?v=0.13.37"></script>
+  <script src="./app.js?v=0.13.38"></script>
 </body>
 </html>

@@ -1,5 +1,5 @@
-const STORAGE_KEY = 'smartclash-web-v1335';
-const APP_VERSION = '0.13.35';
+const STORAGE_KEY = 'smartclash-web-v1336';
+const APP_VERSION = '0.13.36';
 const UPDATE_CMD = 'bash -c "$(curl -fsSL https://raw.githubusercontent.com/cshaizhihao/smartclash-gen/main/install.sh)" -- --update -d ~/.smartclash-gen';
 const AUTH_DISABLED = true;
 const AUTH_KEY = 'smartclash-web-auth';
@@ -174,6 +174,7 @@ const el = {
   presetAIBtn: document.getElementById('presetAIBtn'),
   presetMediaBtn: document.getElementById('presetMediaBtn'),
   presetDomesticBtn: document.getElementById('presetDomesticBtn'),
+  presetAllBtn: document.getElementById('presetAllBtn'),
   presetResetBtn: document.getElementById('presetResetBtn'),
   subLinkOutput: document.getElementById('subLinkOutput'),
   subLinkAnchor: document.getElementById('subLinkAnchor'),
@@ -1809,19 +1810,34 @@ el.exportDiffBtn?.addEventListener('click', () => {
   URL.revokeObjectURL(url);
 });
 
-function applyRulePreset(lines, label) {
-  pushHistory(`规则预设：${label}`);
-  el.rules.value = lines.join('\n');
-  state.rules = [...lines];
-  refreshMarkdownPreview();
-  persistState();
-  setPublishStatus(`已套用规则预设：${label}`, 'success');
+function mergeRuleLines(baseLines, extraLines) {
+  const merged = [];
+  const seen = new Set();
+  [...baseLines, ...extraLines].forEach((line) => {
+    const key = (line || '').trim();
+    if (!key || seen.has(key)) return;
+    seen.add(key);
+    merged.push(key);
+  });
+  return merged;
 }
 
-el.presetAIBtn?.addEventListener('click', () => applyRulePreset(RULE_PRESETS.ai, 'AI 常用'));
-el.presetMediaBtn?.addEventListener('click', () => applyRulePreset(RULE_PRESETS.media, '流媒体常用'));
-el.presetDomesticBtn?.addEventListener('click', () => applyRulePreset(RULE_PRESETS.domestic, '国内直连'));
-el.presetResetBtn?.addEventListener('click', () => applyRulePreset(DEFAULT_RULE_LINES, '恢复默认规则'));
+function applyRulePreset(lines, label, mode = 'replace') {
+  pushHistory(`规则预设：${label}`);
+  const current = el.rules.value.split('\n').map((x) => x.trim()).filter(Boolean);
+  const nextLines = mode === 'merge' ? mergeRuleLines(current, lines) : [...lines];
+  el.rules.value = nextLines.join('\n');
+  state.rules = [...nextLines];
+  refreshMarkdownPreview();
+  persistState();
+  setPublishStatus(mode === 'merge' ? `已叠加规则预设：${label}` : `已套用规则预设：${label}`, 'success');
+}
+
+el.presetAIBtn?.addEventListener('click', () => applyRulePreset(RULE_PRESETS.ai, 'AI 常用', 'merge'));
+el.presetMediaBtn?.addEventListener('click', () => applyRulePreset(RULE_PRESETS.media, '流媒体常用', 'merge'));
+el.presetDomesticBtn?.addEventListener('click', () => applyRulePreset(RULE_PRESETS.domestic, '国内直连', 'merge'));
+el.presetAllBtn?.addEventListener('click', () => applyRulePreset(mergeRuleLines(RULE_PRESETS.ai, mergeRuleLines(RULE_PRESETS.media, RULE_PRESETS.domestic)), '全部预设', 'merge'));
+el.presetResetBtn?.addEventListener('click', () => applyRulePreset(DEFAULT_RULE_LINES, '恢复默认规则', 'replace'));
 
 el.rules.addEventListener('input', () => {
   state.rules = el.rules.value.split('\n');

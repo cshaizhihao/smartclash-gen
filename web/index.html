@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Clash smart 分组编辑器 V0.13.35</title>
-  <link rel="stylesheet" href="./style.css?v=0.13.35" />
+  <title>Clash smart 分组编辑器 V0.13.36</title>
+  <link rel="stylesheet" href="./style.css?v=0.13.36" />
 </head>
 <body>
   <div id="splashScreen" class="splash-screen" aria-hidden="true">
@@ -45,7 +45,7 @@
       <header>
         <div class="header-bar">
           <div>
-            <h1>Clash smart 分组编辑器 V0.13.35</h1>
+            <h1>Clash smart 分组编辑器 V0.13.36</h1>
             <p>极简编排 · YAML 即时交付</p>
           </div>
           <div class="header-links">
@@ -332,9 +332,10 @@
                 <span class="helper-text">现在只在发布前检查与微调</span>
               </div>
               <div class="rule-presets-row row compact-row">
-                <button id="presetAIBtn" class="ghost">AI 常用</button>
-                <button id="presetMediaBtn" class="ghost">流媒体常用</button>
-                <button id="presetDomesticBtn" class="ghost">国内直连</button>
+                <button id="presetAIBtn" class="ghost">叠加 AI 常用</button>
+                <button id="presetMediaBtn" class="ghost">叠加流媒体常用</button>
+                <button id="presetDomesticBtn" class="ghost">叠加国内直连</button>
+                <button id="presetAllBtn" class="ghost">一键叠加全部预设</button>
                 <button id="presetResetBtn" class="ghost">恢复默认规则</button>
               </div>
               <textarea id="rules" rows="12" placeholder="DOMAIN-SUFFIX,google.com,Smart-AUTO&#10;MATCH,Smart-AUTO"></textarea>
@@ -365,7 +366,7 @@
                 <h3>YAML 预览</h3>
                 <p class="helper-text">这里展示的是可直接复制为 `.yaml` 的最终内容。</p>
               </div>
-              <span id="updateStatus" class="helper-text">当前版本：v0.13.35</span>
+              <span id="updateStatus" class="helper-text">当前版本：v0.13.36</span>
             </div>
             <textarea id="markdown" class="code-preview" rows="24"></textarea>
           </section>
@@ -398,6 +399,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
-  <script src="./app.js?v=0.13.35"></script>
+  <script src="./app.js?v=0.13.36"></script>
 </body>
 </html>

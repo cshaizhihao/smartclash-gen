@@ -69,6 +69,7 @@ fi
 if command -v ss >/dev/null 2>&1; then
   if ss -ltn "( sport = :${WEB_PORT} )" 2>/dev/null | grep -q ":${WEB_PORT}"; then
     echo "网页访问端口 ${WEB_PORT} 已被占用，请重新运行脚本并换一个 --web-port。" >&2
+    echo "可尝试的常用端口：10100、10111、18080、18888" >&2
     exit 1
   fi
 fi
@@ -154,6 +155,8 @@ fi
 auto_open_firewall "$WEB_PORT"
 PUBLIC_HOST=$(hostname -I 2>/dev/null | awk '{print $1}')
 [[ -n "${PUBLIC_HOST:-}" ]] || PUBLIC_HOST="127.0.0.1"
+PUBLIC_IP=$(curl --max-time 5 -fsSL https://api.ipify.org 2>/dev/null || true)
+[[ -n "${PUBLIC_IP:-}" ]] || PUBLIC_IP="$PUBLIC_HOST"
 
 sleep 2
 if curl -fsS "http://127.0.0.1:${WEB_PORT}" >/dev/null 2>&1; then
@@ -175,8 +178,10 @@ echo "$STATUS_TEXT"
 echo "访问地址："
 echo "  http://127.0.0.1:${WEB_PORT}"
 echo "  http://${PUBLIC_HOST}:${WEB_PORT}"
+echo "  http://${PUBLIC_IP}:${WEB_PORT}"
 echo ""
 echo "如需停止："
 echo "  cd $TARGET_DIR && ${COMPOSE_CMD} down"
 echo "如需查看日志："
 echo "  cd $TARGET_DIR && ${COMPOSE_CMD} logs -n 100"
+echo "如果浏览器仍然无法从外网访问，请继续检查云服务器安全组 / 云防火墙是否已放行 ${WEB_PORT}/tcp。"

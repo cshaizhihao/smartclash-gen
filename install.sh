@@ -80,7 +80,7 @@ cd "$TARGET_DIR"
 
 if command -v apt-get >/dev/null 2>&1; then
   sudo apt-get update -y >/dev/null 2>&1 || true
-  sudo apt-get install -y python3 python3-pip curl >/dev/null 2>&1 || true
+  sudo apt-get install -y python3 python3-pip python3-venv curl >/dev/null 2>&1 || true
 elif command -v apk >/dev/null 2>&1; then
   sudo apk add --no-cache python3 py3-pip curl >/dev/null 2>&1 || true
 fi
@@ -95,7 +95,16 @@ curl -fsSL -o web/style.css "${BASE_URL}/web/style.css"
 curl -fsSL -o web/app.js "${BASE_URL}/web/app.js"
 curl -fsSL -o web/dev_server.py "${BASE_URL}/web/dev_server.py"
 chmod +x generate.py web/dev_server.py
-python3 -m pip install --user --quiet -r requirements.txt
+
+if [[ ! -d .venv ]]; then
+  if ! python3 -m venv .venv >/dev/null 2>&1; then
+    echo "创建虚拟环境失败，请先安装 python3-venv 后重试。" >&2
+    exit 1
+  fi
+fi
+. .venv/bin/activate
+python -m pip install --upgrade pip >/dev/null 2>&1 || true
+python -m pip install --quiet -r requirements.txt
 
 if [[ "$MODE" == "update" ]]; then
   echo "Clash Smart 分组编辑器 已更新到：v$(cat VERSION 2>/dev/null || echo "$VERSION")"
@@ -106,10 +115,11 @@ else
   echo "默认 mixed-port：$PORT"
   echo ""
   echo "命令行生成示例："
-  echo "  python3 generate.py --urls urls.txt --rules rules.txt --port $PORT --output openclash.yaml"
+  echo "  cd $TARGET_DIR && . .venv/bin/activate && python generate.py --urls urls.txt --rules rules.txt --port $PORT --output openclash.yaml"
   echo ""
   echo "启动 Web 编排台："
-  echo "  cd $TARGET_DIR/web && python3 dev_server.py"
+  echo "  cd $TARGET_DIR/web && ../.venv/bin/python dev_server.py"
   echo ""
   echo "后续如果想改端口，可重新执行脚本并使用：--port <1-65535>"
+  echo "依赖已安装在：$TARGET_DIR/.venv"
 fi

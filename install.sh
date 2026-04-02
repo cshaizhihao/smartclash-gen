@@ -150,9 +150,25 @@ cat > start-web.sh <<EOF
 #!/usr/bin/env bash
 set -e
 cd "${TARGET_DIR}/web"
-PORT=${WEB_PORT} ../.venv/bin/python dev_server.py
+exec env PORT=${WEB_PORT} ../.venv/bin/python dev_server.py
 EOF
-chmod +x generate.py web/dev_server.py start-web.sh
+cat > start-web-bg.sh <<EOF
+#!/usr/bin/env bash
+set -e
+cd "${TARGET_DIR}/web"
+mkdir -p ../runtime
+if [[ -f ../runtime/web.pid ]]; then
+  old_pid="$(cat ../runtime/web.pid 2>/dev/null || true)"
+  if [[ -n "${old_pid:-}" ]] && kill -0 "$old_pid" >/dev/null 2>&1; then
+    kill "$old_pid" >/dev/null 2>&1 || true
+    sleep 1
+  fi
+fi
+nohup env PORT=${WEB_PORT} ../.venv/bin/python dev_server.py > ../runtime/web.log 2>&1 < /dev/null &
+echo $! > ../runtime/web.pid
+echo "已在后台启动 Web 编排台，PID: $(cat ../runtime/web.pid)"
+EOF
+chmod +x generate.py web/dev_server.py start-web.sh start-web-bg.sh
 
 if [[ -d .venv ]]; then
   rm -rf .venv
@@ -168,9 +184,13 @@ fi
 .venv/bin/python -m pip install --upgrade pip setuptools wheel >/dev/null 2>&1 || true
 .venv/bin/python -m pip install --quiet -r requirements.txt
 
+PUBLIC_HOST=$(hostname -I 2>/dev/null | awk '{print $1}')
+[[ -n "${PUBLIC_HOST:-}" ]] || PUBLIC_HOST="127.0.0.1"
+
 if [[ "$MODE" == "update" ]]; then
   echo "Clash Smart 分组编辑器 已更新到：v$(cat VERSION 2>/dev/null || echo "$VERSION")"
   echo "安装目录：$TARGET_DIR"
+  ( cd "$TARGET_DIR" && ./start-web-bg.sh )
 else
   echo "Clash Smart 分组编辑器 v$(cat VERSION 2>/dev/null || echo "$VERSION") 已安装完成"
   echo "安装目录：$TARGET_DIR"
@@ -180,20 +200,31 @@ else
   echo "命令行生成示例："
   echo "  cd $TARGET_DIR && .venv/bin/python generate.py --urls urls.txt --rules rules.txt --port $PORT --output openclash.yaml"
   echo ""
-  echo "启动 Web 编排台："
-  echo "  cd $TARGET_DIR/web && PORT=$WEB_PORT ../.venv/bin/python dev_server.py"
+  echo "正在自动后台启动 Web 编排台..."
+  ( cd "$TARGET_DIR" && ./start-web-bg.sh )
   echo ""
   echo "浏览器访问地址："
   echo "  http://127.0.0.1:$WEB_PORT"
+  echo "  http://${PUBLIC_HOST}:$WEB_PORT"
   echo ""
   echo "后续如果想改端口，可重新执行脚本并使用："
   echo "  --port <1-65535>      # 修改配置代理端口"
   echo "  --web-port <1-65535> # 修改网页访问端口"
   echo ""
   echo "依赖已安装在：$TARGET_DIR/.venv"
+  echo "日志文件：$TARGET_DIR/runtime/web.log"
   echo ""
   echo "如果你的系统仍然拦截 pip，可手动执行："
   echo "  sudo apt-get install -y python3-full python3-venv"
   echo "  cd $TARGET_DIR && rm -rf .venv && python3 -m venv .venv"
   echo "  .venv/bin/python -m pip install -r requirements.txt"
+fi
+
+sleep 2
+if curl -fsS "http://127.0.0.1:${WEB_PORT}" >/dev/null 2>&1; then
+  echo ""
+  echo "Web 编排台启动成功。"
+else
+  echo ""
+  echo "Web 编排台启动失败，请查看日志：$TARGET_DIR/runtime/web.log" >&2
 fi

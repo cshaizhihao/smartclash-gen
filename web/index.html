@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Clash smart 分组编辑器 V0.13.39</title>
-  <link rel="stylesheet" href="./style.css?v=0.13.39" />
+  <title>Clash smart 分组编辑器 V0.13.40</title>
+  <link rel="stylesheet" href="./style.css?v=0.13.40" />
 </head>
 <body>
-  <div id="splashScreen" class="splash-screen" aria-hidden="true">
+  <div id="splashScreen" class="splash-screen hidden" aria-hidden="true">
     <div class="splash-card">
       <p class="splash-kicker">CLASH SMART</p>
       <h2>正在整理节点、分组与链路</h2>
@@ -34,9 +34,9 @@
         记住登录状态（当前浏览器）
       </label>
       <div class="auth-row">
-        <button id="authBtn">开始使用</button>
+        <button id="authBtn">创建管理员账号</button>
       </div>
-      <p id="authTips" class="auth-tips">首次使用：输入用户名和密码后点击“开始使用”；后续用同一账号登录。</p>
+      <p id="authTips" class="auth-tips">首次打开：先设置管理员账号和密码；完成后将进入开屏动画和主界面。</p>
     </div>
   </div>
 
@@ -45,7 +45,7 @@
       <header>
         <div class="header-bar">
           <div>
-            <h1>Clash smart 分组编辑器 V0.13.39</h1>
+            <h1>Clash smart 分组编辑器 V0.13.40</h1>
             <p>极简编排 · YAML 即时交付</p>
           </div>
           <div class="header-links">
@@ -366,7 +366,7 @@
                 <h3>YAML 预览</h3>
                 <p class="helper-text">这里展示的是可直接复制为 `.yaml` 的最终内容。</p>
               </div>
-              <span id="updateStatus" class="helper-text">当前版本：v0.13.39</span>
+              <span id="updateStatus" class="helper-text">当前版本：v0.13.40</span>
             </div>
             <textarea id="markdown" class="code-preview" rows="24"></textarea>
           </section>
@@ -399,6 +399,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
-  <script src="./app.js?v=0.13.39"></script>
+  <script src="./app.js?v=0.13.40"></script>
 </body>
 </html>

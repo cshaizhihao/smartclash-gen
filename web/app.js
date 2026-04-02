@@ -1,7 +1,7 @@
-const STORAGE_KEY = 'smartclash-web-v1339';
-const APP_VERSION = '0.13.39';
+const STORAGE_KEY = 'smartclash-web-v1340';
+const APP_VERSION = '0.13.40';
 const UPDATE_CMD = 'bash -c "$(curl -fsSL https://raw.githubusercontent.com/cshaizhihao/smartclash-gen/main/install.sh)" -- --update -d ~/.smartclash-gen';
-const AUTH_DISABLED = true;
+const AUTH_DISABLED = false;
 const AUTH_KEY = 'smartclash-web-auth';
 const AUTH_SESSION_KEY = 'smartclash-web-auth-session';
 const DEFAULT_RULE_LINES = ['DOMAIN-SUFFIX,google.com,Smart-AUTO', 'MATCH,Smart-AUTO'];
@@ -242,9 +242,26 @@ function isAuthed() {
   return localStorage.getItem(AUTH_SESSION_KEY) === '1' || sessionStorage.getItem(AUTH_SESSION_KEY) === '1';
 }
 
-function showApp() {
+function playSplashThenShowApp() {
   el.authGate.classList.add('hidden');
   el.appShell.classList.remove('blurred');
+  if (!el.splashScreen) return;
+  el.splashScreen.classList.remove('hidden');
+  if (el.splashText) {
+    const msgs = ['初始化管理员空间…', '加载节点与分组能力…', '准备规则与发布链路…'];
+    msgs.forEach((msg, idx) => {
+      setTimeout(() => {
+        if (el.splashText) el.splashText.textContent = msg;
+      }, idx * 820);
+    });
+  }
+  setTimeout(() => {
+    el.splashScreen?.classList.add('hidden');
+  }, 2800);
+}
+
+function showApp() {
+  playSplashThenShowApp();
 }
 
 function setNodeEditorOpen(open) {
@@ -255,11 +272,11 @@ function setNodeEditorOpen(open) {
 
 function showAuth(message) {
   const hasAccount = !!getAuthConfig();
-  el.authBtn.textContent = hasAccount ? '登录' : '开始使用';
+  el.authBtn.textContent = hasAccount ? '登录管理后台' : '创建管理员账号';
   if (!message) {
     el.authTips.textContent = hasAccount
-      ? '请输入已设置的用户名和密码登录。'
-      : '首次使用：输入用户名和密码后点击“开始使用”。';
+      ? '请输入管理员账号和密码后登录。'
+      : '首次打开：请先设置管理员账号和密码，完成后会进入开屏动画与主界面。';
   } else {
     el.authTips.textContent = message;
   }

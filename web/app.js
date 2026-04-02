@@ -1,5 +1,5 @@
-const STORAGE_KEY = 'smartclash-web-v1338';
-const APP_VERSION = '0.13.38';
+const STORAGE_KEY = 'smartclash-web-v1339';
+const APP_VERSION = '0.13.39';
 const UPDATE_CMD = 'bash -c "$(curl -fsSL https://raw.githubusercontent.com/cshaizhihao/smartclash-gen/main/install.sh)" -- --update -d ~/.smartclash-gen';
 const AUTH_DISABLED = true;
 const AUTH_KEY = 'smartclash-web-auth';
@@ -1347,7 +1347,7 @@ function renderWarnings(result) {
         text: result.warnings.length ? `⚠️ 还有 ${result.warnings.length} 条提醒，建议看一眼` : '✅ 当前没有提醒项',
         jump: 'rules/editor/line',
       },
-      { text: '📦 导出格式已确认：YAML + Markdown', jump: 'publish/actions/output' },
+      { text: '📦 导出能力已确认：YAML 下载 + 订阅链接', jump: 'publish/actions/output' },
       { text: '🧪 规则、节点、分组引用已完成一致性检查', jump: 'rules/editor/line' },
       {
         text: result.risks?.length ? `🚨 还有 ${result.risks.length} 个高风险点，建议逐项确认` : '✅ 当前没有高风险项',

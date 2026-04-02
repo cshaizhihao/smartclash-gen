@@ -1,36 +1,38 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-VERSION="0.8.9"
+VERSION="0.13.40"
 PORT=7892
 TARGET_DIR="$HOME/.smartclash-gen"
 BASE_URL="https://raw.githubusercontent.com/cshaizhihao/smartclash-gen/main"
 MODE="install"
+PORT_EXPLICIT=0
 
 usage() {
   cat <<EOF
-smartclash-gen installer v${VERSION}
+Clash Smart 分组编辑器 安装脚本 v${VERSION}
 
-Usage:
-  bash install.sh [-p PORT] [-d TARGET_DIR] [--update]
+用法：
+  bash install.sh [-p 端口] [-d 安装目录] [--update]
 
-Options:
-  -p, --port   Default mixed-port used in example command output (default: 7892)
-  -d, --dir    Install directory (default: ~/.smartclash-gen)
-  --update     Update existing installation in place
-  -h, --help   Show this help
+参数：
+  -p, --port   指定默认 mixed-port（默认：7892）
+  -d, --dir    指定安装目录（默认：~/.smartclash-gen）
+  --update     在现有目录中执行更新
+  -h, --help   显示帮助信息
 EOF
 }
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
     -p|--port)
-      [[ $# -ge 2 ]] || { echo "Missing value for $1" >&2; exit 1; }
+      [[ $# -ge 2 ]] || { echo "参数 $1 缺少端口值" >&2; exit 1; }
       PORT="$2"
+      PORT_EXPLICIT=1
       shift 2
       ;;
     -d|--dir)
-      [[ $# -ge 2 ]] || { echo "Missing value for $1" >&2; exit 1; }
+      [[ $# -ge 2 ]] || { echo "参数 $1 缺少目录值" >&2; exit 1; }
       TARGET_DIR="$2"
       shift 2
       ;;
@@ -43,21 +45,33 @@ while [[ $# -gt 0 ]]; do
       exit 0
       ;;
     *)
-      echo "Unknown arg: $1" >&2
+      echo "未知参数：$1" >&2
       usage
       exit 1
       ;;
   esac
 done
 
+if [[ "$MODE" == "install" && "$PORT_EXPLICIT" -eq 0 && -t 0 ]]; then
+  echo ""
+  echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  echo "Clash Smart 分组编辑器 安装向导"
+  echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  echo "默认 mixed-port 为 7892。"
+  read -r -p "请输入要使用的 mixed-port（直接回车使用 7892）：" INPUT_PORT
+  if [[ -n "${INPUT_PORT:-}" ]]; then
+    PORT="$INPUT_PORT"
+  fi
+fi
+
 case "$PORT" in
   ''|*[!0-9]*)
-    echo "Port must be an integer: $PORT" >&2
+    echo "端口必须是整数：$PORT" >&2
     exit 1
     ;;
 esac
 if (( PORT < 1 || PORT > 65535 )); then
-  echo "Port out of range (1-65535): $PORT" >&2
+  echo "端口超出范围（1-65535）：$PORT" >&2
   exit 1
 fi
 
@@ -84,13 +98,18 @@ chmod +x generate.py web/dev_server.py
 python3 -m pip install --user --quiet -r requirements.txt
 
 if [[ "$MODE" == "update" ]]; then
-  echo "smartclash-gen updated to: v$(cat VERSION 2>/dev/null || echo "$VERSION")"
-  echo "Path: $TARGET_DIR"
+  echo "Clash Smart 分组编辑器 已更新到：v$(cat VERSION 2>/dev/null || echo "$VERSION")"
+  echo "安装目录：$TARGET_DIR"
 else
-  echo "smartclash-gen v${VERSION} installed to: $TARGET_DIR"
-  echo "Suggested command:"
+  echo "Clash Smart 分组编辑器 v$(cat VERSION 2>/dev/null || echo "$VERSION") 已安装完成"
+  echo "安装目录：$TARGET_DIR"
+  echo "默认 mixed-port：$PORT"
+  echo ""
+  echo "命令行生成示例："
   echo "  python3 generate.py --urls urls.txt --rules rules.txt --port $PORT --output openclash.yaml"
-  echo "Web workbench (supports in-page update):"
+  echo ""
+  echo "启动 Web 编排台："
   echo "  cd $TARGET_DIR/web && python3 dev_server.py"
-  echo "You can override the port later with --port <1-65535>."
+  echo ""
+  echo "后续如果想改端口，可重新执行脚本并使用：--port <1-65535>"
 fi

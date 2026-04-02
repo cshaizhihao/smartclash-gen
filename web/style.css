@@ -481,10 +481,21 @@ header p {
 .route-action-btn {
   width: 100%;
 }
+.route-action-btn-primary {
+  background: linear-gradient(135deg, rgba(29,78,216,.96), rgba(14,165,233,.96));
+  border: 1px solid rgba(125,211,252,.42);
+  box-shadow: 0 14px 32px rgba(14,165,233,.18), inset 0 1px 0 rgba(255,255,255,.08);
+}
+.route-action-btn-primary:hover {
+  filter: brightness(1.12);
+}
 .route-config-panel {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 6px;
+}
+.route-config-panel-two {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 .route-config-item {
   display: grid;

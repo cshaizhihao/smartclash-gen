@@ -1,5 +1,5 @@
-const STORAGE_KEY = 'smartclash-web-v1333';
-const APP_VERSION = '0.13.33';
+const STORAGE_KEY = 'smartclash-web-v1334';
+const APP_VERSION = '0.13.34';
 const UPDATE_CMD = 'bash -c "$(curl -fsSL https://raw.githubusercontent.com/cshaizhihao/smartclash-gen/main/install.sh)" -- --update -d ~/.smartclash-gen';
 const AUTH_DISABLED = true;
 const AUTH_KEY = 'smartclash-web-auth';
@@ -59,9 +59,9 @@ function createDefaultState() {
     ],
     rules: [...DEFAULT_RULE_LINES],
     mixedPort: 7892,
-    transitGroupName: 'Smart-Transit',
-    egressGroupName: 'Smart-Egress',
-    chainGroupName: 'Smart-Chain',
+    transitGroupName: '中转组',
+    egressGroupName: '落地组',
+    chainGroupName: '链式代理',
   };
 }
 
@@ -647,7 +647,7 @@ function syncFromDom() {
     group.members = [...ul.children].map((x) => normalizeMemberKey(x.dataset.key || x.dataset.id, x.dataset.kind || 'node'));
   });
 
-  const chainGroup = state.groups.find((group) => group.name === (state.chainGroupName || 'Smart-Chain'));
+  const chainGroup = state.groups.find((group) => group.name === (state.chainGroupName || '链式代理'));
   if (chainGroup) chainGroup.members = [];
 
   refreshMarkdownPreview();
@@ -661,9 +661,9 @@ function getSerializableState() {
     groups: structuredClone(state.groups),
     rules: el.rules.value.split('\n'),
     mixedPort: Number(el.mixedPort.value || state.mixedPort || 7892),
-    transitGroupName: (el.transitGroupName?.value || state.transitGroupName || 'Smart-Transit').trim() || 'Smart-Transit',
-    egressGroupName: (el.egressGroupName?.value || state.egressGroupName || 'Smart-Egress').trim() || 'Smart-Egress',
-    chainGroupName: (el.chainGroupName?.value || state.chainGroupName || 'Smart-Chain').trim() || 'Smart-Chain',
+    transitGroupName: (el.transitGroupName?.value || state.transitGroupName || '中转组').trim() || '中转组',
+    egressGroupName: (el.egressGroupName?.value || state.egressGroupName || '落地组').trim() || '落地组',
+    chainGroupName: (el.chainGroupName?.value || state.chainGroupName || '链式代理').trim() || '链式代理',
     nodeUrls: el.nodeUrls.value || '',
     subUrls: el.subUrls?.value || '',
   };
@@ -686,9 +686,9 @@ function applySnapshot(snap) {
     groups: snap.groups || [],
     rules: snap.rules || [],
     mixedPort: snap.mixedPort || 7892,
-    transitGroupName: snap.transitGroupName || 'Smart-Transit',
-    egressGroupName: snap.egressGroupName || 'Smart-Egress',
-    chainGroupName: snap.chainGroupName || 'Smart-Chain',
+    transitGroupName: snap.transitGroupName || '中转组',
+    egressGroupName: snap.egressGroupName || '落地组',
+    chainGroupName: snap.chainGroupName || '链式代理',
   });
   el.nodeUrls.value = snap.nodeUrls || '';
   if (el.subUrls) el.subUrls.value = snap.subUrls || '';
@@ -731,9 +731,9 @@ function replaceState(nextState) {
   state.groups.splice(0, state.groups.length, ...(nextState.groups || []));
   state.rules.splice(0, state.rules.length, ...(nextState.rules || []));
   state.mixedPort = Number(nextState.mixedPort || 7892);
-  state.transitGroupName = nextState.transitGroupName || 'Smart-Transit';
-  state.egressGroupName = nextState.egressGroupName || 'Smart-Egress';
-  state.chainGroupName = nextState.chainGroupName || 'Smart-Chain';
+  state.transitGroupName = nextState.transitGroupName || '中转组';
+  state.egressGroupName = nextState.egressGroupName || '落地组';
+  state.chainGroupName = nextState.chainGroupName || '链式代理';
 }
 
 function syncNodeEditorOptions() {
@@ -776,9 +776,9 @@ function applyRegionModulesFromNodes() {
     keep.push(g);
   });
 
-  const transitGroupName = (el.transitGroupName?.value || state.transitGroupName || 'Smart-Transit').trim() || 'Smart-Transit';
-  const egressGroupName = (el.egressGroupName?.value || state.egressGroupName || 'Smart-Egress').trim() || 'Smart-Egress';
-  const chainGroupName = (el.chainGroupName?.value || state.chainGroupName || 'Smart-Chain').trim() || 'Smart-Chain';
+  const transitGroupName = (el.transitGroupName?.value || state.transitGroupName || '中转组').trim() || '中转组';
+  const egressGroupName = (el.egressGroupName?.value || state.egressGroupName || '落地组').trim() || '落地组';
+  const chainGroupName = (el.chainGroupName?.value || state.chainGroupName || '链式代理').trim() || '链式代理';
 
   const transit = byName.get(transitGroupName) || { id: makeId(), name: transitGroupName, type: 'select', members: [] };
   transit.type = 'select';
@@ -814,9 +814,9 @@ function hydrateState() {
       groups: filteredGroups.length ? filteredGroups : createDefaultState().groups,
       rules: Array.isArray(parsed.rules) ? parsed.rules : createDefaultState().rules,
       mixedPort: parsed.mixedPort || 7892,
-      transitGroupName: parsed.transitGroupName || 'Smart-Transit',
-      egressGroupName: parsed.egressGroupName || 'Smart-Egress',
-      chainGroupName: parsed.chainGroupName || 'Smart-Chain',
+      transitGroupName: parsed.transitGroupName || '中转组',
+      egressGroupName: parsed.egressGroupName || '落地组',
+      chainGroupName: parsed.chainGroupName || '链式代理',
     });
     if (typeof parsed.nodeUrls === 'string') el.nodeUrls.value = parsed.nodeUrls;
     if (typeof parsed.subUrls === 'string' && el.subUrls) el.subUrls.value = parsed.subUrls;
@@ -893,9 +893,9 @@ function quickGroupNodes() {
 }
 
 function render() {
-  const transitGroupName = state.transitGroupName || 'Smart-Transit';
-  const egressGroupName = state.egressGroupName || 'Smart-Egress';
-  const chainGroupName = state.chainGroupName || 'Smart-Chain';
+  const transitGroupName = state.transitGroupName || '中转组';
+  const egressGroupName = state.egressGroupName || '落地组';
+  const chainGroupName = state.chainGroupName || '链式代理';
   const guaranteed = [
     { name: 'Smart-AUTO', type: 'smart' },
     { name: transitGroupName, type: 'select' },
@@ -969,9 +969,9 @@ function render() {
         group.members = (group.members || []).filter((member) => String(member) !== `group:${g.id}`);
       });
       state.groups.splice(state.groups.findIndex((item) => item.id === g.id), 1);
-      if (state.transitGroupName === g.name) state.transitGroupName = fallbackGroup?.name || 'Smart-Transit';
-      if (state.egressGroupName === g.name) state.egressGroupName = fallbackGroup?.name || 'Smart-Egress';
-      if (state.chainGroupName === g.name) state.chainGroupName = fallbackGroup?.name || 'Smart-Chain';
+      if (state.transitGroupName === g.name) state.transitGroupName = fallbackGroup?.name || '中转组';
+      if (state.egressGroupName === g.name) state.egressGroupName = fallbackGroup?.name || '落地组';
+      if (state.chainGroupName === g.name) state.chainGroupName = fallbackGroup?.name || '链式代理';
       render();
       persistState();
       setPublishStatus(`已删除组：${g.name}`, 'success');
@@ -990,9 +990,9 @@ function render() {
           group.members = (group.members || []).filter((member) => String(member) !== `group:${g.id}`);
         });
         state.groups.splice(state.groups.findIndex((item) => item.id === g.id), 1);
-        if (state.transitGroupName === g.name) state.transitGroupName = fallbackGroup?.name || 'Smart-Transit';
-        if (state.egressGroupName === g.name) state.egressGroupName = fallbackGroup?.name || 'Smart-Egress';
-        if (state.chainGroupName === g.name) state.chainGroupName = fallbackGroup?.name || 'Smart-Chain';
+        if (state.transitGroupName === g.name) state.transitGroupName = fallbackGroup?.name || '中转组';
+        if (state.egressGroupName === g.name) state.egressGroupName = fallbackGroup?.name || '落地组';
+        if (state.chainGroupName === g.name) state.chainGroupName = fallbackGroup?.name || '链式代理';
         render();
         persistState();
         setPublishStatus(`已删除组：${g.name}`, 'success');
@@ -1044,7 +1044,6 @@ function render() {
     el.egressGroupName.value = egressGroupName;
   }
   if (el.chainGroupName) {
-    el.chainGroupName.innerHTML = groupOptions;
     el.chainGroupName.value = chainGroupName;
   }
   syncNodeEditorOptions();
@@ -1106,9 +1105,9 @@ function getGroupProxyNames(groupName) {
 }
 
 function injectChainGroups(proxyGroups) {
-  const transitGroupName = (el.transitGroupName?.value || state.transitGroupName || 'Smart-Transit').trim() || 'Smart-Transit';
-  const egressGroupName = (el.egressGroupName?.value || state.egressGroupName || 'Smart-Egress').trim() || 'Smart-Egress';
-  const chainGroupName = (el.chainGroupName?.value || state.chainGroupName || 'Smart-Chain').trim() || 'Smart-Chain';
+  const transitGroupName = (el.transitGroupName?.value || state.transitGroupName || '中转组').trim() || '中转组';
+  const egressGroupName = (el.egressGroupName?.value || state.egressGroupName || '落地组').trim() || '落地组';
+  const chainGroupName = (el.chainGroupName?.value || state.chainGroupName || '链式代理').trim() || '链式代理';
 
   const transit = getGroupProxyNames(transitGroupName);
   const egress = getGroupProxyNames(egressGroupName);
@@ -1196,9 +1195,9 @@ function validateState() {
   const knownNodeIds = new Set(state.nodes.map((n) => n.id));
   const knownGroupIds = new Set(state.groups.map((g) => g.id));
   const knownGroupNames = new Set(state.groups.map((g) => g.name));
-  knownGroupNames.add((el.transitGroupName?.value || state.transitGroupName || 'Smart-Transit').trim() || 'Smart-Transit');
-  knownGroupNames.add((el.egressGroupName?.value || state.egressGroupName || 'Smart-Egress').trim() || 'Smart-Egress');
-  knownGroupNames.add((el.chainGroupName?.value || state.chainGroupName || 'Smart-Chain').trim() || 'Smart-Chain');
+  knownGroupNames.add((el.transitGroupName?.value || state.transitGroupName || '中转组').trim() || '中转组');
+  knownGroupNames.add((el.egressGroupName?.value || state.egressGroupName || '落地组').trim() || '落地组');
+  knownGroupNames.add((el.chainGroupName?.value || state.chainGroupName || '链式代理').trim() || '链式代理');
 
   state.groups.forEach((g) => {
     if (g.type === 'smart' && g.members.length === 0) {
@@ -1268,8 +1267,8 @@ function validateState() {
     risks.push('高风险：缺少 MATCH 兜底规则，可能会有流量找不到出口');
   }
 
-  const transitGroupName = (el.transitGroupName?.value || state.transitGroupName || 'Smart-Transit').trim() || 'Smart-Transit';
-  const egressGroupName = (el.egressGroupName?.value || state.egressGroupName || 'Smart-Egress').trim() || 'Smart-Egress';
+  const transitGroupName = (el.transitGroupName?.value || state.transitGroupName || '中转组').trim() || '中转组';
+  const egressGroupName = (el.egressGroupName?.value || state.egressGroupName || '落地组').trim() || '落地组';
   const transitCount = getGroupProxyNames(transitGroupName).length;
   const egressCount = getGroupProxyNames(egressGroupName).length;
   if (!transitCount || !egressCount) {
@@ -1837,21 +1836,21 @@ el.mixedPort.addEventListener('input', () => {
 });
 
 el.transitGroupName?.addEventListener('change', () => {
-  state.transitGroupName = (el.transitGroupName.value || 'Smart-Transit').trim() || 'Smart-Transit';
+  state.transitGroupName = (el.transitGroupName.value || '中转组').trim() || '中转组';
   ensureComposeGroup(state.transitGroupName, 'select');
   render();
   persistState();
 });
 
 el.egressGroupName?.addEventListener('change', () => {
-  state.egressGroupName = (el.egressGroupName.value || 'Smart-Egress').trim() || 'Smart-Egress';
+  state.egressGroupName = (el.egressGroupName.value || '落地组').trim() || '落地组';
   ensureComposeGroup(state.egressGroupName, 'select');
   render();
   persistState();
 });
 
 el.chainGroupName?.addEventListener('change', () => {
-  state.chainGroupName = (el.chainGroupName.value || 'Smart-Chain').trim() || 'Smart-Chain';
+  state.chainGroupName = (el.chainGroupName.value || '链式代理').trim() || '链式代理';
   ensureComposeGroup(state.chainGroupName, 'select');
   render();
   persistState();
@@ -1862,13 +1861,12 @@ el.createComposePreset?.addEventListener('click', () => {
   let idx = 1;
   let transit = `中转组-${idx}`;
   let egress = `落地组-${idx}`;
-  let chain = `链式组-${idx}`;
+  const chain = '链式代理';
   const names = new Set(state.groups.map((g) => g.name));
-  while (names.has(transit) || names.has(egress) || names.has(chain)) {
+  while (names.has(transit) || names.has(egress)) {
     idx += 1;
     transit = `中转组-${idx}`;
     egress = `落地组-${idx}`;
-    chain = `链式组-${idx}`;
   }
   ensureComposeGroup(transit, 'select');
   ensureComposeGroup(egress, 'select');
@@ -1878,7 +1876,7 @@ el.createComposePreset?.addEventListener('click', () => {
   state.chainGroupName = chain;
   render();
   persistState();
-  setPublishStatus(`已创建链路组：${transit} / ${egress} / ${chain}`, 'success');
+  setPublishStatus(`已创建中转组 / 落地组，链式代理结果会自动生成`, 'success');
 });
 
 el.quickGroupBtn?.addEventListener('click', quickGroupNodes);

@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Clash smart 分组编辑器 V0.13.33</title>
-  <link rel="stylesheet" href="./style.css?v=0.13.33" />
+  <title>Clash smart 分组编辑器 V0.13.34</title>
+  <link rel="stylesheet" href="./style.css?v=0.13.34" />
 </head>
 <body>
   <div id="splashScreen" class="splash-screen" aria-hidden="true">
@@ -45,7 +45,7 @@
       <header>
         <div class="header-bar">
           <div>
-            <h1>Clash smart 分组编辑器 V0.13.33</h1>
+            <h1>Clash smart 分组编辑器 V0.13.34</h1>
             <p>极简编排 · YAML 即时交付</p>
           </div>
           <div class="header-links">
@@ -129,11 +129,11 @@
         <div class="stage-head stage-head-compose">
           <div>
             <h2>步骤 2：中转 / 落地编排 <span id="doneGenerate" class="helper-text"></span></h2>
-            <p class="helper-text">这一步只负责分组和链路编排：把节点分到中转组、落地组或其他分组里，系统会自动生成链式结果。</p>
+            <p class="helper-text">这一步只需要配两个角色：中转组、落地组。链式代理结果由系统自动生成，你不用再手动维护第三个业务组。</p>
             <div class="compose-guide-strip compose-guide-strip-strong compose-guide-strip-compact">
               <div class="guide-step"><b>1</b><span><strong>右侧挑节点</strong>，支持重复分配</span></div>
               <div class="guide-step"><b>2</b><span><strong>左侧放组里</strong>，先中转后落地</span></div>
-              <div class="guide-step"><b>3</b><span><strong>系统自动出链式组合</strong></span></div>
+              <div class="guide-step"><b>3</b><span><strong>系统自动生成链式代理结果</strong></span></div>
             </div>
             <div class="compose-status-row">
               <div class="status-chip">
@@ -149,7 +149,7 @@
                 <strong id="composeEgressCount">0</strong>
               </div>
               <div class="status-chip status-chip-accent">
-                <span class="status-chip-label">链式结果</span>
+                <span class="status-chip-label">自动链式</span>
                 <strong id="composeChainCount">0</strong>
               </div>
             </div>
@@ -157,20 +157,18 @@
           <div class="compose-route-hint compose-route-hint-vertical">
             <div class="route-card">
               <span class="route-card-label">链路逻辑</span>
-              <strong>中转组 → 落地组 → 链式结果</strong>
-              <small>组名可自定义；链式组会按你选的中转组 / 落地组自动生成。</small>
+              <strong>中转组 → 落地组 → 自动链式结果</strong>
+              <small>你只需要选中转组和落地组；链式代理结果会自动生成并用于导出。</small>
             </div>
-            <div class="route-config-panel">
+            <div class="route-config-panel route-config-panel-two">
               <label class="route-config-item">中转组
                 <select id="transitGroupName"></select>
               </label>
               <label class="route-config-item">落地组
                 <select id="egressGroupName"></select>
               </label>
-              <label class="route-config-item">链式组
-                <select id="chainGroupName"></select>
-              </label>
             </div>
+            <input id="chainGroupName" type="hidden" value="链式代理" />
             <div class="route-live-summary">
               <div class="route-live-item"><span>当前中转</span><strong id="routeLiveTransit">未选择</strong></div>
               <div class="route-live-item"><span>当前落地</span><strong id="routeLiveEgress">未选择</strong></div>
@@ -178,8 +176,8 @@
             </div>
             <div class="route-config-actions row compact-row">
               <button id="quickGroupBtn" class="ghost">一键分组</button>
-              <button id="createComposePreset" class="ghost">创建中转/落地/链式组</button>
-              <button id="applyRegionModules" class="ghost route-action-btn">自动补齐默认组结构</button>
+              <button id="createComposePreset" class="ghost">创建中转组 / 落地组</button>
+              <button id="applyRegionModules" class="ghost route-action-btn route-action-btn-primary">自动补齐默认组结构</button>
             </div>
           </div>
         </div>
@@ -367,7 +365,7 @@
                 <h3>YAML 预览</h3>
                 <p class="helper-text">这里展示的是可直接复制为 `.yaml` 的最终内容。</p>
               </div>
-              <span id="updateStatus" class="helper-text">当前版本：v0.13.33</span>
+              <span id="updateStatus" class="helper-text">当前版本：v0.13.34</span>
             </div>
             <textarea id="markdown" class="code-preview" rows="24"></textarea>
           </section>
@@ -400,6 +398,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
-  <script src="./app.js?v=0.13.33"></script>
+  <script src="./app.js?v=0.13.34"></script>
 </body>
 </html>

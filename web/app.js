@@ -1,5 +1,5 @@
-const STORAGE_KEY = 'smartclash-web-v1332';
-const APP_VERSION = '0.13.32';
+const STORAGE_KEY = 'smartclash-web-v1333';
+const APP_VERSION = '0.13.33';
 const UPDATE_CMD = 'bash -c "$(curl -fsSL https://raw.githubusercontent.com/cshaizhihao/smartclash-gen/main/install.sh)" -- --update -d ~/.smartclash-gen';
 const AUTH_DISABLED = true;
 const AUTH_KEY = 'smartclash-web-auth';
@@ -204,6 +204,8 @@ const el = {
   copyUpdateCmdBtn: document.getElementById('copyUpdateCmdBtn'),
   updateStatus: document.getElementById('updateStatus'),
   exportDiffBtn: document.getElementById('exportDiffBtn'),
+  splashScreen: document.getElementById('splashScreen'),
+  splashText: document.getElementById('splashText'),
 };
 
 function simpleHash(input) {
@@ -2116,6 +2118,17 @@ renderPanes();
 setPublishStatus('尚未发布', 'idle');
 setImportStatus('未导入', 'idle');
 if (el.updateStatus) el.updateStatus.textContent = `当前版本：v${APP_VERSION}`;
+if (el.splashText) {
+  const msgs = ['初始化编辑器外壳…', '加载节点与分组能力…', '准备规则与发布链路…'];
+  msgs.forEach((msg, idx) => {
+    setTimeout(() => {
+      if (el.splashText) el.splashText.textContent = msg;
+    }, idx * 820);
+  });
+}
+setTimeout(() => {
+  el.splashScreen?.classList.add('hidden');
+}, 2800);
 
 if (AUTH_DISABLED) {
   showApp();

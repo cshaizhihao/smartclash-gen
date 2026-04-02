@@ -3,10 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Clash smart 分组编辑器 V0.13.31</title>
-  <link rel="stylesheet" href="./style.css?v=0.13.32" />
+  <title>Clash smart 分组编辑器 V0.13.33</title>
+  <link rel="stylesheet" href="./style.css?v=0.13.33" />
 </head>
 <body>
+  <div id="splashScreen" class="splash-screen" aria-hidden="true">
+    <div class="splash-card">
+      <p class="splash-kicker">CLASH SMART</p>
+      <h2>正在整理节点、分组与链路</h2>
+      <p id="splashText" class="splash-text">初始化编辑器外壳…</p>
+      <div class="splash-progress"><i id="splashBar"></i></div>
+    </div>
+  </div>
   <div class="ambient-grid" aria-hidden="true"></div>
   <div class="ambient-orb orb-left" aria-hidden="true"></div>
   <div class="ambient-orb orb-right" aria-hidden="true"></div>
@@ -37,7 +45,7 @@
       <header>
         <div class="header-bar">
           <div>
-            <h1>Clash smart 分组编辑器 V0.13.32</h1>
+            <h1>Clash smart 分组编辑器 V0.13.33</h1>
             <p>极简编排 · YAML 即时交付</p>
           </div>
           <div class="header-links">
@@ -359,7 +367,7 @@
                 <h3>YAML 预览</h3>
                 <p class="helper-text">这里展示的是可直接复制为 `.yaml` 的最终内容。</p>
               </div>
-              <span id="updateStatus" class="helper-text">当前版本：v0.13.32</span>
+              <span id="updateStatus" class="helper-text">当前版本：v0.13.33</span>
             </div>
             <textarea id="markdown" class="code-preview" rows="24"></textarea>
           </section>
@@ -392,6 +400,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
-  <script src="./app.js?v=0.13.32"></script>
+  <script src="./app.js?v=0.13.33"></script>
 </body>
 </html>

@@ -1,5 +1,5 @@
-const STORAGE_KEY = 'smartclash-web-v1331';
-const APP_VERSION = '0.13.31';
+const STORAGE_KEY = 'smartclash-web-v1332';
+const APP_VERSION = '0.13.32';
 const UPDATE_CMD = 'bash -c "$(curl -fsSL https://raw.githubusercontent.com/cshaizhihao/smartclash-gen/main/install.sh)" -- --update -d ~/.smartclash-gen';
 const AUTH_DISABLED = true;
 const AUTH_KEY = 'smartclash-web-auth';

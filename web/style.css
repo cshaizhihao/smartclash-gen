@@ -176,6 +176,11 @@ header p {
   background: linear-gradient(135deg, rgba(29,78,216,.95), rgba(14,165,233,.92));
   color: white;
   border: 1px solid rgba(125,211,252,.45);
+  box-shadow: 0 12px 28px rgba(14,165,233,.18), inset 0 1px 0 rgba(255,255,255,.08);
+}
+.wiz-step:not(.active):hover {
+  border-color: rgba(125,211,252,.28);
+  transform: translateY(-1px);
 }
 .progress-track {
   height: 6px;
@@ -689,6 +694,11 @@ h3 {
   font-size: 13px;
   line-height: 1.45;
 }
+.sub-link-card a:hover,
+.sub-link-anchor:hover {
+  color: #bae6fd;
+  text-decoration: underline;
+}
 input, select, textarea, button {
   border-radius: 12px;
   border: 1px solid rgba(71, 85, 105, 0.8);
@@ -697,6 +707,22 @@ input, select, textarea, button {
   padding: 9px 11px;
 }
 input, select, textarea { width: 100%; }
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: rgba(125,211,252,.65);
+  box-shadow: 0 0 0 3px rgba(56,189,248,.12), inset 0 1px 0 rgba(255,255,255,.04);
+  background: rgba(8,15,29,.86);
+}
+button:focus-visible,
+.header-link:focus-visible,
+.header-icon-link:focus-visible,
+.sub-link-anchor:focus-visible,
+.sub-link-card a:focus-visible {
+  outline: 2px solid rgba(125,211,252,.9);
+  outline-offset: 2px;
+}
 textarea { resize: vertical; min-height: 120px; }
 textarea.code-preview {
   min-height: 520px;

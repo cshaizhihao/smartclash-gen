@@ -1,5 +1,5 @@
-const STORAGE_KEY = 'smartclash-web-v1330';
-const APP_VERSION = '0.13.30';
+const STORAGE_KEY = 'smartclash-web-v1331';
+const APP_VERSION = '0.13.31';
 const UPDATE_CMD = 'bash -c "$(curl -fsSL https://raw.githubusercontent.com/cshaizhihao/smartclash-gen/main/install.sh)" -- --update -d ~/.smartclash-gen';
 const AUTH_DISABLED = true;
 const AUTH_KEY = 'smartclash-web-auth';
@@ -1683,22 +1683,23 @@ async function generateSubscriptionLink() {
     body: JSON.stringify({ yaml }),
   });
   const data = await resp.json();
-  if (!resp.ok || !data.ok || !data.url) throw new Error(data.error || '生成失败');
+  if (!resp.ok || !data.ok) throw new Error(data.error || '生成失败');
+  const finalUrl = new URL('/sub/latest', window.location.origin).toString();
   if (el.subLinkOutput) {
-    el.subLinkOutput.value = data.url;
+    el.subLinkOutput.value = finalUrl;
     focusAndSelectInput(el.subLinkOutput);
   }
   if (el.subLinkAnchor) {
-    el.subLinkAnchor.href = data.url;
+    el.subLinkAnchor.href = finalUrl;
     el.subLinkAnchor.classList.remove('hidden');
   }
   if (el.subLinkCard && el.subLinkCardAnchor) {
     el.subLinkCard.classList.remove('hidden');
-    el.subLinkCardAnchor.href = data.url;
-    el.subLinkCardAnchor.textContent = data.url;
+    el.subLinkCardAnchor.href = finalUrl;
+    el.subLinkCardAnchor.textContent = finalUrl;
   }
   setPublishStatus(`订阅链接已生成，可直接给 Clash 使用`, 'success');
-  return data.url;
+  return finalUrl;
 }
 
 el.publishBtn.addEventListener('click', () => {

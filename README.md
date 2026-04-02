@@ -1,6 +1,6 @@
 # smartclash-gen
 
-> 版本：**v0.13.30**
+> 版本：**v0.13.31**
 
 一个面向 **OpenClash + mihomo(type: smart)** 的配置生成器：
 
@@ -143,6 +143,11 @@ python3 generate.py \
 ---
 
 ## 版本更新说明
+
+### v0.13.31
+- 生成订阅链接时不再依赖后端回传的 host，前端统一按当前站点 `window.location.origin + /sub/latest` 构造最终链接；别人自行部署时，前缀会自动变成他们自己的域名
+- 本地已验证 `/sub/latest` 返回的是标准 `application/x-yaml` 内容，且包含 `proxies / proxy-groups / rules`，可作为 Clash 订阅读取
+- 维持每轮同步升级可见版本号与静态资源 query 的规则
 
 ### v0.13.30
 - 站点页签标题、页头品牌标题、验证标题与发布页版本提示重新同步，避免名称还停留在旧的 `smartclash-gen` 文案

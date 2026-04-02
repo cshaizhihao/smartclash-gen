@@ -101,6 +101,15 @@ if ! command -v docker >/dev/null 2>&1; then
   exit 1
 fi
 
+if docker compose version >/dev/null 2>&1; then
+  COMPOSE_CMD="docker compose"
+elif command -v docker-compose >/dev/null 2>&1; then
+  COMPOSE_CMD="docker-compose"
+else
+  echo "未检测到 docker compose / docker-compose，请先安装 Compose 后再运行本脚本。" >&2
+  exit 1
+fi
+
 mkdir -p "$TARGET_DIR"
 cd "$TARGET_DIR"
 mkdir -p web/published
@@ -129,21 +138,27 @@ services:
       - ./web/published:/app/web/published
 EOF
 
-if docker compose version >/dev/null 2>&1; then
-  docker compose up -d --build
-else
-  docker-compose up -d --build
-fi
+${COMPOSE_CMD} up -d --build
 
 auto_open_firewall "$WEB_PORT"
 PUBLIC_HOST=$(hostname -I 2>/dev/null | awk '{print $1}')
 [[ -n "${PUBLIC_HOST:-}" ]] || PUBLIC_HOST="127.0.0.1"
 
+sleep 2
+if curl -fsS "http://127.0.0.1:${WEB_PORT}" >/dev/null 2>&1; then
+  STATUS_TEXT="Web 编排台容器启动成功"
+else
+  STATUS_TEXT="容器已启动，但本机健康检查未通过，请执行 ${COMPOSE_CMD} logs -n 100 排查"
+fi
+
 echo "Clash Smart 分组编辑器 Docker 版已部署完成"
 echo "安装目录：$TARGET_DIR"
+echo "$STATUS_TEXT"
 echo "访问地址："
 echo "  http://127.0.0.1:${WEB_PORT}"
 echo "  http://${PUBLIC_HOST}:${WEB_PORT}"
 echo ""
 echo "如需停止："
-echo "  cd $TARGET_DIR && docker compose down"
+echo "  cd $TARGET_DIR && ${COMPOSE_CMD} down"
+echo "如需查看日志："
+echo "  cd $TARGET_DIR && ${COMPOSE_CMD} logs -n 100"
